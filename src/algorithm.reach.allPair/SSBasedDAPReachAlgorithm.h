@@ -7,9 +7,10 @@
 
 
 #include "DynamicAPReachAlgorithm.h"
-#include <algorithm.reach/cachingdfsssreachalgorithm.h>
 
-#include <map>
+
+#include <property/fastpropertymap.h>
+
 #include <memory>
 
 class SSBasedDAPReachAlgorithm : public DynamicAPReachAlgorithm{
@@ -18,7 +19,7 @@ class SSBasedDAPReachAlgorithm : public DynamicAPReachAlgorithm{
 
 public:
     typedef Algora::DynamicSSReachAlgorithm SSRAlgo;
-    typedef std::map<const Algora::Vertex *, std::unique_ptr<SSRAlgo>> VertexAlgoMap;
+    typedef Algora::FastPropertyMap<std::unique_ptr<Algora::DynamicSSReachAlgorithm>> VertexAlgoMap;
 
 
     explicit SSBasedDAPReachAlgorithm() : DynamicAPReachAlgorithm(){ }
@@ -58,7 +59,7 @@ private:
     VertexAlgoMap vertexMap;
 
     virtual void reset(){
-        vertexMap.clear();
+        vertexMap.resetAll();
         if(diGraph) init();
     }
 
