@@ -10,11 +10,32 @@
 
 
 class SimpleIncAPReachAlgorithm : SSBasedDAPReachAlgorithm{
-    std::string getName() const override;
+public:
 
-    std::string getShortName() const override;
+    explicit SimpleIncAPReachAlgorithm(bool reverse = false, bool searchForward = false, double maxUS= 1.0, bool radicalReset = false);
 
+    void setMaxUnknownStateSqrt();
+    void setMaxUnknownStateLog();
+    void relateToReachableVertices( bool rTR);
+
+    std::string getName() const noexcept override;
+
+    std::string getShortName() const noexcept override;
+
+private:
     SSRAlgo *createAlgorithm() override;
+
+
+private:
+
+    bool reverse;
+    bool searchForward;
+    double maxUS;
+    bool radicalReset;
+
+    bool relateToReachable;
+    bool maxUSLog;
+    bool maxUSSqrt;
 
 };
 

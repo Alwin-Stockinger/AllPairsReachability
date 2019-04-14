@@ -7,6 +7,7 @@
 
 
 #include "SSBasedDAPReachAlgorithm.h"
+#include <algorithm.reach/cachingdfsssreachalgorithm.h>
 
 class CachingDFSAPReachAlgorithm : SSBasedDAPReachAlgorithm{
     std::string getName() const noexcept override;
