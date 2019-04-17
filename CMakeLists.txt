@@ -15,7 +15,9 @@ link_directories("../DyReach/build/Release")
 link_libraries("libAlgoraDyn.a")
 link_libraries("libAlgoraCore.a")
 
-SET(OBJS "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/reachabilitysuite.o" src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/StaticBFSAPReachAlgorithm.cpp src/algorithm.reach.allPair/StaticBFSAPReachAlgorithm.h src/algorithm.reach.allPair/StaticDFSAPReachAlgorithm.cpp src/algorithm.reach.allPair/StaticDFSAPReachAlgorithm.h src/algorithm.reach.allPair/CachingBFSAPReachAlgorithm.cpp src/algorithm.reach.allPair/CachingBFSAPReachAlgorithm.h src/algorithm.reach.allPair/CachingDFSAPReachAlgorithm.cpp src/algorithm.reach.allPair/CachingDFSAPReachAlgorithm.h src/algorithm.reach.allPair/LazyBFSAPReachAlgorithm.cpp src/algorithm.reach.allPair/LazyBFSAPReachAlgorithm.h src/algorithm.reach.allPair/LazyDFSAPReachAlgorithm.cpp src/algorithm.reach.allPair/LazyDFSAPReachAlgorithm.h src/algorithm.reach.allPair/SimpleIncAPReachAlgorithm.cpp src/algorithm.reach.allPair/SimpleIncAPReachAlgorithm.h)
+
+#src
+SET(OBJS "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/reachabilitysuite.o" src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h )
 
 add_executable(AllPairReach src/main.cpp ${OBJS})
 
@@ -29,7 +31,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 
 #unit tests
-SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestStaticBFSAPReachAlgorithm.cpp)
+SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestSSBasedDAPReachAlgorithm.cpp)
 
 add_executable(runTests ${TESTS} ${OBJS})
 

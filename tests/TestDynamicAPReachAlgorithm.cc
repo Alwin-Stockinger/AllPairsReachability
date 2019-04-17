@@ -30,3 +30,13 @@ TEST_P(TestDynamicAPReachAlgorithm, testwrongArc) {
 
     ASSERT_FALSE(algorithm -> query(vertex1, vertex3));
 }
+
+TEST_P(TestDynamicAPReachAlgorithm, testArcInWrongDirection) {
+    Algora::Vertex* vertex1 = dynamicDiGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex2 = dynamicDiGraph -> getCurrentVertexForId(2);
+
+    dynamicDiGraph -> addArc(2,1,1);
+    dynamicDiGraph -> applyNextDelta();
+
+    ASSERT_FALSE(algorithm -> query(vertex1, vertex2));
+}

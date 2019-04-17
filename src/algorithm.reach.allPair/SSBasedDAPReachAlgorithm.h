@@ -12,18 +12,23 @@
 #include <property/fastpropertymap.h>
 
 #include <memory>
+#include <type_traits>
 
-class SSBasedDAPReachAlgorithm : public DynamicAPReachAlgorithm{
+template <typename T>
+class SSBasedDAPReachAlgorithm : public DynamicAPReachAlgorithm {
 
-
+    static_assert(std::is_base_of<Algora::DynamicSSReachAlgorithm,T>::value, "Template Parameter has to inherite from Algora::DynamicSSReachAlgorithm");
 
 public:
-    typedef Algora::DynamicSSReachAlgorithm SSRAlgo;
-    typedef Algora::FastPropertyMap<std::unique_ptr<Algora::DynamicSSReachAlgorithm>> VertexAlgoMap;
+    typedef Algora::FastPropertyMap<T*> VertexAlgoMap;
+
+    std::string getName() const noexcept override;
+
+    std::string getShortName() const noexcept override;
 
 
     explicit SSBasedDAPReachAlgorithm() : DynamicAPReachAlgorithm(){ }
-    ~SSBasedDAPReachAlgorithm() override = default;
+    ~SSBasedDAPReachAlgorithm() override;
 
 
     // DiGraphAlgorithm interface
@@ -51,25 +56,20 @@ protected:
         reset();
     }
 
-    //Factory Method for specific Algorithm creation
-    virtual SSRAlgo* createAlgorithm() = 0;
+
 
 private:
 
     VertexAlgoMap vertexMap;
 
-    virtual void reset(){
-        vertexMap.resetAll();
-        if(diGraph) init();
-    }
+    virtual void reset();
 
     virtual void init();
 
     virtual void addVertexToMap(Algora::Vertex *vertex);
 
+    virtual void deleteAllAlgorithms();
+
 };
-
-
-
 
 #endif //ALLPAIRREACH_DYNAMICAPREACHALGORITHM_H

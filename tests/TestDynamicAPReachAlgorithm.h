@@ -10,7 +10,6 @@
 #include "gtest/gtest.h"
 
 #include "../src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h"
-#include "../src/algorithm.reach.allPair/StaticBFSAPReachAlgorithm.h"
 
 class TestDynamicAPReachAlgorithm : public testing::TestWithParam<DynamicAPReachAlgorithm*>{
 
