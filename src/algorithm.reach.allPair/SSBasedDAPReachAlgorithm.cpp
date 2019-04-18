@@ -54,7 +54,7 @@ void SSBasedDAPReachAlgorithm<T>::init() {
 template<typename T>
 void SSBasedDAPReachAlgorithm<T>::addVertexToMap(Algora::Vertex *vertex) {
 
-    T *algorithm = new T;
+    auto *algorithm = new T;
 
     algorithm->setGraph(diGraph);
     algorithm->setSource(vertex);

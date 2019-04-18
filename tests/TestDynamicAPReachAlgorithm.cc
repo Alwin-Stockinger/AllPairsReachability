@@ -40,3 +40,30 @@ TEST_P(TestDynamicAPReachAlgorithm, testArcInWrongDirection) {
 
     ASSERT_FALSE(algorithm -> query(vertex1, vertex2));
 }
+
+TEST_P(TestDynamicAPReachAlgorithm, testArcRemove) {
+    Algora::Vertex* vertex1 = dynamicDiGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex2 = dynamicDiGraph -> getCurrentVertexForId(2);
+
+    dynamicDiGraph -> addArc(1,2,1);
+    dynamicDiGraph -> applyNextDelta();
+
+    ASSERT_TRUE(algorithm -> query(vertex1, vertex2));
+
+    dynamicDiGraph -> removeArc(1,2,2);
+    dynamicDiGraph -> applyNextDelta();
+
+    ASSERT_FALSE(algorithm -> query(vertex1, vertex2));
+}
+
+TEST_P(TestDynamicAPReachAlgorithm, testMultipleArcWay) {
+    Algora::Vertex* vertex1 = dynamicDiGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex3 = dynamicDiGraph -> getCurrentVertexForId(3);
+
+    dynamicDiGraph -> addArc(1,2,1);
+    dynamicDiGraph -> addArc(2,3,1);
+    dynamicDiGraph -> applyNextDelta();
+
+    ASSERT_TRUE(algorithm -> query(vertex1, vertex3));
+}
+
