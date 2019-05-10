@@ -17,6 +17,8 @@ public:
 
     virtual bool query(const Algora::Vertex *start,const  Algora::Vertex *end) = 0;
 
+    bool containsVertex(const Algora::Vertex* vertex);
+
 };
 
 
