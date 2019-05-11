@@ -17,7 +17,7 @@ link_libraries("libAlgoraCore.a")
 
 
 #src
-SET(OBJS "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/reachabilitysuite.o" src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h )
+SET(OBJS "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/reachabilitysuite.o" src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h)
 
 add_executable(AllPairReach src/main.cpp ${OBJS})
 
@@ -36,3 +36,8 @@ SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm
 add_executable(runTests ${TESTS} ${OBJS})
 
 target_link_libraries(runTests  gtest_main)
+
+
+SET(CONVERT src/converter/GraphFileConverter.cpp src/converter/GraphFileConverter.h src/converter/ConverterMain.cpp)
+
+add_executable(converter ${CONVERT})
