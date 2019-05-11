@@ -5,6 +5,7 @@
 #ifndef ALLPAIRREACH_PARTITIONEDDAPREACHALGORITHM_H
 #define ALLPAIRREACH_PARTITIONEDDAPREACHALGORITHM_H
 
+#include <map>
 
 #include "DynamicAPReachAlgorithm.h"
 #include "SSBasedDAPReachAlgorithm.h"
@@ -33,7 +34,7 @@ private:
     T overlayAlgorithm;
 
     std::vector<T*> apAlgorithms;
-    Algora::FastPropertyMap<std::vector<Algora::Vertex*>> edgeVertices;
+    std::map<DynamicAPReachAlgorithm,std::vector<Algora::Vertex*>> edgeVertices;
 
     void deleteAlgorithms();
 

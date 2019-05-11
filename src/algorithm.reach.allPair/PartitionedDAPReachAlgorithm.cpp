@@ -53,7 +53,7 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
 
         std::vector<Algora::Vertex *> reachableEdges;
 
-        std::vector<Algora::Vertex *> startEdgeVertices = edgeVertices.getValue(startGraphAlgorithm);
+        std::vector<Algora::Vertex *> startEdgeVertices = edgeVertices.at(startGraphAlgorithm);
 
         //find outgoing vertices
         for (Algora::Vertex *vertex : startEdgeVertices) {
@@ -62,7 +62,7 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
             }
         }
 
-        std::vector<Algora::Vertex *> endEdgeVertices = edgeVertices.getValue(endGraphAlgorithm);
+        std::vector<Algora::Vertex *> endEdgeVertices = edgeVertices.at(endGraphAlgorithm);
         std::vector<Algora::Vertex *> overlayConnectedVertices;
 
 
@@ -108,6 +108,8 @@ void PartitionedDAPReachAlgorithm<T>::deleteAlgorithms() {
     delete overlayAlgorithm;
 
     apAlgorithms.clear();
+
+    edgeVertices.clear();
 }
 
 template<typename T>
@@ -119,8 +121,16 @@ PartitionedDAPReachAlgorithm<T>::setGraphs(std::vector<Algora::DiGraph *> *graph
 
     //create new Algorithms
     overlayAlgorithm = new T(connectorGraph);
-    for(Algora::DiGraph* graph : *graphs){
-        apAlgorithms.push_back( new T(graph));
+    for (Algora::DiGraph *graph : *graphs) {
+        DynamicAPReachAlgorithm* algorithm = new T(graph);
+        apAlgorithms.push_back( algorithm);
+
+        std::vector<Algora::Vertex*> edgesOfGraph;
+        graph->mapVertices([&edgesOfGraph, &connectorGraph](Algora::Vertex *vertex) {
+            if( connectorGraph->containsVertex(vertex)){
+                edgesOfGraph.push_back(vertex);
+            }
+        });
+        edgeVertices.insert(algorithm, edgesOfGraph);
     }
 }
-
