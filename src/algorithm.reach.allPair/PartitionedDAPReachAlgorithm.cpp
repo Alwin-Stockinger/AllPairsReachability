@@ -76,7 +76,7 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
         }
 
         //check for connections
-        for(Algora::Vertex *overlayVertex : containsVertex()){
+        for(Algora::Vertex *overlayVertex : overlayConnectedVertices){
             if( endGraphAlgorithm->query(overlayVertex, end)){
                 return true;
             }
@@ -131,6 +131,6 @@ PartitionedDAPReachAlgorithm<T>::setGraphs(std::vector<Algora::DiGraph *> *graph
                 edgesOfGraph.push_back(vertex);
             }
         });
-        edgeVertices.insert(algorithm, edgesOfGraph);
+        edgeVertices.insert({algorithm, edgesOfGraph});
     }
 }

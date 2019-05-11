@@ -34,7 +34,7 @@ private:
     T overlayAlgorithm;
 
     std::vector<T*> apAlgorithms;
-    std::map<DynamicAPReachAlgorithm,std::vector<Algora::Vertex*>> edgeVertices;
+    std::map<DynamicAPReachAlgorithm*,std::vector<Algora::Vertex*>> edgeVertices;
 
     void deleteAlgorithms();
 
