@@ -31,9 +31,9 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 
 #unit tests
-SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestSSBasedDAPReachAlgorithm.cpp)
+SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestSSBasedDAPReachAlgorithm.cpp tests/TestPartitionedDAPReachAlgorithm.cpp)
 
-add_executable(runTests ${TESTS} ${OBJS})
+add_executable(runTests ${OBJS} ${TESTS})
 
 target_link_libraries(runTests  gtest_main)
 

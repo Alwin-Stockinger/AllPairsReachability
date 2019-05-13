@@ -4,6 +4,8 @@
 
 #include "PartitionedDAPReachAlgorithm.h"
 
+#include <algorithm.reach/staticbfsssreachalgorithm.h>
+
 template<typename T>
 void PartitionedDAPReachAlgorithm<T>::run() {
     overlayAlgorithm -> run();
@@ -54,31 +56,23 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
         std::vector<Algora::Vertex *> reachableEdges;
 
         std::vector<Algora::Vertex *> startEdgeVertices = edgeVertices.at(startGraphAlgorithm);
-
-        //find outgoing vertices
-        for (Algora::Vertex *vertex : startEdgeVertices) {
-            if (startGraphAlgorithm->query(start, vertex)) {
-                reachableEdges.push_back(vertex);
-            }
-        }
-
         std::vector<Algora::Vertex *> endEdgeVertices = edgeVertices.at(endGraphAlgorithm);
         std::vector<Algora::Vertex *> overlayConnectedVertices;
 
+        //find outgoing vertices
+        for (Algora::Vertex *outVertex : startEdgeVertices) {
 
-        //find connections in overlay graph
-        for(Algora::Vertex *startVertex : reachableEdges){
-            for(Algora::Vertex *endVertex : endEdgeVertices){
-                if( overlayAlgorithm.query(startVertex, endVertex)){
-                    overlayConnectedVertices.push_back(endVertex);
+            if (startGraphAlgorithm->query(start, outVertex)) {
+
+                for(Algora::Vertex *inVertex : endEdgeVertices){
+                    if( overlayAlgorithm->query(outVertex, inVertex)){      //save which ends already visited?
+
+                        if( endGraphAlgorithm->query(inVertex, end)){
+                            return true;
+                        }
+
+                    }
                 }
-            }
-        }
-
-        //check for connections
-        for(Algora::Vertex *overlayVertex : overlayConnectedVertices){
-            if( endGraphAlgorithm->query(overlayVertex, end)){
-                return true;
             }
         }
 
@@ -89,7 +83,7 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
 }
 
 template<typename T>
-PartitionedDAPReachAlgorithm<T>::PartitionedDAPReachAlgorithm(std::vector<Algora::DiGraph *>* graphs,
+PartitionedDAPReachAlgorithm<T>::PartitionedDAPReachAlgorithm(std::vector<Algora::DiGraph *> graphs,
                                                               Algora::DiGraph* connectorGraph) : DynamicAPReachAlgorithm() {
     setGraphs(graphs, connectorGraph);
 }
@@ -114,15 +108,17 @@ void PartitionedDAPReachAlgorithm<T>::deleteAlgorithms() {
 
 template<typename T>
 void
-PartitionedDAPReachAlgorithm<T>::setGraphs(std::vector<Algora::DiGraph *> *graphs, Algora::DiGraph *connectorGraph) {
+PartitionedDAPReachAlgorithm<T>::setGraphs(std::vector<Algora::DiGraph *> graphs, Algora::DiGraph *connectorGraph) {
     //delete old Algorithms
     deleteAlgorithms();
 
 
     //create new Algorithms
-    overlayAlgorithm = new T(connectorGraph);
-    for (Algora::DiGraph *graph : *graphs) {
-        DynamicAPReachAlgorithm* algorithm = new T(graph);
+    overlayAlgorithm = new T();
+    overlayAlgorithm->setGraph(connectorGraph);
+    for (Algora::DiGraph *graph : graphs) {
+        T* algorithm = new T();
+        algorithm -> setGraph(graph);
         apAlgorithms.push_back( algorithm);
 
         std::vector<Algora::Vertex*> edgesOfGraph;
@@ -134,3 +130,33 @@ PartitionedDAPReachAlgorithm<T>::setGraphs(std::vector<Algora::DiGraph *> *graph
         edgeVertices.insert({algorithm, edgesOfGraph});
     }
 }
+
+template<typename T>
+void PartitionedDAPReachAlgorithm<T>::onVertexAdd(Algora::Vertex *vertex) {
+    DynamicDiGraphAlgorithm::onVertexAdd(vertex);
+
+    //TODO
+}
+
+template<typename T>
+void PartitionedDAPReachAlgorithm<T>::onVertexRemove(Algora::Vertex *vertex) {
+    DynamicDiGraphAlgorithm::onVertexRemove(vertex);
+
+    //TODO
+}
+
+template<typename T>
+void PartitionedDAPReachAlgorithm<T>::onArcAdd(Algora::Arc *arc) {
+    DynamicDiGraphAlgorithm::onArcAdd(arc);
+
+    //TODO
+}
+
+template<typename T>
+void PartitionedDAPReachAlgorithm<T>::onArcRemove(Algora::Arc *arc) {
+    DynamicDiGraphAlgorithm::onArcRemove(arc);
+
+    //TODO
+}
+
+template class PartitionedDAPReachAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>;
