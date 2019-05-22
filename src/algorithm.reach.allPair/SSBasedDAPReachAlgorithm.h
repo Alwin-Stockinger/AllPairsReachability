@@ -47,12 +47,12 @@ protected:
 
     // DiGraphAlgorithm interface
     void onDiGraphSet() override {
-        DynamicDiGraphAlgorithm::onDiGraphSet();
-        reset();
+        DynamicAPReachAlgorithm::onDiGraphSet();
+        init();
     };
 
     void onDiGraphUnset() override {
-        DynamicDiGraphAlgorithm::onDiGraphUnset();
+        DynamicAPReachAlgorithm::onDiGraphUnset();
         reset();
     }
 

@@ -21,6 +21,22 @@ TEST_P(TestDynamicAPReachAlgorithm, testArc) {
     ASSERT_TRUE(algorithm -> query(vertex1, vertex2));
 }
 
+TEST_P(TestDynamicAPReachAlgorithm, testTwoWayArc) {
+    Algora::Vertex* vertex1 = dynamicDiGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex2 = dynamicDiGraph -> getCurrentVertexForId(2);
+
+    dynamicDiGraph -> addArc(1,2,1);
+    dynamicDiGraph -> applyNextDelta();
+
+    ASSERT_TRUE(algorithm -> query(vertex1, vertex2));
+    ASSERT_FALSE(algorithm -> query(vertex2, vertex1));
+
+    dynamicDiGraph -> addArc(2,1,2);
+    dynamicDiGraph -> applyNextDelta();
+
+    ASSERT_TRUE(algorithm -> query(vertex2, vertex1));
+}
+
 TEST_P(TestDynamicAPReachAlgorithm, testwrongArc) {
     Algora::Vertex* vertex1 = dynamicDiGraph -> getCurrentVertexForId(1);
     Algora::Vertex* vertex3 = dynamicDiGraph -> getCurrentVertexForId(3);

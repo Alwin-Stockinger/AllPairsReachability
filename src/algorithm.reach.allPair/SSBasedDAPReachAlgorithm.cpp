@@ -78,7 +78,6 @@ void SSBasedDAPReachAlgorithm<T>::reset() {
     deleteAllAlgorithms();
 
     vertexMap.resetAll();
-    if(diGraph) init();
 }
 
 template<typename T>

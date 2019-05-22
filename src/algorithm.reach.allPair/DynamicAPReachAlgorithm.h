@@ -19,6 +19,12 @@ public:
 
     bool containsVertex(const Algora::Vertex* vertex);
 
+    Algora::Arc* addArc(Algora::Vertex* head, Algora::Vertex* tail );
+
+    void removeArc(Algora::Vertex* head, Algora::Vertex* tail);
+
+    bool isIsolated(const Algora::Vertex* vertex);
+
 };
 
 

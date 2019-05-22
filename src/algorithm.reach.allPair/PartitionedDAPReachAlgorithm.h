@@ -6,17 +6,22 @@
 #define ALLPAIRREACH_PARTITIONEDDAPREACHALGORITHM_H
 
 #include <map>
+#include <set>
 
 #include "DynamicAPReachAlgorithm.h"
 #include "SSBasedDAPReachAlgorithm.h"
 
 template <typename T>
-class PartitionedDAPReachAlgorithm : DynamicAPReachAlgorithm{
+class PartitionedDAPReachAlgorithm : public DynamicAPReachAlgorithm{
 
 public:
     static_assert(std::is_base_of<DynamicAPReachAlgorithm,T>::value, "Template Parameter has to inherit from DynamicApAlgorithm");
 
-    explicit PartitionedDAPReachAlgorithm(std::vector<Algora::DiGraph*> graphs, Algora::DiGraph* connectorGraph);
+    explicit PartitionedDAPReachAlgorithm() : DynamicAPReachAlgorithm(){};
+
+    explicit PartitionedDAPReachAlgorithm(std::vector<Algora::DiGraph *> &graphs, Algora::DiGraph *overlayGraph,
+                                          std::map<const Algora::Vertex *, Algora::Vertex *> &inMap,
+                                          std::map<const Algora::Vertex *, Algora::Vertex *> &mainToOverlayMap);
 
     ~PartitionedDAPReachAlgorithm() override;
 
@@ -28,7 +33,7 @@ public:
 
     bool query(const Algora::Vertex *start, const Algora::Vertex *end) override;
 
-    void setGraphs(std::vector<Algora::DiGraph*> graphs, Algora::DiGraph* connectorGraph);
+    void setGraphs(std::vector<Algora::DiGraph *>* graphs, Algora::DiGraph *overlayGraph, std::map<const Algora::Vertex*,Algora::Vertex*>& inMap, std::map<const Algora::Vertex*, Algora::Vertex*>& mainToOverlayMap);
 
 protected:
 
@@ -44,10 +49,14 @@ private:
 private:
     T* overlayAlgorithm = nullptr;
 
-    std::vector<T*> apAlgorithms;
-    std::map<DynamicAPReachAlgorithm*,std::vector<Algora::Vertex*>> edgeVertices;
+    std::set<T*> apAlgorithms;
+    std::map<DynamicAPReachAlgorithm*, std::set<Algora::Vertex*>> edgeVertices;
+    std::map<const Algora::Vertex*,Algora::Vertex*> inMap;
+    std::map<const Algora::Vertex*,Algora::Vertex*> mainToOverlayMap;
+
 
     void deleteAlgorithms();
+    T* findAlgorithm(const Algora::Vertex* vertex);
 
 };
 
