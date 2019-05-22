@@ -9,17 +9,27 @@
 
 #include <algorithm.reach/staticbfsssreachalgorithm.h>
 #include <graph.dyn/dynamicdigraph.h>
-#include <graph/subdigraph.h>
+#include <algorithm.reach/staticdfsssreachalgorithm.h>
+#include <algorithm.reach/cachingbfsssreachalgorithm.h>
+#include <algorithm.reach/cachingdfsssreachalgorithm.h>
+#include <algorithm.reach/lazydfsssreachalgorithm.h>
+#include <algorithm.reach/lazybfsssreachalgorithm.h>
+#include <algorithm.reach/simpleincssreachalgorithm.h>
+#include <algorithm.reach.es/estree-queue.h>
+#include <algorithm.reach.es/estree-bqueue.h>
+#include <algorithm.reach.es/estree-ml.h>
+#include <algorithm.reach.es/simpleestree.h>
 
 
+template <typename T>
 class TestPartitionedDAPReachAlgorithm : public testing::Test{
 
 protected:
-    PartitionedDAPReachAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>* algorithm;
+    PartitionedDAPReachAlgorithm<T>* algorithm{};
 
-    Algora::DynamicDiGraph* mainGraph;
+    Algora::DynamicDiGraph* mainGraph{};
     std::vector<Algora::DynamicDiGraph*> graphs;
-    Algora::DynamicDiGraph* overlayGraph;
+    Algora::DynamicDiGraph* overlayGraph{};
 
     std::vector<Algora::DiGraph*> subGraphs;
 
@@ -118,130 +128,131 @@ public:
         }
 
 
-        algorithm = new PartitionedDAPReachAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>();
+        algorithm = new PartitionedDAPReachAlgorithm<T>();
         algorithm->setGraph(mainGraph->getDiGraph());
         algorithm->setGraphs(
                 &subGraphs, overlayGraph->getDiGraph(), inMap, mainToOverlayMap);
     }
 };
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testSameRegion){
+using TestTypes = ::testing::Types<SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::ESTreeQ>, SSBasedDAPReachAlgorithm<Algora::OldESTree>, SSBasedDAPReachAlgorithm<Algora::ESTreeML>, SSBasedDAPReachAlgorithm<Algora::SimpleESTree>>;
+TYPED_TEST_SUITE(TestPartitionedDAPReachAlgorithm, TestTypes);
 
-    Algora::Vertex* vertex1 = mainGraph -> getCurrentVertexForId(1);
-    Algora::Vertex* vertex2 = mainGraph -> getCurrentVertexForId(2);
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testSameRegion){
 
-    ASSERT_TRUE(algorithm -> query(vertex1, vertex2));
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex2 = this->mainGraph -> getCurrentVertexForId(2);
+
+    ASSERT_TRUE(this->algorithm -> query(vertex1, vertex2));
 }
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testOverlayConnection){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testOverlayConnection){
 
-    Algora::Vertex* vertex1 = mainGraph -> getCurrentVertexForId(1);
-    Algora::Vertex* vertex4 = mainGraph -> getCurrentVertexForId(4);
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex4 = this->mainGraph -> getCurrentVertexForId(4);
 
-    ASSERT_TRUE(algorithm -> query(vertex1, vertex4));
+    ASSERT_TRUE(this->algorithm -> query(vertex1, vertex4));
 }
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testSameVertex){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testSameVertex){
 
-    Algora::Vertex* vertex1 = mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
 
-    ASSERT_TRUE(algorithm -> query(vertex1, vertex1));
+    ASSERT_TRUE(this->algorithm -> query(vertex1, vertex1));
 }
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testWrongDirection){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testWrongDirection){
 
-    Algora::Vertex* vertex1 = mainGraph -> getCurrentVertexForId(1);
-    Algora::Vertex* vertex4 = mainGraph -> getCurrentVertexForId(4);
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex4 = this->mainGraph -> getCurrentVertexForId(4);
 
-    ASSERT_FALSE(algorithm -> query(vertex4, vertex1));
+    ASSERT_FALSE(this->algorithm -> query(vertex4, vertex1));
 }
 
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testDynamicSameRegion1){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testDynamicSameRegion1){
 
-    Algora::Vertex* vertex2 = mainGraph -> getCurrentVertexForId(2);
-    Algora::Vertex* vertex1 = mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex2 = this->mainGraph -> getCurrentVertexForId(2);
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
 
-    ASSERT_FALSE(algorithm -> query(vertex2, vertex1));
+    ASSERT_FALSE(this->algorithm -> query(vertex2, vertex1));
 
-    mainGraph->addArc(2,1,1);
+    this->mainGraph->addArc(2,1,1);
 
-    mainGraph->applyNextDelta();
+    this->mainGraph->applyNextDelta();
 
-    ASSERT_TRUE(algorithm -> query(vertex2, vertex1));
+    ASSERT_TRUE(this->algorithm -> query(vertex2, vertex1));
 }
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testDynamicSameRegion2){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testDynamicSameRegion2){
 
-    Algora::Vertex* vertex3 = mainGraph -> getCurrentVertexForId(3);
-    Algora::Vertex* vertex4 = mainGraph -> getCurrentVertexForId(4);
+    Algora::Vertex* vertex3 = this->mainGraph -> getCurrentVertexForId(3);
+    Algora::Vertex* vertex4 = this->mainGraph -> getCurrentVertexForId(4);
 
-    ASSERT_FALSE(algorithm -> query(vertex4, vertex3));
+    ASSERT_FALSE(this->algorithm -> query(vertex4, vertex3));
 
-    mainGraph->addArc(4,3,1);
-    mainGraph->applyNextDelta();
+    this->mainGraph->addArc(4,3,1);
+    this->mainGraph->applyNextDelta();
 
-    ASSERT_TRUE(algorithm -> query(vertex4, vertex3));
+    ASSERT_TRUE(this->algorithm -> query(vertex4, vertex3));
 }
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testDynamicOtherRegion){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testDynamicOtherRegion){
 
-    Algora::Vertex* vertex1 = mainGraph -> getCurrentVertexForId(1);
-    Algora::Vertex* vertex2 = mainGraph -> getCurrentVertexForId(2);
-    Algora::Vertex* vertex3 = mainGraph -> getCurrentVertexForId(3);
-    Algora::Vertex* vertex4 = mainGraph -> getCurrentVertexForId(4);
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex2 = this->mainGraph -> getCurrentVertexForId(2);
+    Algora::Vertex* vertex3 = this->mainGraph -> getCurrentVertexForId(3);
+    Algora::Vertex* vertex4 = this->mainGraph -> getCurrentVertexForId(4);
 
-    ASSERT_FALSE(algorithm -> query(vertex4, vertex1));
+    ASSERT_FALSE(this->algorithm -> query(vertex4, vertex1));
 
-    mainGraph->addArc(4,3,1);
-    mainGraph->addArc(3,2,1);
-    mainGraph->addArc(2,1,1);
-    mainGraph->applyNextDelta();
+    this->mainGraph->addArc(4,3,1);
+    this->mainGraph->addArc(3,2,1);
+    this->mainGraph->addArc(2,1,1);
+    this->mainGraph->applyNextDelta();
 
 
-    //ASSERT_TRUE(algorithm -> query(vertex2, vertex1));
-    ASSERT_TRUE(algorithm -> query(vertex3, vertex2));
-    //ASSERT_TRUE(algorithm -> query(vertex4, vertex3));
-    ASSERT_TRUE(algorithm -> query(vertex4, vertex1));
+    ASSERT_TRUE(this->algorithm -> query(vertex3, vertex2));
+    ASSERT_TRUE(this->algorithm -> query(vertex4, vertex1));
 }
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testDynamicOverlayRegion){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testDynamicOverlayRegion){
 
-    Algora::Vertex* vertex3 = mainGraph -> getCurrentVertexForId(3);
-    Algora::Vertex* vertex2 = mainGraph -> getCurrentVertexForId(2);
+    Algora::Vertex* vertex3 = this->mainGraph -> getCurrentVertexForId(3);
+    Algora::Vertex* vertex2 = this->mainGraph -> getCurrentVertexForId(2);
 
-    ASSERT_FALSE(algorithm -> query(vertex3, vertex2));
+    ASSERT_FALSE(this->algorithm -> query(vertex3, vertex2));
 
-    mainGraph->addArc(3,2,1);
-    mainGraph->applyNextDelta();
+    this->mainGraph->addArc(3,2,1);
+    this->mainGraph->applyNextDelta();
 
-    ASSERT_TRUE(algorithm -> query(vertex3, vertex2));
+    ASSERT_TRUE(this->algorithm -> query(vertex3, vertex2));
 }
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testOverlayRegion){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testOverlayRegion){
 
-    Algora::Vertex* vertex3 = mainGraph -> getCurrentVertexForId(3);
-    Algora::Vertex* vertex2 = mainGraph -> getCurrentVertexForId(2);
+    Algora::Vertex* vertex3 = this->mainGraph -> getCurrentVertexForId(3);
+    Algora::Vertex* vertex2 = this->mainGraph -> getCurrentVertexForId(2);
 
-    ASSERT_TRUE(algorithm -> query(vertex2, vertex3));
+    ASSERT_TRUE(this->algorithm -> query(vertex2, vertex3));
 }
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testOverlayMultipleVertices){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testOverlayMultipleVertices){
 
-    Algora::Vertex* vertex6 = mainGraph -> getCurrentVertexForId(6);
-    Algora::Vertex* vertex4 = mainGraph -> getCurrentVertexForId(4);
+    Algora::Vertex* vertex6 = this->mainGraph -> getCurrentVertexForId(6);
+    Algora::Vertex* vertex4 = this->mainGraph -> getCurrentVertexForId(4);
 
-    ASSERT_TRUE(algorithm -> query(vertex6, vertex4));
+    ASSERT_TRUE(this->algorithm -> query(vertex6, vertex4));
 }
 
-TEST_F(TestPartitionedDAPReachAlgorithm, testNewOverlayVertex){
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testNewOverlayVertex){
 
-    Algora::Vertex* vertex1 = mainGraph -> getCurrentVertexForId(1);
-    Algora::Vertex* vertex7 = mainGraph -> getCurrentVertexForId(7);
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex7 = this->mainGraph -> getCurrentVertexForId(7);
 
-    mainGraph->addArc(6,1,1);
-    mainGraph->applyNextDelta();
+    this->mainGraph->addArc(6,1,1);
+    this->mainGraph->applyNextDelta();
 
-    ASSERT_TRUE(algorithm -> query(vertex7, vertex1));
+    ASSERT_TRUE(this->algorithm -> query(vertex7, vertex1));
 }
 
