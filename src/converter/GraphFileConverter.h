@@ -31,7 +31,7 @@ public:
     makeSubGraphs(const std::string &graphFileName, std::map<unsigned int, unsigned int> &partitionMap);
 
     static void addSubVertices(const std::map<unsigned int, unsigned int> &partitionMap,
-                               Algora::DynamicDiGraph *graphs);
+                               std::vector<Algora::DynamicDiGraph*> *graphs);
 
     static std::map<const Algora::Vertex *, Algora::Vertex *> *
     makeMainToOverlayMap(Algora::DynamicDiGraph *mainGraph, Algora::DynamicDiGraph *overlayGraph);

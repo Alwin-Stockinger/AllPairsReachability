@@ -16,10 +16,12 @@ link_libraries("libAlgoraDyn.a")
 link_libraries("libAlgoraCore.a")
 
 
-#src
-SET(OBJS "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/reachabilitysuite.o" src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h)
+SET(CONVERT src/converter/GraphFileConverter.cpp src/converter/GraphFileConverter.h )
 
-add_executable(AllPairReach src/main.cpp ${OBJS})
+#src
+SET(OBJS "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/reachabilitysuite.o" src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h src/handler/AlgorithmHandler.cpp src/handler/AlgorithmHandler.h)
+
+add_executable(AllPairReach src/main.cpp ${OBJS} ${CONVERT})
 
 
 #gtest
@@ -38,6 +40,6 @@ add_executable(runTests ${OBJS} ${TESTS})
 target_link_libraries(runTests  gtest_main)
 
 
-SET(CONVERT src/converter/GraphFileConverter.cpp src/converter/GraphFileConverter.h src/converter/ConverterMain.cpp)
 
-add_executable(converter ${CONVERT})
+
+add_executable(converter src/converter/ConverterMain.cpp ${CONVERT})

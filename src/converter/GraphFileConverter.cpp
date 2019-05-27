@@ -7,7 +7,7 @@
 #include "GraphFileConverter.h"
 
 
-
+//TODO make ids unsigned long long
 
 void GraphFileConverter::convertDiToUnDi(const std::string &inName, const std::string &outName) {
     std::ifstream inFile(inName);
@@ -81,7 +81,7 @@ Algora::DynamicDiGraph * GraphFileConverter::readGraph(const std::string &fileNa
             std::string neighbourString;
 
             while(std::getline(ss, neighbourString, ' ')){
-                graph->addArc(std::stoul(neighbourString), i, 0);
+                graph->addArc(i , std::stoul(neighbourString), 0);
             }
         }
         graph->applyNextDelta();
@@ -117,7 +117,7 @@ GraphFileConverter::makeOverlay(const std::string &graphFileName, std::map<unsig
                 unsigned neighbourId = std::stoul(neighbourString);
 
                 if(partitionMap[i] != partitionMap[neighbourId]){
-                    graph->addArc(neighbourId, i, 0);
+                    graph->addArc(i, neighbourId, 0);
                 }
             }
         }
@@ -178,7 +178,7 @@ GraphFileConverter::makeSubGraphs(const std::string &graphFileName,
         subGraphs->push_back(new Algora::DynamicDiGraph);
     }
 
-    addSubVertices(partitionMap, nullptr);
+    addSubVertices(partitionMap, subGraphs);
 
     std::ifstream graphFile(graphFileName);
     if(graphFile.good()) {
@@ -193,7 +193,7 @@ GraphFileConverter::makeSubGraphs(const std::string &graphFileName,
             while(std::getline(graphSS, neighbourString, ' ')){
                 unsigned neighbourId = std::stoul(neighbourString);
                 if(partitionMap[i] == partitionMap[neighbourId]){
-                    subGraphs->at(partitionMap[i])->addArc(neighbourId, i, 0);
+                    subGraphs->at(partitionMap[i])->addArc(i, neighbourId, 0);
                 }
             }
 
@@ -216,19 +216,20 @@ GraphFileConverter::makeSubGraphs(const std::string &graphFileName,
 
 void
 GraphFileConverter::addSubVertices(const std::map<unsigned int, unsigned int> &partitionMap,
-                                   Algora::DynamicDiGraph *graphs) {
+                                   std::vector<Algora::DynamicDiGraph*> *graphs) {
     for(const auto &[id, partition]: partitionMap){
-        graphs[partition].addVertex(id, 0);
+        graphs->at(partition)->addVertex(id, 0);
     }
 }
 
 std::map<const Algora::Vertex *, Algora::Vertex *> *
 GraphFileConverter::makeMainToOverlayMap(Algora::DynamicDiGraph *mainGraph, Algora::DynamicDiGraph *overlayGraph) {
 
-    auto* vertexMap = new std::map<const Algora::Vertex*, Algora::Vertex*>();
+    auto* vertexMap = new std::map<const Algora::Vertex*, Algora::Vertex*>;
 
     for(unsigned i = 1; i < mainGraph->getCurrentGraphSize()+1; i++){
-        vertexMap->insert(mainGraph->getCurrentVertexForId(i), overlayGraph->getCurrentVertexForId(i));
+        Algora::Vertex* keyVertex = mainGraph->getCurrentVertexForId(i);
+        vertexMap->insert({keyVertex, overlayGraph->getCurrentVertexForId(i)});
     }
     return vertexMap;
 }
@@ -241,7 +242,7 @@ GraphFileConverter::makeInMap(Algora::DynamicDiGraph *overlayGraph, std::vector<
     for(unsigned i = 1; i < overlayGraph->getCurrentGraphSize()+1; i++){
         Algora::DynamicDiGraph* subGraph = subGraphs->at(partitionMap[i]);
         Algora::Vertex* subVertex = subGraph->getCurrentVertexForId(i);
-        vertexMap->insert(overlayGraph->getCurrentVertexForId(i), subVertex);
+        vertexMap->insert({overlayGraph->getCurrentVertexForId(i),subVertex});
     }
     return vertexMap;
 }
