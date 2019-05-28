@@ -40,6 +40,4 @@ add_executable(runTests ${OBJS} ${TESTS})
 target_link_libraries(runTests  gtest_main)
 
 
-
-
 add_executable(converter src/converter/ConverterMain.cpp ${CONVERT})

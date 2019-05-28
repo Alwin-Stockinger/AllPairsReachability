@@ -256,3 +256,19 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testNewOverlayVertex){
     ASSERT_TRUE(this->algorithm -> query(vertex7, vertex1));
 }
 
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testNewOverlayVertexRemoved){
+
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex7 = this->mainGraph -> getCurrentVertexForId(7);
+
+    this->mainGraph->addArc(6,1,1);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_TRUE(this->algorithm -> query(vertex7, vertex1));
+
+    this->mainGraph->removeArc(6,1,2);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_FALSE(this->algorithm -> query(vertex7, vertex1));
+}
+

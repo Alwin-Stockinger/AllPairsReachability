@@ -82,6 +82,6 @@ void AlgorithmHandler::removeArc(){
     std::cin >> endId;
 
 
-    graph->removeArc(endId, startId, graph->getCurrentTime()+1);
+    graph->removeArc(startId, endId, graph->getCurrentTime()+1);
     graph->applyNextDelta();
 }

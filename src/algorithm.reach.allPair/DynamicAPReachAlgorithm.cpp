@@ -14,7 +14,7 @@ Algora::Arc* DynamicAPReachAlgorithm::addArc(Algora::Vertex *head, Algora::Verte
 }
 
 void DynamicAPReachAlgorithm::removeArc(Algora::Vertex *head, Algora::Vertex *tail) {
-    Algora::Arc* arc = diGraph->findArc(head, tail);
+    Algora::Arc* arc = diGraph->findArc(tail, head);
     diGraph->removeArc(arc);
 }
 
