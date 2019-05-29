@@ -64,12 +64,12 @@ void SSBasedDAPReachAlgorithm<T>::addVertexToMap(Algora::Vertex *vertex) {
 
 template<typename T>
 std::string SSBasedDAPReachAlgorithm<T>::getName() const noexcept {
-    return std::__cxx11::string("All Pair Reachability based on Single Source Reachability Algorithm");
+    return std::__cxx11::string("Single Source based All Pair Reachability based on " + vertexMap.getValue(diGraph->getAnyVertex()) -> getName());
 }
 
 template<typename T>
 std::string SSBasedDAPReachAlgorithm<T>::getShortName() const noexcept {
-    return std::__cxx11::string("AP Reach SS based");
+    return std::__cxx11::string("SS AP based on " + vertexMap.getValue(diGraph->getAnyVertex()) -> getName());
 }
 
 template<typename T>

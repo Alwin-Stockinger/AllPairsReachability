@@ -48,11 +48,16 @@ void AlgorithmHandler::reachabilityCheck() {
     std::cout << "End Vertex: ";
     std::cin >> endId;
 
-    if(algorithm->query(graph->getCurrentVertexForId(startId), graph->getCurrentVertexForId(endId))){
-        std::cout << "True\n";
-    }
-    else{
-        std::cout << "False\n";
+    for( DynamicAPReachAlgorithm* algorithm : algorithms){
+
+        std::cout << algorithm->getName() << ": ";
+
+        if(algorithm->query(graph->getCurrentVertexForId(startId), graph->getCurrentVertexForId(endId))){
+            std::cout << "True\n";
+        }
+        else{
+            std::cout << "False\n";
+        }
     }
 }
 

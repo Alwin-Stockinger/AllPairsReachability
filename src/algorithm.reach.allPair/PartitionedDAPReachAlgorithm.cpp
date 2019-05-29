@@ -27,12 +27,12 @@ void PartitionedDAPReachAlgorithm<T>::run() {
 
 template<typename T>
 std::string PartitionedDAPReachAlgorithm<T>::getName() const noexcept {
-    return std::__cxx11::string("Partitioned Graph All Pair Reachability Algorithm");
+    return std::__cxx11::string("Partitioned Graph All Pair Reachability Algorithm based on " + overlayAlgorithm -> getName()+"");
 }
 
 template<typename T>
 std::string PartitionedDAPReachAlgorithm<T>::getShortName() const noexcept {
-    return std::__cxx11::string("Partitioned DAP Reach Algo");
+    return std::__cxx11::string("Partitioned DAP Reach Algo(" + overlayAlgorithm -> getShortName()+")");
 }
 
 template<typename T>

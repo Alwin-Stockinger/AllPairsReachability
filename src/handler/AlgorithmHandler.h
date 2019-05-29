@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by Alwin Stockinger.
 //
@@ -13,7 +15,7 @@
 class AlgorithmHandler {
 
 public:
-    AlgorithmHandler(DynamicAPReachAlgorithm *newAlgorithm, Algora::DynamicDiGraph *newGraph) : algorithm(newAlgorithm), graph(newGraph){}
+    AlgorithmHandler(std::vector<DynamicAPReachAlgorithm *> newAlgorithms, Algora::DynamicDiGraph *newGraph) : algorithms(std::move(newAlgorithms)), graph(newGraph){}
 
     void run();
 
@@ -23,7 +25,7 @@ private:
     void removeArc();
 
 private:
-    DynamicAPReachAlgorithm *algorithm;
+    std::vector<DynamicAPReachAlgorithm *> algorithms;
 
     Algora::DynamicDiGraph *graph;
 
