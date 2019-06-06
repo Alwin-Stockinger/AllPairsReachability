@@ -17,7 +17,7 @@ class AlgorithmHandler {
 public:
     AlgorithmHandler(std::vector<DynamicAPReachAlgorithm *> newAlgorithms, Algora::DynamicDiGraph *newGraph) : algorithms(std::move(newAlgorithms)), graph(newGraph){}
 
-    void run();
+    void runInterface();
 
 private:
     void addArc();

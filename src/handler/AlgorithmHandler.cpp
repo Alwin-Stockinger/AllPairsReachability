@@ -7,7 +7,7 @@
 
 enum class MenuOptions{ reach=1, addArc=2, removeArc=3, quit=0} option;
 
-void AlgorithmHandler::run() {
+void AlgorithmHandler::runInterface() {
     std::cout << "All Pair Reachability Suite\n";
 
     option = MenuOptions ::reach;

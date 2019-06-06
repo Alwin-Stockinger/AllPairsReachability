@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     CLI::App app{"Dynamic All Pairs Reachability program"};
 
     std::string graphType = "random";
-    app.add_option("-t, --type", graphType, "Type of input Graph(e.g. random, konect)");
+    auto typeOption = app.add_option("-t, --type", graphType, "Type of input Graph(e.g. random, konect)");
 
     std::string inputFileName = "input";
     app.add_option("-i, --inputFile", inputFileName, "File name of the input Graph");
@@ -43,27 +43,58 @@ int main(int argc, char *argv[]) {
     std::string kahipFileName = "forKahip";
     app.add_option("-k, --kahipFile", kahipFileName, "File name for kahip files");
 
-    bool allAlgorithms = false;
-    app.add_option("-e, --everyAlgorithms", allAlgorithms, "Use all available algorithms");
-
     std::vector<std::string> algorithmNames;
-    app.add_option("-a, --algorithms", algorithmNames, "Algorithms to use");
+    app.add_option("-A, --algorithms", algorithmNames, "Algorithms to use");
+
+    unsigned long long vertexSize = 100;
+    app.add_option("-s, --vertexSize", vertexSize, "Amount of vertices for random graphs");
+
+    unsigned long long arcSize = 100;
+    app.add_option("--arcSize", arcSize, "Amount of arcs for random graphs");
+
+    double arcProb = 0.1;
+    app.add_option("-p, --arcProbability", arcProb, "Probability of arcs for random graphs");
+
+    bool multiArcs = false;
+    auto multiArcsOption = app.add_option("-M, --multiArcs", multiArcs, "Multi Arcs are allowed");
+
+    unsigned long long numOperations = 100;
+    auto numOperationsOption = app.add_option("-o, --numOperations", numOperations, "Number of Operations");
+
+    unsigned queryProp = 70;
+    auto queryProbOption = app.add_option("-q, --queryProp", queryProp, "Proportion of queries");
+
+    unsigned removalProp = 15;
+    auto removalPropOption = app.add_option("-r, --removalProp", removalProp, "Proportion of removals");
+
+    unsigned additionProp = 15;
+    auto additionPropOption = app.add_option("-a, --additionProp", additionProp, "Proportion of additions");
+
+    unsigned multiplier = 1;
+    auto multiplierOption = app.add_option("-m, --multiplier", multiplier, "Multiplier of operations");
+
 
     CLI11_PARSE(app, argc, argv)
 
-    Algora::InstanceProvider *provider = nullptr;
+    Algora::InstanceProvider* provider = nullptr;
 
     if(graphType == "random"){
-        auto* randomProvider = new Algora::RandomInstanceProvider;
-        randomProvider->setGraphSize(6);
-        randomProvider->setInitialArcProbability(0.2);
-        randomProvider->allowMultiArcs(true);
-        //TODO random options
+        auto randomProvider = new Algora::RandomInstanceProvider;
+        randomProvider->setGraphSize(vertexSize);
+        randomProvider->setInitialArcProbability(arcProb);
+        randomProvider->setInitialArcSize(arcSize);
+        randomProvider->allowMultiArcs(multiArcs);
+
+        randomProvider->setNumOperations(numOperations);
+        randomProvider->setQueriesProportion(queryProp);
+        randomProvider->setArcRemovalProportion(removalProp);
+        randomProvider->setArcAdditionProportion(additionProp);
+        randomProvider->setMultiplier(multiplier);
 
         provider = randomProvider;
     }
     else if(graphType == "konect"){
-        auto* konectProvider = new Algora::KonectNetworkInstanceProvider;
+        auto konectProvider = new Algora::KonectNetworkInstanceProvider;
         konectProvider->addInputFile(inputFileName);
 
         provider = konectProvider;
@@ -71,12 +102,13 @@ int main(int argc, char *argv[]) {
     else{
         //TODO error
 
+        std::cerr << graphType << " is not a viable graphtype\n";
         return 1;
     }
 
     provider->nextInstance();
 
-    Algora::DynamicDiGraph dynGraph = provider->getGraph();
+    auto& dynGraph = provider->getGraph();
     dynGraph.resetToBigBang();
     dynGraph.applyNextDelta();
 
@@ -94,10 +126,6 @@ int main(int argc, char *argv[]) {
     std::set<std::map<const Algora::Vertex *, Algora::Vertex *>*> mapsSet;
 
     std::map<unsigned long long, unsigned long long > partitionMap = GraphFileConverter::makePartitionMap(kahipInputFileName);
-
-
-
-    //TODO all algorithms
 
 
     for(const std::string& algorithmName: algorithmNames){
@@ -203,7 +231,25 @@ int main(int argc, char *argv[]) {
         }
     }
     AlgorithmHandler handler(algorithms, &dynGraph);
-    handler.run();
+    handler.runInterface();
+
+    for(DynamicAPReachAlgorithm* algorithm: algorithms){
+        delete algorithm;
+    }
+    for(Algora::DynamicDiGraph* graph: overlayGraphsSet){
+        delete graph;
+    }
+    for(std::vector<Algora::DynamicDiGraph*>* subGraphs : subGraphsSet){
+        for(Algora::DynamicDiGraph* subGraph: *subGraphs){
+            delete subGraph;
+        }
+        delete subGraphs;
+    }
+    for(std::map<const Algora::Vertex *, Algora::Vertex *>* map : mapsSet){
+        delete map;
+    }
+
+    delete provider;
 }
 
 
