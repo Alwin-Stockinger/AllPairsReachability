@@ -19,6 +19,8 @@ public:
 
     void runInterface();
 
+    void runTests();
+
 private:
     void addArc();
 

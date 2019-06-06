@@ -34,6 +34,8 @@ void AlgorithmHandler::runInterface() {
             case MenuOptions ::removeArc:
                 removeArc();
                 break;
+            case MenuOptions::quit:
+                break;
         }
     }
 }
@@ -89,4 +91,8 @@ void AlgorithmHandler::removeArc(){
 
     graph->removeArc(startId, endId, graph->getCurrentTime()+1);
     graph->applyNextDelta();
+}
+
+void AlgorithmHandler::runTests() {
+
 }
