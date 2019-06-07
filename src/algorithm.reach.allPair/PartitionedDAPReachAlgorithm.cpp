@@ -19,7 +19,7 @@
 template<typename T>
 void PartitionedDAPReachAlgorithm<T>::run() {
     overlayAlgorithm -> run();
-    for(T* algorithm : apAlgorithms){
+    for(auto [_,algorithm] : graphToAlgorithmMap){
         algorithm -> run();
     }
 
@@ -44,8 +44,8 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
     end = inMap[end];
 
     //select subgraphalgorithms
-    DynamicAPReachAlgorithm* startGraphAlgorithm = findAlgorithm(start);
-    DynamicAPReachAlgorithm* endGraphAlgorithm = findAlgorithm(end);
+    DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[start->getParent()];
+    DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[end->getParent()];
 
     if(!startGraphAlgorithm || !endGraphAlgorithm){
         //TODO throw exception?
@@ -58,11 +58,11 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
     }
     else {
 
-        std::vector<Algora::Vertex *> reachableEdges;
+        std::set<Algora::Vertex *> reachableEdges;
 
-        std::set<Algora::Vertex *> startEdgeVertices = edgeVertices[startGraphAlgorithm];
-        std::set<Algora::Vertex *> endEdgeVertices = edgeVertices[endGraphAlgorithm];
-        std::vector<Algora::Vertex *> overlayConnectedVertices;
+        std::set<Algora::Vertex *> startEdgeVertices = edgeVertices[start->getParent()];
+        std::set<Algora::Vertex *> endEdgeVertices = edgeVertices[end->getParent()];
+        std::set<Algora::Vertex *> overlayConnectedVertices;
 
         //find outgoing vertices
         for (Algora::Vertex *outVertex : startEdgeVertices) {
@@ -71,12 +71,13 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
 
 
                 for(Algora::Vertex *inVertex : endEdgeVertices){
-                    if( overlayAlgorithm->query(outVertex, inVertex)){      //save which ends already visited?
+
+                    if( overlayAlgorithm->query(outVertex, inVertex)){
 
                         if( endGraphAlgorithm->query(inMap[inVertex], end)){
                             return true;
                         }
-
+                        else endEdgeVertices.erase(inVertex);    //exclude for future queries, because dead-end
                     }
                 }
             }
@@ -91,8 +92,7 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
 template<typename T>
 PartitionedDAPReachAlgorithm<T>::PartitionedDAPReachAlgorithm(std::vector<Algora::DiGraph *> &graphs,
                                                               Algora::DiGraph *overlayGraph,
-                                                              std::map<const Algora::Vertex *, Algora::Vertex *> &inMap,
-                                                              std::map<const Algora::Vertex *, Algora::Vertex *> &mainToOverlayMap) {
+                                                              Algora::FastPropertyMap< Algora::Vertex*>& inMap, Algora::FastPropertyMap< Algora::Vertex*>& mainToOverlayMap) {
     setGraphs(&graphs, overlayGraph, inMap, mainToOverlayMap);
 }
 
@@ -103,44 +103,43 @@ PartitionedDAPReachAlgorithm<T>::~PartitionedDAPReachAlgorithm() {
 
 template<typename T>
 void PartitionedDAPReachAlgorithm<T>::deleteAlgorithms() {
-    for(DynamicAPReachAlgorithm* algorithm: apAlgorithms){
+    for(auto [_,algorithm] : graphToAlgorithmMap){
         delete algorithm;
     }
-
     delete overlayAlgorithm;
 
-    apAlgorithms.clear();
-
-    edgeVertices.clear();
+    graphToAlgorithmMap.resetAll();
+    edgeVertices.resetAll();
 }
 
 template<typename T>
 void
-PartitionedDAPReachAlgorithm<T>::setGraphs(std::vector<Algora::DiGraph *>* graphs, Algora::DiGraph *overlayGraph, std::map<const Algora::Vertex*, Algora::Vertex*>& inMap, std::map<const Algora::Vertex*, Algora::Vertex*>& mainToOverlayMap) {
+PartitionedDAPReachAlgorithm<T>::setGraphs(std::vector<Algora::DiGraph *>* graphs, Algora::DiGraph *overlayGraph, Algora::FastPropertyMap< Algora::Vertex*>& inMap, Algora::FastPropertyMap< Algora::Vertex*>& mainToOverlayMap) {
     //delete old Algorithms
     deleteAlgorithms();
 
     this->inMap=inMap;
     this->mainToOverlayMap=mainToOverlayMap;
 
-    this->diGraph = overlayGraph;
+    //this->diGraph = overlayGraph; ??? will be overwritten anyway???
 
     //create new Algorithms
     overlayAlgorithm = new T();
     overlayAlgorithm->setGraph(overlayGraph);
     for (Algora::DiGraph *graph : *graphs) {
+        //algorithm for graph setup
         T* algorithm = new T();
         algorithm -> setGraph(graph);
-        apAlgorithms.insert( algorithm);
+        graphToAlgorithmMap.setValue(graph, algorithm);
 
+        //edges of graph setup
         std::set<Algora::Vertex*> edgesOfGraph;
-
         overlayGraph->mapVertices([&overlayGraph, &edgesOfGraph, graph, &inMap](Algora::Vertex *vertex) {
             if(!overlayGraph->isIsolated(vertex) && graph->containsVertex(inMap[vertex])){
                 edgesOfGraph.insert(vertex);
             }
         });
-        edgeVertices.insert({algorithm, edgesOfGraph});
+        edgeVertices.setValue(graph, edgesOfGraph);
     }
 
 }
@@ -164,20 +163,30 @@ template<typename T>
 void PartitionedDAPReachAlgorithm<T>::onArcAdd(Algora::Arc *arc) {
     DynamicDiGraphAlgorithm::onArcAdd(arc);
 
-    Algora::Vertex* overlayHead = mainToOverlayMap[arc->getHead()];
-    Algora::Vertex* overlayTail = mainToOverlayMap[arc->getTail()];
+    auto * overlayHead = mainToOverlayMap[arc->getHead()];
+    auto * overlayTail = mainToOverlayMap[arc->getTail()];
 
-    auto* headAlgorithm = findAlgorithm(inMap[overlayHead]);
-    auto* tailAlgorithm = findAlgorithm(inMap[overlayTail]);
+    auto * subHead = inMap[overlayHead];
+    auto * subTail = inMap[overlayTail];
 
 
-    if(headAlgorithm && (headAlgorithm == tailAlgorithm)){
-        headAlgorithm->addArc(inMap[overlayHead], inMap[overlayTail]);
+    auto* headGraph = subHead->getParent();
+    auto* tailGraph = subTail->getParent();
+
+
+    //auto* headAlgorithm = findAlgorithm(inMap[overlayHead]);
+    //auto* tailAlgorithm = findAlgorithm(inMap[overlayTail]);
+
+
+    if(headGraph == tailGraph){
+        static_cast<Algora::DiGraph*>(headGraph)->addArc(subTail, subHead);
     }
     else{
-        edgeVertices[headAlgorithm].insert(overlayHead);
-        edgeVertices[tailAlgorithm].insert(overlayTail);
-        overlayAlgorithm->addArc(overlayHead, overlayTail);
+
+        static_cast<Algora::DiGraph*>(overlayHead->getParent())->addArc(overlayTail, overlayHead);
+
+        edgeVertices[headGraph].insert(overlayHead);
+        edgeVertices[tailGraph].insert(overlayTail);
     }
 }
 
@@ -185,34 +194,33 @@ template<typename T>
 void PartitionedDAPReachAlgorithm<T>::onArcRemove(Algora::Arc *arc) {
     DynamicDiGraphAlgorithm::onArcRemove(arc);
 
-    Algora::Vertex* overlayHead = mainToOverlayMap[arc->getHead()];
-    Algora::Vertex* overlayTail = mainToOverlayMap[arc->getTail()];
+    auto * overlayHead = mainToOverlayMap[arc->getHead()];
+    auto * overlayTail = mainToOverlayMap[arc->getTail()];
 
-    auto* headAlgorithm = findAlgorithm(inMap[overlayHead]);
-    auto * tailAlgorithm = findAlgorithm(inMap[overlayTail]);
+    auto * subHead = inMap[overlayHead];
+    auto * subTail = inMap[overlayTail];
 
-    if(headAlgorithm == tailAlgorithm){
-        headAlgorithm->removeArc(inMap[overlayHead], inMap[overlayTail]);
+
+    auto* headGraph = subHead->getParent();
+    auto* tailGraph = subTail->getParent();
+
+    if(headGraph == tailGraph){
+        auto* subGraph = static_cast<Algora::DiGraph*>(headGraph);
+        Algora::Arc* subArc = subGraph->findArc(subTail, subHead);
+        subGraph->removeArc(subArc);
     }
     else{
-        overlayAlgorithm->removeArc(overlayHead, overlayTail);
-        if(overlayAlgorithm->isIsolated(overlayHead)){
-            edgeVertices[headAlgorithm].erase(overlayHead);
-        }
-        if(overlayAlgorithm->isIsolated(overlayTail)){
-            edgeVertices[tailAlgorithm].erase(overlayTail);
-        }
-    }
-}
+        auto* overlayGraph = static_cast<Algora::DiGraph*>(overlayHead->getParent());
+        Algora::Arc* overlayArc = overlayGraph->findArc(overlayTail, overlayHead);
+        overlayGraph->removeArc(overlayArc);
 
-template<typename T>
-T *PartitionedDAPReachAlgorithm<T>::findAlgorithm(const Algora::Vertex *vertex) {
-    for( T* apAlgorithm: apAlgorithms){
-        if(apAlgorithm->containsVertex(vertex)){
-            return apAlgorithm;
+        if(overlayGraph->isIsolated(overlayHead)){
+            edgeVertices[headGraph].erase(overlayHead);
+        }
+        if(overlayGraph->isIsolated(overlayTail)){
+            edgeVertices[tailGraph].erase(overlayTail);
         }
     }
-    return nullptr;
 }
 
 template class PartitionedDAPReachAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>;

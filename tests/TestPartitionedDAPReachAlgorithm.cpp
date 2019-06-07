@@ -111,7 +111,7 @@ public:
         overlayGraph->applyNextDelta();
 
 
-        std::map<const Algora::Vertex*, Algora::Vertex*> inMap;
+        Algora::FastPropertyMap<Algora::Vertex*> inMap;
 
         inMap[overlayGraph->getCurrentVertexForId(1)]= graph1->getCurrentVertexForId(1);
         inMap[overlayGraph->getCurrentVertexForId(2)]= graph1->getCurrentVertexForId(2);
@@ -121,7 +121,7 @@ public:
         inMap[overlayGraph->getCurrentVertexForId(6)]= graph3->getCurrentVertexForId(6);
         inMap[overlayGraph->getCurrentVertexForId(7)]= graph3->getCurrentVertexForId(7);
 
-        std::map<const Algora::Vertex*, Algora::Vertex*> mainToOverlayMap;
+        Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
 
         for(int i=1; i<8; i++){
             mainToOverlayMap[mainGraph->getCurrentVertexForId(i)] = overlayGraph->getCurrentVertexForId(i);

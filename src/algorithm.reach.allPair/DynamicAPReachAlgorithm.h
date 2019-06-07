@@ -17,14 +17,6 @@ public:
 
     virtual bool query(const Algora::Vertex *start,const  Algora::Vertex *end) = 0;
 
-    bool containsVertex(const Algora::Vertex* vertex);
-
-    Algora::Arc* addArc(Algora::Vertex* head, Algora::Vertex* tail );
-
-    void removeArc(Algora::Vertex* head, Algora::Vertex* tail);
-
-    bool isIsolated(const Algora::Vertex* vertex);
-
 };
 
 

@@ -7,6 +7,7 @@
 
 #include <map>
 #include <set>
+#include <property/propertymap.h>
 
 #include "DynamicAPReachAlgorithm.h"
 #include "SSBasedDAPReachAlgorithm.h"
@@ -20,8 +21,7 @@ public:
     explicit PartitionedDAPReachAlgorithm() : DynamicAPReachAlgorithm(){};
 
     explicit PartitionedDAPReachAlgorithm(std::vector<Algora::DiGraph *> &graphs, Algora::DiGraph *overlayGraph,
-                                          std::map<const Algora::Vertex *, Algora::Vertex *> &inMap,
-                                          std::map<const Algora::Vertex *, Algora::Vertex *> &mainToOverlayMap);
+                                          Algora::FastPropertyMap< Algora::Vertex*>& inMap, Algora::FastPropertyMap< Algora::Vertex*>& mainToOverlayMap);
 
     ~PartitionedDAPReachAlgorithm() override;
 
@@ -33,7 +33,7 @@ public:
 
     bool query(const Algora::Vertex *start, const Algora::Vertex *end) override;
 
-    void setGraphs(std::vector<Algora::DiGraph *>* graphs, Algora::DiGraph *overlayGraph, std::map<const Algora::Vertex*,Algora::Vertex*>& inMap, std::map<const Algora::Vertex*, Algora::Vertex*>& mainToOverlayMap);
+    void setGraphs(std::vector<Algora::DiGraph *>* graphs, Algora::DiGraph *overlayGraph, Algora::FastPropertyMap< Algora::Vertex*>& inMap, Algora::FastPropertyMap< Algora::Vertex*>& mainToOverlayMap);
 
 protected:
 
@@ -49,14 +49,13 @@ private:
 private:
     T* overlayAlgorithm = nullptr;
 
-    std::set<T*> apAlgorithms;
-    std::map<DynamicAPReachAlgorithm*, std::set<Algora::Vertex*>> edgeVertices;
-    std::map<const Algora::Vertex*,Algora::Vertex*> inMap;
-    std::map<const Algora::Vertex*,Algora::Vertex*> mainToOverlayMap;
+    Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;
+    Algora::FastPropertyMap<Algora::Vertex*> inMap;
+    Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
+    Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;//can not use FastPropertyMap, because of different graphs???
 
 
     void deleteAlgorithms();
-    T* findAlgorithm(const Algora::Vertex* vertex);
 
 };
 
