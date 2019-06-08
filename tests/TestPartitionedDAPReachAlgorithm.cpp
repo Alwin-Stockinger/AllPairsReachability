@@ -70,7 +70,7 @@ public:
 
         mainGraph->applyNextDelta();
 
-
+        /*
         auto* graph1 = new Algora::DynamicDiGraph;
         graph1->addVertex(1,0);
         graph1->addVertex(2,0);
@@ -109,29 +109,30 @@ public:
         overlayGraph->addArc(5,2,0);
         overlayGraph->addArc(7,3,0);
         overlayGraph->applyNextDelta();
+        */
 
 
-        Algora::FastPropertyMap<Algora::Vertex*> inMap;
 
-        inMap[overlayGraph->getCurrentVertexForId(1)]= graph1->getCurrentVertexForId(1);
-        inMap[overlayGraph->getCurrentVertexForId(2)]= graph1->getCurrentVertexForId(2);
-        inMap[overlayGraph->getCurrentVertexForId(3)]= graph2->getCurrentVertexForId(3);
-        inMap[overlayGraph->getCurrentVertexForId(4)]= graph2->getCurrentVertexForId(4);
-        inMap[overlayGraph->getCurrentVertexForId(5)]= graph3->getCurrentVertexForId(5);
-        inMap[overlayGraph->getCurrentVertexForId(6)]= graph3->getCurrentVertexForId(6);
-        inMap[overlayGraph->getCurrentVertexForId(7)]= graph3->getCurrentVertexForId(7);
+        Algora::FastPropertyMap<unsigned long long> partitionMap;
 
-        Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
+        partitionMap[mainGraph->getCurrentVertexForId(1)]= 0;//graph1->getCurrentVertexForId(1);
+        partitionMap[mainGraph->getCurrentVertexForId(2)]= 0;//graph1->getCurrentVertexForId(2);
+        partitionMap[mainGraph->getCurrentVertexForId(3)]= 1;//graph2->getCurrentVertexForId(3);
+        partitionMap[mainGraph->getCurrentVertexForId(4)]= 1;//graph2->getCurrentVertexForId(4);
+        partitionMap[mainGraph->getCurrentVertexForId(5)]= 2;//graph3->getCurrentVertexForId(5);
+        partitionMap[mainGraph->getCurrentVertexForId(6)]= 2;//graph3->getCurrentVertexForId(6);
+        partitionMap[mainGraph->getCurrentVertexForId(7)]= 2;
 
-        for(int i=1; i<8; i++){
+
+
+        /*for(int i=1; i<8; i++){
             mainToOverlayMap[mainGraph->getCurrentVertexForId(i)] = overlayGraph->getCurrentVertexForId(i);
-        }
+        }*/
 
 
         algorithm = new PartitionedDAPReachAlgorithm<T>();
         algorithm->setGraph(mainGraph->getDiGraph());
-        algorithm->setGraphs(
-                &subGraphs, overlayGraph->getDiGraph(), inMap, mainToOverlayMap);
+        algorithm->partition(partitionMap, 3);
     }
 };
 

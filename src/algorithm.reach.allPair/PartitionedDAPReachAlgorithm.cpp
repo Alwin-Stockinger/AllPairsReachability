@@ -16,10 +16,12 @@
 #include <algorithm.reach.es/estree-queue.h>
 #include <algorithm.reach.es/simpleestree.h>
 
+#include <graph.incidencelist/incidencelistgraph.h>
+
 template<typename T>
 void PartitionedDAPReachAlgorithm<T>::run() {
     overlayAlgorithm -> run();
-    for(auto [_,algorithm] : graphToAlgorithmMap){
+    for(const auto &[_,algorithm] : graphToAlgorithmMap){
         algorithm -> run();
     }
 
@@ -89,59 +91,54 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
 
 }
 
-template<typename T>
-PartitionedDAPReachAlgorithm<T>::PartitionedDAPReachAlgorithm(std::vector<Algora::DiGraph *> &graphs,
-                                                              Algora::DiGraph *overlayGraph,
-                                                              Algora::FastPropertyMap< Algora::Vertex*>& inMap, Algora::FastPropertyMap< Algora::Vertex*>& mainToOverlayMap) {
-    setGraphs(&graphs, overlayGraph, inMap, mainToOverlayMap);
-}
 
 template<typename T>
 PartitionedDAPReachAlgorithm<T>::~PartitionedDAPReachAlgorithm() {
-    deleteAlgorithms();
+    deleteOldPartition();
 }
 
 template<typename T>
-void PartitionedDAPReachAlgorithm<T>::deleteAlgorithms() {
-    for(auto [_,algorithm] : graphToAlgorithmMap){
+void PartitionedDAPReachAlgorithm<T>::deleteOldPartition() {
+    for(auto [graph,algorithm] : graphToAlgorithmMap){
         delete algorithm;
+        delete graph;
     }
     delete overlayAlgorithm;
+    delete mainToOverlayMap[diGraph->getAnyVertex()];
 
+    mainToOverlayMap.resetAll();
+    inMap.resetAll();
     graphToAlgorithmMap.resetAll();
     edgeVertices.resetAll();
 }
 
 template<typename T>
 void
-PartitionedDAPReachAlgorithm<T>::setGraphs(std::vector<Algora::DiGraph *>* graphs, Algora::DiGraph *overlayGraph, Algora::FastPropertyMap< Algora::Vertex*>& inMap, Algora::FastPropertyMap< Algora::Vertex*>& mainToOverlayMap) {
-    //delete old Algorithms
-    deleteAlgorithms();
+PartitionedDAPReachAlgorithm<T>::initAlgorithms(std::vector<Algora::DiGraph *> &graphs, Algora::DiGraph *overlayGraph) {
 
-    this->inMap=inMap;
-    this->mainToOverlayMap=mainToOverlayMap;
 
-    //this->diGraph = overlayGraph; ??? will be overwritten anyway???
 
     //create new Algorithms
     overlayAlgorithm = new T();
     overlayAlgorithm->setGraph(overlayGraph);
-    for (Algora::DiGraph *graph : *graphs) {
-        //algorithm for graph setup
+    for (Algora::DiGraph *graph : graphs) {
         T* algorithm = new T();
         algorithm -> setGraph(graph);
         graphToAlgorithmMap.setValue(graph, algorithm);
 
-        //edges of graph setup
-        std::set<Algora::Vertex*> edgesOfGraph;
-        overlayGraph->mapVertices([&overlayGraph, &edgesOfGraph, graph, &inMap](Algora::Vertex *vertex) {
-            if(!overlayGraph->isIsolated(vertex) && graph->containsVertex(inMap[vertex])){
-                edgesOfGraph.insert(vertex);
-            }
-        });
-        edgeVertices.setValue(graph, edgesOfGraph);
     }
 
+}
+
+template<typename T>
+void PartitionedDAPReachAlgorithm<T>::initEdges(const std::vector<Algora::DiGraph*> &graphs, Algora::DiGraph *overlayGraph){
+
+    overlayGraph->mapVertices([overlayGraph, this](Algora::Vertex* vertex){
+        if(!overlayGraph->isIsolated(vertex)){
+            Algora::Vertex* subVertex = inMap[vertex];
+            edgeVertices[subVertex->getParent()].insert(vertex);
+        }
+    });
 }
 
 template<typename T>
@@ -221,6 +218,52 @@ void PartitionedDAPReachAlgorithm<T>::onArcRemove(Algora::Arc *arc) {
             edgeVertices[tailGraph].erase(overlayTail);
         }
     }
+}
+
+template<typename T>
+void
+PartitionedDAPReachAlgorithm<T>::partition(const Algora::FastPropertyMap<unsigned long long> &partitionMap,
+                                           const unsigned long long k) {
+
+    deleteOldPartition();
+
+    std::vector<Algora::DiGraph*> subGraphs;
+
+    for(auto i = 0ULL; i < k; i++){
+        subGraphs.push_back(new Algora::IncidenceListGraph);
+    }
+    Algora::DiGraph* overlayGraph = new Algora::IncidenceListGraph;
+
+
+
+    diGraph->mapVertices([&subGraphs, &overlayGraph, this, partitionMap](Algora::Vertex* vertex){
+        Algora::Vertex* subVertex = subGraphs.at(partitionMap.getValue(vertex))->addVertex();
+        Algora::Vertex* overlayVertex = overlayGraph->addVertex();
+
+        mainToOverlayMap[vertex] = overlayVertex;
+        inMap[overlayVertex] = subVertex;
+    });
+
+    diGraph->mapArcs([&subGraphs, &overlayGraph, this, partitionMap](Algora::Arc* arc){
+        unsigned long long headPartition = partitionMap.getValue(arc->getHead());
+        unsigned long long tailPartition = partitionMap.getValue(arc->getTail());
+
+        if( headPartition == tailPartition){
+            Algora::Vertex* subTail = inMap.getValue(mainToOverlayMap.getValue(arc->getTail()));
+            Algora::Vertex* subHead = inMap.getValue(mainToOverlayMap.getValue(arc->getHead()));
+            subGraphs.at(headPartition)->addArc(subTail, subHead);
+        }
+        else{
+            Algora::Vertex* overlayTail = mainToOverlayMap.getValue(arc->getTail());
+            Algora::Vertex* overlayHead = mainToOverlayMap.getValue(arc->getHead());
+
+            overlayGraph->addArc(overlayTail, overlayHead);
+        }
+
+    });
+
+    initAlgorithms(subGraphs, overlayGraph);
+    initEdges(subGraphs, overlayGraph);
 }
 
 template class PartitionedDAPReachAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>;

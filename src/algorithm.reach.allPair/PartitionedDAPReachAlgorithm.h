@@ -20,9 +20,6 @@ public:
 
     explicit PartitionedDAPReachAlgorithm() : DynamicAPReachAlgorithm(){};
 
-    explicit PartitionedDAPReachAlgorithm(std::vector<Algora::DiGraph *> &graphs, Algora::DiGraph *overlayGraph,
-                                          Algora::FastPropertyMap< Algora::Vertex*>& inMap, Algora::FastPropertyMap< Algora::Vertex*>& mainToOverlayMap);
-
     ~PartitionedDAPReachAlgorithm() override;
 
     void run() override;
@@ -33,9 +30,12 @@ public:
 
     bool query(const Algora::Vertex *start, const Algora::Vertex *end) override;
 
-    void setGraphs(std::vector<Algora::DiGraph *>* graphs, Algora::DiGraph *overlayGraph, Algora::FastPropertyMap< Algora::Vertex*>& inMap, Algora::FastPropertyMap< Algora::Vertex*>& mainToOverlayMap);
+    void partition(const Algora::FastPropertyMap<unsigned long long int> &partitionMap,
+                   unsigned long long int k);
 
-protected:
+private:
+    void initAlgorithms(std::vector<Algora::DiGraph *> &graphs, Algora::DiGraph *overlayGraph);
+
 
 private:
     void onVertexAdd(Algora::Vertex *vertex) override;
@@ -46,17 +46,21 @@ private:
 
     void onArcRemove(Algora::Arc *arc) override;
 
+
+
 private:
     T* overlayAlgorithm = nullptr;
 
-    Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;
+    Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;//cannot use FastPropertyMap, because of different graphs???
     Algora::FastPropertyMap<Algora::Vertex*> inMap;
     Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
-    Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;//can not use FastPropertyMap, because of different graphs???
+    Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;//cannot use FastPropertyMap, because of different graphs???
 
 
-    void deleteAlgorithms();
+    void deleteOldPartition();
 
+
+    void initEdges(const std::vector<Algora::DiGraph *> &graphs, Algora::DiGraph *overlayGraph);
 };
 
 
