@@ -33,7 +33,7 @@ void GraphFileConverter::writeMapToFile(const std::string &outFileName, Algora::
 
     if(outFile.good() && outFile.is_open()){
         outFile << graph->getSize() << " " << arcSize << " 1\n";
-        outFile.flush();
+        //outFile.flush();
     }
 
     for(unsigned long long i = 0; i < graph->getSize(); i++){
@@ -43,7 +43,7 @@ void GraphFileConverter::writeMapToFile(const std::string &outFileName, Algora::
             }
         }
         outFile << "\n";
-        outFile.flush();
+        //outFile.flush();
     }
 
     outFile.close();

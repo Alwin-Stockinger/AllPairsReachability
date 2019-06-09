@@ -18,7 +18,7 @@ struct AlgorithmHandler::TimeCollector {
         this->algorithm = algorithm;
     }
 
-    Algora::DiGraphAlgorithm *algorithm = nullptr;
+    DynamicAPReachAlgorithm *algorithm = nullptr;
 
     std::vector<unsigned long long> queryTimes;
     std::vector<unsigned long long> addArcTimes;
@@ -47,12 +47,12 @@ struct AlgorithmHandler::TimeCollector {
         return getAvg(addArcTimes);
     }
 
-    const double getAvgRemvoeArcTime(){
+    const double getAvgRemoveArcTime(){
         return getAvg(removeArcTimes);
     }
 
 private:
-    const double getAvg(std::vector<unsigned long long > times){
+    static const double getAvg(std::vector<unsigned long long > times){
         unsigned long long sum = 0ULL;
         for(unsigned long long time : times){
             sum += time;
@@ -229,19 +229,21 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
     std::ofstream file;
     file.open("results.csv");
 
+    file << instanceProvider->getConfiguration() << std::endl;
+
     file << "SS Base Algorithm";
     file << ",avg query time";
     file << ",avg add Arc time";
     file << ",avg remove Arc time";
 
-    file << "\n";
+    file << std::endl;
 
     for(TimeCollector* timer: timers){
-        file << timer.algorithm.getBaseName();
-        file << "," << timer.getAvgQueryTime();
-        file << "," << timer.getAvgAddArcTime();
-        file << "," << timer.getAvgRemoveArcTime();
-        file << "\n";
+        file << timer->algorithm->getBaseName();
+        file << "," << timer->getAvgQueryTime();
+        file << "," << timer->getAvgAddArcTime();
+        file << "," << timer->getAvgRemoveArcTime();
+        file << std::endl;
     }
 }
 
