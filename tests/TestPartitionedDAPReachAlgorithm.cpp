@@ -25,22 +25,12 @@ template <typename T>
 class TestPartitionedDAPReachAlgorithm : public testing::Test{
 
 protected:
-    PartitionedDAPReachAlgorithm<T>* algorithm{};
+    PartitionedDAPReachAlgorithm<T>* algorithm = nullptr;
 
-    Algora::DynamicDiGraph* mainGraph{};
-    std::vector<Algora::DynamicDiGraph*> graphs;
-    Algora::DynamicDiGraph* overlayGraph{};
-
-    std::vector<Algora::DiGraph*> subGraphs;
+    Algora::DynamicDiGraph* mainGraph = nullptr;
 
     ~TestPartitionedDAPReachAlgorithm() override{
         delete algorithm;
-
-        delete overlayGraph;
-
-        for( Algora::DynamicDiGraph* graph: graphs){
-            delete graph;
-        }
 
         delete mainGraph;
     }
@@ -70,48 +60,6 @@ public:
 
         mainGraph->applyNextDelta();
 
-        /*
-        auto* graph1 = new Algora::DynamicDiGraph;
-        graph1->addVertex(1,0);
-        graph1->addVertex(2,0);
-        graph1->addArc(1,2,0);
-        graph1->applyNextDelta();
-        graphs.push_back(graph1);
-        subGraphs.push_back(graph1->getDiGraph());
-
-        auto* graph2 = new Algora::DynamicDiGraph;
-        graph2->addVertex(3,0);
-        graph2->addVertex(4,0);
-        graph2->addArc(3,4,0);
-        graph2->applyNextDelta();
-        graphs.push_back(graph2);
-        subGraphs.push_back(graph2->getDiGraph());
-
-        auto* graph3 = new Algora::DynamicDiGraph;
-        graph3->addVertex(5,0);
-        graph3->addVertex(6,0);
-        graph3->addVertex(7,0);
-        graph3->addArc(6,5,0);
-        graph3->addArc(7,6,0);
-        graph3->applyNextDelta();
-        graphs.push_back(graph3);
-        subGraphs.push_back(graph3->getDiGraph());
-
-        overlayGraph = new Algora::DynamicDiGraph;
-        overlayGraph->addVertex(1, 0);
-        overlayGraph->addVertex(2, 0);
-        overlayGraph->addVertex(3, 0);
-        overlayGraph->addVertex(4, 0);
-        overlayGraph->addVertex(5, 0);
-        overlayGraph->addVertex(6, 0);
-        overlayGraph->addVertex(7, 0);
-        overlayGraph->addArc(2,3,0);
-        overlayGraph->addArc(5,2,0);
-        overlayGraph->addArc(7,3,0);
-        overlayGraph->applyNextDelta();
-        */
-
-
 
         Algora::FastPropertyMap<unsigned long long> partitionMap;
 
@@ -122,12 +70,6 @@ public:
         partitionMap[mainGraph->getCurrentVertexForId(5)]= 2;//graph3->getCurrentVertexForId(5);
         partitionMap[mainGraph->getCurrentVertexForId(6)]= 2;//graph3->getCurrentVertexForId(6);
         partitionMap[mainGraph->getCurrentVertexForId(7)]= 2;
-
-
-
-        /*for(int i=1; i<8; i++){
-            mainToOverlayMap[mainGraph->getCurrentVertexForId(i)] = overlayGraph->getCurrentVertexForId(i);
-        }*/
 
 
         algorithm = new PartitionedDAPReachAlgorithm<T>();
@@ -272,4 +214,18 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testNewOverlayVertexRemoved){
 
     ASSERT_FALSE(this->algorithm -> query(vertex7, vertex1));
 }
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testPreviousConnectionRemoved){
+
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex2 = this->mainGraph -> getCurrentVertexForId(2);
+
+    ASSERT_TRUE(this->algorithm -> query(vertex1, vertex2));
+
+    this->mainGraph->removeArc(1,2,1);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_FALSE(this->algorithm -> query(vertex1, vertex2));
+}
+
 

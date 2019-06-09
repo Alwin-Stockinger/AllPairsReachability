@@ -18,7 +18,7 @@
 class AlgorithmHandler {
 
 public:
-    AlgorithmHandler(std::vector<DynamicAPReachAlgorithm *> newAlgorithms, Algora::DynamicDiGraph *newGraph) : algorithms(std::move(newAlgorithms)), graph(newGraph){}
+    AlgorithmHandler(std::vector<DynamicAPReachAlgorithm *> newAlgorithms, Algora::InstanceProvider* newProvider) : algorithms(std::move(newAlgorithms)), instanceProvider{newProvider}{}
 
     void runInterface();
 

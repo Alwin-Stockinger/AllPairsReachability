@@ -71,16 +71,20 @@ bool PartitionedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const A
 
             if (startGraphAlgorithm->query(start, inMap[outVertex])) {
 
+                for(auto it = endEdgeVertices.begin(); it != endEdgeVertices.end();){//Algora::Vertex *inVertex : endEdgeVertices){
 
-                for(Algora::Vertex *inVertex : endEdgeVertices){
+                    Algora::Vertex* inVertex = *it;
 
                     if( overlayAlgorithm->query(outVertex, inVertex)){
 
                         if( endGraphAlgorithm->query(inMap[inVertex], end)){
                             return true;
                         }
-                        else endEdgeVertices.erase(inVertex);    //exclude for future queries, because dead-end
+                        else{
+                            it = endEdgeVertices.erase(it);    //exclude for future queries, because dead-end
+                        }
                     }
+                    else it++;
                 }
             }
         }
@@ -104,7 +108,9 @@ void PartitionedDAPReachAlgorithm<T>::deleteOldPartition() {
         delete graph;
     }
     delete overlayAlgorithm;
-    delete mainToOverlayMap[diGraph->getAnyVertex()];
+    if(mainToOverlayMap[diGraph->getAnyVertex()]){
+        delete mainToOverlayMap[diGraph->getAnyVertex()]->getParent();
+    }
 
     mainToOverlayMap.resetAll();
     inMap.resetAll();
