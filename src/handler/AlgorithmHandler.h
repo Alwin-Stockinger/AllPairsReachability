@@ -1,4 +1,5 @@
 #include <utility>
+#include <instanceprovider.h>
 
 //
 // Created by Alwin Stockinger.
@@ -11,6 +12,8 @@
 #include "graph.dyn/dynamicdigraph.h"
 
 #include "../algorithm.reach.allPair/DynamicAPReachAlgorithm.h"
+
+
 
 class AlgorithmHandler {
 
@@ -27,11 +30,18 @@ private:
     void removeArc();
 
 private:
+
+    struct TimeCollector;
+
     std::vector<DynamicAPReachAlgorithm *> algorithms;
 
-    Algora::DynamicDiGraph *graph;
+    Algora::InstanceProvider* instanceProvider;
 
     void reachabilityCheck();
+
+    void writeResults(const std::vector<TimeCollector*>& timers);
+
+
 };
 
 

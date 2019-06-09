@@ -92,9 +92,6 @@ void SSBasedDAPReachAlgorithm<T>::deleteAllAlgorithms(){
     }
 }
 
-
-
-
 template class SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>;
 template class SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>;
 template class SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>;

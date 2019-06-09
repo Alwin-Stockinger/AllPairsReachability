@@ -38,6 +38,10 @@ public:
     // DynamicAPReachAlgorithm interface
     bool query(const Algora::Vertex *start, const Algora::Vertex *end) override;
 
+    std::string const getBaseName() override{
+        return vertexMap.getValue(diGraph->getAnyVertex())->getShortName();
+    }
+
 protected:
 
     // DynamicDiGraphAlgorithm interface

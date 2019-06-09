@@ -30,6 +30,10 @@ public:
 
     bool query(const Algora::Vertex *start, const Algora::Vertex *end) override;
 
+    std::string const getBaseName() override {
+        return overlayAlgorithm->getBaseName();
+    }
+
     void partition(const Algora::FastPropertyMap<unsigned long long int> &partitionMap,
                    unsigned long long int k);
 
