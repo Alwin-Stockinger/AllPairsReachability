@@ -58,6 +58,7 @@ protected:
 
 private:
     T* overlayAlgorithm = nullptr;
+    Algora::DiGraph* overlayGraph = nullptr;
 
     Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;//cannot use FastPropertyMap, because of different graphs???
     Algora::FastPropertyMap<Algora::Vertex*> inMap;

@@ -74,9 +74,7 @@ std::string SSBasedDAPReachAlgorithm<T>::getShortName() const noexcept {
 
 template<typename T>
 void SSBasedDAPReachAlgorithm<T>::reset() {
-
     deleteAllAlgorithms();
-
     vertexMap.resetAll();
 }
 

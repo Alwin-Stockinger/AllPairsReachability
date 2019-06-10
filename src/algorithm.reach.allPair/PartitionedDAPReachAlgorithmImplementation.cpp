@@ -109,10 +109,11 @@ void PartitionedDAPReachAlgorithmImplementation<T>::deleteOldPartition() {
     }
 
     delete overlayAlgorithm;
+    delete overlayGraph;
 
-    if(diGraph && mainToOverlayMap[diGraph->getAnyVertex()]){
-        delete mainToOverlayMap[diGraph->getAnyVertex()]->getParent();
-    }
+    /*if(diGraph && mainToOverlayMap[diGraph->getAnyVertex()]){
+        delete mainToOverlayMap[diGraph->getAnyVertex()]->getParent();  //why is there a memory leak when done this way???
+    }*/
 
     mainToOverlayMap.resetAll();
     inMap.resetAll();
@@ -123,8 +124,6 @@ void PartitionedDAPReachAlgorithmImplementation<T>::deleteOldPartition() {
 template<typename T>
 void
 PartitionedDAPReachAlgorithmImplementation<T>::initAlgorithms(std::vector<Algora::DiGraph *> &graphs, Algora::DiGraph *overlayGraph) {
-
-
 
     //create new Algorithms
     overlayAlgorithm = new T();
@@ -235,11 +234,11 @@ PartitionedDAPReachAlgorithmImplementation<T>::partition(const Algora::FastPrope
     for(auto i = 0ULL; i < k; i++){
         subGraphs.push_back(new Algora::IncidenceListGraph);
     }
-    Algora::DiGraph* overlayGraph = new Algora::IncidenceListGraph;
+    overlayGraph = new Algora::IncidenceListGraph;
 
 
 
-    diGraph->mapVertices([&subGraphs, &overlayGraph, this, partitionMap](Algora::Vertex* vertex){
+    diGraph->mapVertices([&subGraphs, this, partitionMap](Algora::Vertex* vertex){
         Algora::Vertex* subVertex = subGraphs.at(partitionMap.getValue(vertex))->addVertex();
         Algora::Vertex* overlayVertex = overlayGraph->addVertex();
 
@@ -247,7 +246,7 @@ PartitionedDAPReachAlgorithmImplementation<T>::partition(const Algora::FastPrope
         inMap[overlayVertex] = subVertex;
     });
 
-    diGraph->mapArcs([&subGraphs, &overlayGraph, this, partitionMap](Algora::Arc* arc){
+    diGraph->mapArcs([&subGraphs, this, partitionMap](Algora::Arc* arc){
         unsigned long long headPartition = partitionMap.getValue(arc->getHead());
         unsigned long long tailPartition = partitionMap.getValue(arc->getTail());
 
@@ -262,7 +261,6 @@ PartitionedDAPReachAlgorithmImplementation<T>::partition(const Algora::FastPrope
             Algora::Vertex* overlayHead = mainToOverlayMap.getValue(arc->getHead());
 
             overlayGraph->addArc(overlayTail, overlayHead);
-
         }
 
     });

@@ -28,8 +28,6 @@
 template<typename T>
 PartitionedDAPReachAlgorithm  *createAlgorithm(const Algora::DynamicDiGraph &mainGraph);
 
-void deleteAll(Algora::DynamicDiGraph *mainGraph);
-
 int main(int argc, char *argv[]) {
 
 

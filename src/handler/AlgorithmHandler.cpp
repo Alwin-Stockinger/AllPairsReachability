@@ -19,11 +19,13 @@ typedef std::chrono::high_resolution_clock::time_point TimePoint;
 struct AlgorithmHandler::TimeCollector {
 
 
-    explicit TimeCollector(DynamicAPReachAlgorithm *algorithm) {
+    explicit TimeCollector(DynamicAPReachAlgorithm *algorithm, const unsigned long long int k) {
         this->algorithm = algorithm;
+        this->k = k;
     }
 
     DynamicAPReachAlgorithm *algorithm = nullptr;
+    unsigned long long k;
 
     std::vector<unsigned long long> queryTimes;
     std::vector<unsigned long long> addArcTimes;
@@ -184,7 +186,7 @@ void AlgorithmHandler::runTests(unsigned long long const k) {
     auto &dynGraph = instanceProvider->getGraph();
     auto* diGraph = dynGraph.getDiGraph();
 
-    for(unsigned long long i = 0; i < k ; i++){
+    for(unsigned long long i = 2; i <= k ; i++){
 
         Algora::FastPropertyMap partitionMap = handlePartitioning(k, diGraph);
 
@@ -195,7 +197,7 @@ void AlgorithmHandler::runTests(unsigned long long const k) {
             algorithm->setGraph(diGraph);
             algorithm->partition(partitionMap, k);
 
-            auto* timer = new TimeCollector( algorithm);
+            auto* timer = new TimeCollector(algorithm, k);
             timers.push_back(timer);
 
             auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
@@ -254,6 +256,10 @@ void AlgorithmHandler::runTests(unsigned long long const k) {
     }
 
     writeResults(timers);
+
+    for(TimeCollector* timer : timers){
+        delete timer;
+    }
 }
 
 void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
@@ -266,7 +272,8 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
 
     file << instanceProvider->getConfiguration() << std::endl;
 
-    file << "SS Base Algorithm";
+    file << "k";
+    file << ",SS Base Algorithm";
     file << ",avg query time(ns)";
     file << ",avg add Arc time(ns)";
     file << ",avg remove Arc time(ns)";
@@ -275,7 +282,8 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
     file << std::endl;
 
     for(TimeCollector* timer: timers){
-        file << timer->algorithm->getBaseName();
+        file << timer->k;
+        file << "," << timer->algorithm->getBaseName();
         file << "," << timer->getAvgQueryTime();
         file << "," << timer->getAvgAddArcTime();
         file << "," << timer->getAvgRemoveArcTime();
