@@ -188,16 +188,17 @@ void AlgorithmHandler::runTests(unsigned long long const k) {
 
     for(unsigned long long i = 2; i <= k ; i++){
 
-        Algora::FastPropertyMap partitionMap = handlePartitioning(k, diGraph);
+        Algora::FastPropertyMap partitionMap = handlePartitioning(i, diGraph);
 
         for(auto* algorithm:algorithms) {
 
-
             algorithm->setAutoUpdate(false);
             algorithm->setGraph(diGraph);
-            algorithm->partition(partitionMap, k);
+            algorithm->partition(partitionMap, i);
 
-            auto* timer = new TimeCollector(algorithm, k);
+            std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
+
+            auto* timer = new TimeCollector(algorithm, i);
             timers.push_back(timer);
 
             auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
