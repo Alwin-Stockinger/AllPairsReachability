@@ -14,7 +14,7 @@
 #include <algorithm.reach.es/estree-queue.h>
 #include <algorithm.reach.es/simpleestree.h>
 #include "converter/GraphFileConverter.h"
-#include "algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h"
+#include "algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
 #include "handler/AlgorithmHandler.h"
 
 #include <CLI11.hpp>
@@ -26,9 +26,7 @@
 
 
 template<typename T>
-DynamicAPReachAlgorithm *createAlgorithm(const Algora::DynamicDiGraph &mainGraph,
-                                         const Algora::FastPropertyMap<unsigned long long> &partitionMap,
-                                         const unsigned long long &k);
+PartitionedDAPReachAlgorithm  *createAlgorithm(const Algora::DynamicDiGraph &mainGraph);
 
 void deleteAll(Algora::DynamicDiGraph *mainGraph);
 
@@ -125,79 +123,56 @@ int main(int argc, char *argv[]) {
     dynGraph.resetToBigBang();
     dynGraph.applyNextDelta();
 
-    GraphFileConverter::convertDiGraphToKahip(dynGraph.getDiGraph(), kahipFileName);
 
 
-    //TODO implement Kahip options
-
-    pid_t pid;
-
-    std::string kahipName = "kaffpa";
-    std::string preconfig = "--preconfiguration=eco";   //TODO
-    std::string kahipInputFileName = "k";
-    std::string kahipArgInputFileName = "--output_filename=" + kahipInputFileName;
-    std::string kahipK = "--k=" + std::to_string(k);
-
-    char* kahipArgv[] = {kahipName.data(), kahipFileName.data(), kahipK.data(), preconfig.data(), kahipArgInputFileName.data(), nullptr};
-    char* const envp[]={nullptr};
-    int kahipStatus = posix_spawn(&pid, kahipName.data(), nullptr, nullptr, kahipArgv, envp);
-
-    if(kahipStatus != 0 || waitpid(pid, &kahipStatus, 0) == -1){
-            delete provider;
-            return  -1;
-    }
-
-    std::vector<DynamicAPReachAlgorithm*> algorithms;
-
-    Algora::FastPropertyMap<unsigned long long > partitionMap = GraphFileConverter::makePartitionMap(kahipInputFileName, dynGraph.getDiGraph());
-
+    std::vector<PartitionedDAPReachAlgorithm*> algorithms;
 
     for(const std::string& algorithmName: algorithmNames){
 
 
         if(algorithmName == "StaticBFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>(dynGraph));
         }
         else if(algorithmName == "StaticDFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "LazyDFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "LazyBFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "CachingDFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "CachingBFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "SimpleInc") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "ESTreeML") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeML>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeML>>(dynGraph));
         }
         else if( algorithmName == "OldESTree") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::OldESTree>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::OldESTree>>(dynGraph));
         }
         else if( algorithmName == "ESTreeQ") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeQ>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeQ>>(dynGraph));
         }
         else if( algorithmName == "SimpleESTree") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleESTree>>(dynGraph,partitionMap, k));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleESTree>>(dynGraph));
         }
         else{
             std::cerr << algorithmName << " not a viable algorithm" << std::endl;
@@ -207,7 +182,7 @@ int main(int argc, char *argv[]) {
     AlgorithmHandler handler(algorithms, provider);
 
     if(runPerformanceTests){
-        handler.runTests();
+        handler.runTests(k);
     }
     else{
         handler.runInterface();
@@ -376,16 +351,8 @@ int main(int argc, char *argv[]) {
 
 
 template<typename T>
-    DynamicAPReachAlgorithm *createAlgorithm(const Algora::DynamicDiGraph &mainGraph,
-                                             const Algora::FastPropertyMap<unsigned long long> &partitionMap,
-                                             const unsigned long long &k) {
-
-
-    auto* algorithm = new PartitionedDAPReachAlgorithm<T>();
-    algorithm->setGraph(mainGraph.getDiGraph());
-    algorithm->partition(partitionMap, k);
-
-    return algorithm;
+    PartitionedDAPReachAlgorithm  *createAlgorithm(const Algora::DynamicDiGraph &mainGraph) {
+        return new PartitionedDAPReachAlgorithmImplementation<T>();
 }
 
 void deleteAll(Algora::DynamicDiGraph *mainGraph) {

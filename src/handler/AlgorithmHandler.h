@@ -1,5 +1,6 @@
 #include <utility>
 #include <instanceprovider.h>
+#include <property/fastpropertymap.h>
 
 //
 // Created by Alwin Stockinger.
@@ -12,17 +13,17 @@
 #include "graph.dyn/dynamicdigraph.h"
 
 #include "../algorithm.reach.allPair/DynamicAPReachAlgorithm.h"
-
+#include "../algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
 
 
 class AlgorithmHandler {
 
 public:
-    AlgorithmHandler(std::vector<DynamicAPReachAlgorithm *> newAlgorithms, Algora::InstanceProvider* newProvider) : algorithms(std::move(newAlgorithms)), instanceProvider{newProvider}{}
+    AlgorithmHandler(std::vector<PartitionedDAPReachAlgorithm*> newAlgorithms, Algora::InstanceProvider* newProvider) : algorithms(std::move(newAlgorithms)), instanceProvider{newProvider}{}
 
     void runInterface();
 
-    void runTests();
+    void runTests(unsigned long long k);
 
 private:
     void addArc();
@@ -33,7 +34,7 @@ private:
 
     struct TimeCollector;
 
-    std::vector<DynamicAPReachAlgorithm *> algorithms;
+    std::vector<PartitionedDAPReachAlgorithm*> algorithms;
 
     Algora::InstanceProvider* instanceProvider;
 
@@ -42,6 +43,7 @@ private:
     void writeResults(const std::vector<TimeCollector*>& timers);
 
 
+    Algora::FastPropertyMap<unsigned long long> handlePartitioning(unsigned long long int k, Algora::DiGraph *graph);
 };
 
 

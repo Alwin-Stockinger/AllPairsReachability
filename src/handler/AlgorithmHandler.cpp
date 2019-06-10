@@ -5,8 +5,13 @@
 #include <iostream>
 #include <chrono>
 #include "AlgorithmHandler.h"
+#include "../converter/GraphFileConverter.h"
 #include <set>
 #include <fstream>
+#include <numeric>
+#include <property/fastpropertymap.h>
+#include <spawn.h>
+#include <wait.h>
 
 typedef std::chrono::high_resolution_clock HRC;
 typedef std::chrono::high_resolution_clock::time_point TimePoint;
@@ -49,6 +54,22 @@ struct AlgorithmHandler::TimeCollector {
 
     const double getAvgRemoveArcTime(){
         return getAvg(removeArcTimes);
+    }
+
+    const unsigned long long getQueryTime(){
+        return std::accumulate(queryTimes.begin(), queryTimes.end(), 0ULL);
+    }
+
+    const unsigned long long getAddArcTime(){
+        return std::accumulate(addArcTimes.begin(), addArcTimes.end(), 0ULL);
+    }
+
+    const unsigned long long getRemoveArcTime(){
+        return std::accumulate(removeArcTimes.begin(), removeArcTimes.end(), 0ULL);
+    }
+
+    const unsigned long long getAllTime(){
+        return getQueryTime() + getAddArcTime() + getRemoveArcTime();
     }
 
 private:
@@ -155,7 +176,7 @@ void AlgorithmHandler::removeArc(){
     graph.applyNextDelta();
 }
 
-void AlgorithmHandler::runTests() {
+void AlgorithmHandler::runTests(unsigned long long const k) {
 
     std::vector<TimeCollector*> timers;
 
@@ -163,63 +184,73 @@ void AlgorithmHandler::runTests() {
     auto &dynGraph = instanceProvider->getGraph();
     auto* diGraph = dynGraph.getDiGraph();
 
+    for(unsigned long long i = 0; i < k ; i++){
 
-    for(auto* algorithm:algorithms) {
-        auto* timer = new TimeCollector( algorithm);
-        timers.push_back(timer);
+        Algora::FastPropertyMap partitionMap = handlePartitioning(k, diGraph);
 
-        algorithm->setAutoUpdate(false);
-        algorithm->setGraph(dynGraph.getDiGraph());
-
-        auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
-            auto startTime = HRC::now();
-            algorithm->onArcAdd(arc);
-            auto endTime = HRC::now();
-            timer->addAddArcTime(startTime, endTime);
-        };
-        diGraph->onArcAdd(algorithm,onArcAdded);
-
-        auto onArcRemoved = [algorithm, &timer](Algora::Arc* arc){
-            auto startTime = HRC::now();
-            algorithm->onArcRemove(arc);
-            auto endTime = HRC::now();
-            timer->addRemoveArcTime(startTime, endTime);
-        };
-        diGraph->onArcRemove(algorithm, onArcRemoved);
-
-        auto onVertexAdded = [algorithm, &timer](Algora::Vertex* vertex){
-            algorithm->onVertexAdd(vertex);
-        };
-        diGraph->onVertexAdd(algorithm, onVertexAdded);
-
-        auto onVertexRemoved = [algorithm, &timer](Algora::Vertex* vertex){
-            algorithm->onVertexRemove(vertex);
-        };
-        diGraph->onVertexRemove(algorithm, onVertexRemoved);
-
-        for (auto &currentQueries : queries) {
-            for (auto i = 0ULL; currentQueries.size() != 0ULL && i < currentQueries.size() - 1; i += 2) {
-
-                auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[i]);
-                auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[i + 1]);
+        for(auto* algorithm:algorithms) {
 
 
-                auto startTime = std::chrono::high_resolution_clock::now();
-                algorithm->query(startVertex, endVertex);
-                auto endTime = std::chrono::high_resolution_clock::now();
-                timer->addQueryTime(startTime, endTime);
+            algorithm->setAutoUpdate(false);
+            algorithm->setGraph(diGraph);
+            algorithm->partition(partitionMap, k);
+
+            auto* timer = new TimeCollector( algorithm);
+            timers.push_back(timer);
+
+            auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
+                auto startTime = HRC::now();
+                algorithm->onArcAdd(arc);
+                auto endTime = HRC::now();
+                timer->addAddArcTime(startTime, endTime);
+            };
+            diGraph->onArcAdd(algorithm,onArcAdded);
+
+            auto onArcRemoved = [algorithm, &timer](Algora::Arc* arc){
+                auto startTime = HRC::now();
+                algorithm->onArcRemove(arc);
+                auto endTime = HRC::now();
+                timer->addRemoveArcTime(startTime, endTime);
+            };
+            diGraph->onArcRemove(algorithm, onArcRemoved);
+
+            auto onVertexAdded = [algorithm, &timer](Algora::Vertex* vertex){
+                algorithm->onVertexAdd(vertex);
+            };
+            diGraph->onVertexAdd(algorithm, onVertexAdded);
+
+            auto onVertexRemoved = [algorithm, &timer](Algora::Vertex* vertex){
+                algorithm->onVertexRemove(vertex);
+            };
+            diGraph->onVertexRemove(algorithm, onVertexRemoved);
+
+            for (auto &currentQueries : queries) {
+                for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
+
+                    auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
+                    auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[j + 1]);
+
+
+                    auto startTime = std::chrono::high_resolution_clock::now();
+                    algorithm->query(startVertex, endVertex);
+                    auto endTime = std::chrono::high_resolution_clock::now();
+                    timer->addQueryTime(startTime, endTime);
+                }
+                dynGraph.applyNextDelta();
             }
+
+            algorithm->unsetGraph();
+
+            diGraph->removeOnArcAdd(algorithm);
+            diGraph->removeOnArcRemove(algorithm);
+            diGraph->removeOnVertexAdd(algorithm);
+            diGraph->removeOnVertexRemove(algorithm);
+
+
+            //reset to initial graph
+            dynGraph.resetToBigBang();
             dynGraph.applyNextDelta();
         }
-
-        diGraph->removeOnArcAdd(algorithm);
-        diGraph->removeOnArcRemove(algorithm);
-        diGraph->removeOnVertexAdd(algorithm);
-        diGraph->removeOnVertexRemove(algorithm);
-
-        //reset to initial graph
-        dynGraph.resetToBigBang();
-        dynGraph.applyNextDelta();
     }
 
     writeResults(timers);
@@ -236,9 +267,10 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
     file << instanceProvider->getConfiguration() << std::endl;
 
     file << "SS Base Algorithm";
-    file << ",avg query time";
-    file << ",avg add Arc time";
-    file << ",avg remove Arc time";
+    file << ",avg query time(ns)";
+    file << ",avg add Arc time(ns)";
+    file << ",avg remove Arc time(ns)";
+    file << ",whole Time(ns)";
 
     file << std::endl;
 
@@ -247,6 +279,33 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
         file << "," << timer->getAvgQueryTime();
         file << "," << timer->getAvgAddArcTime();
         file << "," << timer->getAvgRemoveArcTime();
+        file << "," << timer->getAllTime();
         file << std::endl;
     }
+}
+
+Algora::FastPropertyMap<unsigned long long> AlgorithmHandler::handlePartitioning(const unsigned long long int k, Algora::DiGraph* graph) {
+
+    std::string kahipFileName = "forKahip";
+
+    GraphFileConverter::convertDiGraphToKahip(graph, kahipFileName);
+    //TODO implement Kahip options
+    pid_t pid;
+
+    std::string kahipName = "kaffpa";
+    std::string preconfig = "--preconfiguration=eco";   //TODO
+
+    std::string kahipInputFileName = "k";
+    std::string kahipArgInputFileName = "--output_filename=" + kahipInputFileName;
+    std::string kahipK = "--k=" + std::to_string(k);
+
+    char* kahipArgv[] = {kahipName.data(), kahipFileName.data(), kahipK.data(), preconfig.data(), kahipArgInputFileName.data(), nullptr};
+    char* const envp[]={nullptr};
+    std::cout << "\n\nStarting Kahip with k=" + std::to_string(k) << std::endl;
+    int kahipStatus = posix_spawn(&pid, kahipName.data(), nullptr, nullptr, kahipArgv, envp);
+
+    if(kahipStatus != 0 || waitpid(pid, &kahipStatus, 0) == -1){
+        throw std::runtime_error("kahip could not be executed");
+    }
+    return GraphFileConverter::makePartitionMap(kahipInputFileName, graph);
 }

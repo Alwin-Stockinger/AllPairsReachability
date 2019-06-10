@@ -2,7 +2,7 @@
 // Created by Alwin Stockinger.
 //
 
-#include "../src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h"
+#include "../src/algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
 #include "../src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h"
 
 #include <gtest/gtest.h>
@@ -25,7 +25,7 @@ template <typename T>
 class TestPartitionedDAPReachAlgorithm : public testing::Test{
 
 protected:
-    PartitionedDAPReachAlgorithm<T>* algorithm = nullptr;
+    PartitionedDAPReachAlgorithmImplementation<T>* algorithm = nullptr;
 
     Algora::DynamicDiGraph* mainGraph = nullptr;
 
@@ -72,7 +72,7 @@ public:
         partitionMap[mainGraph->getCurrentVertexForId(7)]= 2;
 
 
-        algorithm = new PartitionedDAPReachAlgorithm<T>();
+        algorithm = new PartitionedDAPReachAlgorithmImplementation<T>();
         algorithm->setGraph(mainGraph->getDiGraph());
         algorithm->partition(partitionMap, 3);
     }

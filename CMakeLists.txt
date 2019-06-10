@@ -19,7 +19,7 @@ link_libraries("libAlgoraCore.a")
 SET(CONVERT src/converter/GraphFileConverter.cpp src/converter/GraphFileConverter.h )
 
 #src
-SET(OBJS "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/konectnetworkinstanceprovider.o" "../DyReach/build/Release/reachabilitysuite.o" src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h src/handler/AlgorithmHandler.cpp src/handler/AlgorithmHandler.h)
+SET(OBJS "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/konectnetworkinstanceprovider.o" "../DyReach/build/Release/reachabilitysuite.o" src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.cpp src/algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h src/handler/AlgorithmHandler.cpp src/handler/AlgorithmHandler.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h)
 
 add_executable(AllPairReach src/main.cpp ${OBJS} ${CONVERT} src/generator/RandomDoubleQueryGenerator.cpp src/generator/RandomDoubleQueryGenerator.h)
 
@@ -33,7 +33,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 
 #unit tests
-SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestSSBasedDAPReachAlgorithm.cpp tests/TestPartitionedDAPReachAlgorithm.cpp src/generator/RandomDoubleQueryGenerator.cpp src/generator/RandomDoubleQueryGenerator.h)
+SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestSSBasedDAPReachAlgorithm.cpp tests/TestPartitionedDAPReachAlgorithm.cpp src/generator/RandomDoubleQueryGenerator.cpp src/generator/RandomDoubleQueryGenerator.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h)
 
 add_executable(runTests ${OBJS} ${TESTS})
 
