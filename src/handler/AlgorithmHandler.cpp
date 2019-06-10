@@ -168,8 +168,8 @@ void AlgorithmHandler::runTests() {
         auto* timer = new TimeCollector( algorithm);
         timers.push_back(timer);
 
-        algorithm->setGraph(dynGraph.getDiGraph());
         algorithm->setAutoUpdate(false);
+        algorithm->setGraph(dynGraph.getDiGraph());
 
         auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
             auto startTime = HRC::now();
@@ -198,7 +198,7 @@ void AlgorithmHandler::runTests() {
         diGraph->onVertexRemove(algorithm, onVertexRemoved);
 
         for (auto &currentQueries : queries) {
-            for (auto i = 0ULL; i < currentQueries.size(); i += 2) {
+            for (auto i = 0ULL; currentQueries.size() != 0ULL && i < currentQueries.size() - 1; i += 2) {
 
                 auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[i]);
                 auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[i + 1]);
@@ -211,7 +211,11 @@ void AlgorithmHandler::runTests() {
             }
             dynGraph.applyNextDelta();
         }
-        algorithm->unsetGraph();
+
+        diGraph->removeOnArcAdd(algorithm);
+        diGraph->removeOnArcRemove(algorithm);
+        diGraph->removeOnVertexAdd(algorithm);
+        diGraph->removeOnVertexRemove(algorithm);
 
         //reset to initial graph
         dynGraph.resetToBigBang();

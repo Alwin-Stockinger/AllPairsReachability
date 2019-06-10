@@ -25,7 +25,7 @@ public:
 
     static void addVertices(const Algora::DynamicDiGraph &oldGraph, Algora::DynamicDiGraph *newGraph);
 
-    static std::map<unsigned long long, unsigned long long> makePartitionMap(const std::string &partitionFileName);
+    static Algora::FastPropertyMap< unsigned long long> makePartitionMap(const std::string &partitionFileName, Algora::DiGraph* graph);
 
     static std::vector<Algora::DynamicDiGraph *> *
     makeSubGraphs(const Algora::DynamicDiGraph& mainGraph, const std::map<unsigned long long, unsigned long long> &partitionMap);

@@ -228,4 +228,16 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testPreviousConnectionRemoved){
     ASSERT_FALSE(this->algorithm -> query(vertex1, vertex2));
 }
 
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testRemoveOverlayArc){
+
+    Algora::Vertex* vertex2 = this->mainGraph -> getCurrentVertexForId(2);
+    Algora::Vertex* vertex3 = this->mainGraph -> getCurrentVertexForId(3);
+
+    ASSERT_TRUE(this->algorithm -> query(vertex2, vertex3));
+
+    this->mainGraph->removeArc(2,3,1);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_FALSE(this->algorithm -> query(vertex2, vertex3));
+}
 

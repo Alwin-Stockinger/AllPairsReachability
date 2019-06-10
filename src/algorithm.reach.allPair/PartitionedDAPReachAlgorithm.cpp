@@ -107,8 +107,11 @@ void PartitionedDAPReachAlgorithm<T>::deleteOldPartition() {
         delete algorithm;
         delete graph;
     }
+
     delete overlayAlgorithm;
-    if(mainToOverlayMap[diGraph->getAnyVertex()]){
+
+    Algora::Vertex* anyVertex = diGraph->getAnyVertex();
+    if(mainToOverlayMap[anyVertex]){
         delete mainToOverlayMap[diGraph->getAnyVertex()]->getParent();
     }
 
@@ -149,17 +152,12 @@ void PartitionedDAPReachAlgorithm<T>::initEdges(const std::vector<Algora::DiGrap
 
 template<typename T>
 void PartitionedDAPReachAlgorithm<T>::onVertexAdd(Algora::Vertex *vertex) {
-
-    throw "Not implemented";
-    DynamicDiGraphAlgorithm::onVertexAdd(vertex);
+    throw std::logic_error("Not implemented");
 }
 
 template<typename T>
 void PartitionedDAPReachAlgorithm<T>::onVertexRemove(Algora::Vertex *vertex) {
-
-    throw "Not implemented";
-
-    DynamicDiGraphAlgorithm::onVertexRemove(vertex);
+    throw std::logic_error("Not implemented");
 }
 
 template<typename T>
@@ -258,12 +256,14 @@ PartitionedDAPReachAlgorithm<T>::partition(const Algora::FastPropertyMap<unsigne
             Algora::Vertex* subTail = inMap.getValue(mainToOverlayMap.getValue(arc->getTail()));
             Algora::Vertex* subHead = inMap.getValue(mainToOverlayMap.getValue(arc->getHead()));
             subGraphs.at(headPartition)->addArc(subTail, subHead);
+
         }
         else{
             Algora::Vertex* overlayTail = mainToOverlayMap.getValue(arc->getTail());
             Algora::Vertex* overlayHead = mainToOverlayMap.getValue(arc->getHead());
 
             overlayGraph->addArc(overlayTail, overlayHead);
+
         }
 
     });

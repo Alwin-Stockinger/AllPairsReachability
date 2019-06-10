@@ -6,6 +6,8 @@
 #include <set>
 #include <konectnetworkinstanceprovider.h>
 #include <randominstanceprovider.h>
+#include <property/fastpropertymap.h>
+#include <cstring>
 #include "GraphFileConverter.h"
 
 
@@ -185,21 +187,30 @@ void GraphFileConverter::addVertices(const Algora::DynamicDiGraph &oldGraph, Alg
     });
 }
 
-std::map<unsigned long long, unsigned long long> GraphFileConverter::makePartitionMap(const std::string &partitionFileName) {
+Algora::FastPropertyMap<unsigned long long> GraphFileConverter::makePartitionMap(const std::string &partitionFileName, Algora::DiGraph* graph) {
 
-    std::map<unsigned long long, unsigned long long> partitionMap;
+
+    std::map<unsigned long long, Algora::Vertex*> vertices;
+
+    unsigned long long vertexI = 0ULL;
+    graph->mapVertices([&vertices, &vertexI](Algora::Vertex* vertex){
+        vertices.insert({vertexI++, vertex});
+    });
+
+    Algora::FastPropertyMap<unsigned long long> partitionMap;
 
     std::ifstream file(partitionFileName);
 
     if(file.good()) {
         std::string line;
-        for (unsigned i = 0; std::getline(file, line); i++) {
-            partitionMap[i] = std::stoul(line);
+        for (unsigned long long i = 0ULL; std::getline(file, line); i++) {
+            partitionMap[vertices[i]] = std::stoul(line);
         }
     }
     else{
         //TODO error
-        std::cerr << "PartitionFile not good";
+        std::cerr << "PartitionFile not good" << std::endl;
+        std::cerr << "Error: " << strerror(errno);
     }
 
     return partitionMap;

@@ -1,7 +1,8 @@
 
+#include <cstring>
+
 
 #include <algorithm.reach/staticbfsssreachalgorithm.h>
-#include <cstring>
 #include <algorithm.reach/staticdfsssreachalgorithm.h>
 #include <algorithm.reach/lazydfsssreachalgorithm.h>
 #include <algorithm.reach/lazybfsssreachalgorithm.h>
@@ -20,12 +21,14 @@
 #include <instanceprovider.h>
 #include <randominstanceprovider.h>
 #include <konectnetworkinstanceprovider.h>
+#include <spawn.h>
+#include <wait.h>
 
 
-template<typename T> DynamicAPReachAlgorithm * createAlgorithm(const Algora::DynamicDiGraph& mainGraph, Algora::DynamicDiGraph *overlayGraph,
-                                          std::vector<Algora::DynamicDiGraph *> *subGraphs,
-                                          std::map<const Algora::Vertex *, Algora::Vertex *> *inMap,
-                                          std::map<const Algora::Vertex *, Algora::Vertex *> *mainToOverlayMap);
+template<typename T>
+DynamicAPReachAlgorithm *createAlgorithm(const Algora::DynamicDiGraph &mainGraph,
+                                         const Algora::FastPropertyMap<unsigned long long> &partitionMap,
+                                         const unsigned long long &k);
 
 void deleteAll(Algora::DynamicDiGraph *mainGraph);
 
@@ -41,7 +44,11 @@ int main(int argc, char *argv[]) {
     app.add_option("-i, --inputFile", inputFileName, "File name of the input Graph");
 
     std::string kahipFileName = "forKahip";
-    app.add_option("-k, --kahipFile", kahipFileName, "File name for kahip files");
+    app.add_option(" --kahipFile", kahipFileName, "File name for kahip files");
+
+    unsigned long long k = 10;
+    app.add_option(" -k, --partitions", k, "Amount of partitions");
+
 
     std::vector<std::string> algorithmNames;
     app.add_option("-A, --algorithms", algorithmNames, "Algorithms to use");
@@ -50,7 +57,7 @@ int main(int argc, char *argv[]) {
     app.add_option("-s, --vertexSize", vertexSize, "Amount of vertices for random graphs");
 
     unsigned long long arcSize = 100;
-    app.add_option("--arcSize", arcSize, "Amount of arcs for random graphs");
+    auto arcSizeOption = app.add_option("--arcSize", arcSize, "Amount of arcs for random graphs");
 
     double arcProb = 0.1;
     app.add_option("-p, --arcProbability", arcProb, "Probability of arcs for random graphs");
@@ -62,7 +69,7 @@ int main(int argc, char *argv[]) {
     auto numOperationsOption = app.add_option("-o, --numOperations", numOperations, "Number of Operations");
 
     unsigned queryProp = 70;
-    auto queryProbOption = app.add_option("-q, --queryProp", queryProp, "Proportion of queries");
+    auto queryProbOption = app.add_option("-q, --queries", queryProp, "Proportion of queries");
 
     unsigned removalProp = 15;
     auto removalPropOption = app.add_option("-r, --removalProp", removalProp, "Proportion of removals");
@@ -73,6 +80,8 @@ int main(int argc, char *argv[]) {
     unsigned multiplier = 1;
     auto multiplierOption = app.add_option("-m, --multiplier", multiplier, "Multiplier of operations");
 
+    bool runPerformanceTests = true;
+    auto runPerformanceTestsOption = app.add_option("-b, --performance", runPerformanceTests, "To run performance tests");
 
     CLI11_PARSE(app, argc, argv)
 
@@ -81,12 +90,16 @@ int main(int argc, char *argv[]) {
     if(graphType == "random"){
         auto randomProvider = new Algora::RandomInstanceProvider;
         randomProvider->setGraphSize(vertexSize);
-        randomProvider->setInitialArcProbability(arcProb);
-        randomProvider->setInitialArcSize(arcSize);
+        if(arcSizeOption ){
+            randomProvider->setInitialArcSize(arcSize);
+        }
+        else{
+            randomProvider->setInitialArcProbability(arcProb);
+        }
         randomProvider->allowMultiArcs(multiArcs);
 
         randomProvider->setNumOperations(numOperations);
-        randomProvider->setQueriesProportion(queryProp);
+        randomProvider->setQueriesProportion(2*queryProp);  //TODO use new Query Generator
         randomProvider->setArcRemovalProportion(removalProp);
         randomProvider->setArcAdditionProportion(additionProp);
         randomProvider->setMultiplier(multiplier);
@@ -102,7 +115,7 @@ int main(int argc, char *argv[]) {
     else{
         //TODO error
 
-        std::cerr << graphType << " is not a viable graphtype\n";
+        std::cerr << graphType << " is not a viable graph type\n";
         return 1;
     }
 
@@ -114,139 +127,94 @@ int main(int argc, char *argv[]) {
 
     GraphFileConverter::convertDiGraphToKahip(dynGraph.getDiGraph(), kahipFileName);
 
-    std::string kahipInputFileName;
 
-    std::cout << "Kahip input file name:\n";
-    std::cin >> kahipInputFileName;
+    //TODO implement Kahip options
 
+    pid_t pid;
+
+    std::string kahipName = "kaffpa";
+    std::string preconfig = "--preconfiguration=eco";   //TODO
+    std::string kahipInputFileName = "k";
+    std::string kahipArgInputFileName = "--output_filename=" + kahipInputFileName;
+    std::string kahipK = "--k=" + std::to_string(k);
+
+    char* kahipArgv[] = {kahipName.data(), kahipFileName.data(), kahipK.data(), preconfig.data(), kahipArgInputFileName.data(), nullptr};
+    char* const envp[]={nullptr};
+    int kahipStatus = posix_spawn(&pid, kahipName.data(), nullptr, nullptr, kahipArgv, envp);
+
+    if(kahipStatus != 0 || waitpid(pid, &kahipStatus, 0) == -1){
+            delete provider;
+            return  -1;
+    }
 
     std::vector<DynamicAPReachAlgorithm*> algorithms;
-    std::set<Algora::DynamicDiGraph*> overlayGraphsSet;
-    std::set<std::vector<Algora::DynamicDiGraph*>*> subGraphsSet;
-    std::set<std::map<const Algora::Vertex *, Algora::Vertex *>*> mapsSet;
 
-    std::map<unsigned long long, unsigned long long > partitionMap = GraphFileConverter::makePartitionMap(kahipInputFileName);
+    Algora::FastPropertyMap<unsigned long long > partitionMap = GraphFileConverter::makePartitionMap(kahipInputFileName, dynGraph.getDiGraph());
 
 
     for(const std::string& algorithmName: algorithmNames){
-        Algora::DynamicDiGraph* overlayGraph = GraphFileConverter::makeOverlay(dynGraph,partitionMap);
-        overlayGraphsSet.insert(overlayGraph);
 
-        std::vector<Algora::DynamicDiGraph*> *subGraphs = GraphFileConverter::makeSubGraphs(dynGraph,partitionMap);
-        subGraphsSet.insert(subGraphs);
-
-        std::map<const Algora::Vertex *, Algora::Vertex *>
-                * inMap = GraphFileConverter::makeInMap(overlayGraph, subGraphs, partitionMap),
-                *mainToOverlayMap = GraphFileConverter::makeMainToOverlayMap(dynGraph, overlayGraph);
-        mapsSet.insert({mainToOverlayMap, inMap});
 
         if(algorithmName == "StaticBFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>(dynGraph,
-                                                                                                 overlayGraph,
-                                                                                                 subGraphs, inMap,
-                                                                                                 mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
         }
         else if(algorithmName == "StaticDFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>>(dynGraph,
-                                                                                                 overlayGraph,
-                                                                                                 subGraphs, inMap,
-                                                                                                 mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
         }
         else if( algorithmName == "LazyDFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>>(dynGraph,
-                                                                                               overlayGraph,
-                                                                                               subGraphs, inMap,
-                                                                                               mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
         }
         else if( algorithmName == "LazyBFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>>(
-                            dynGraph,
-                            overlayGraph,
-                            subGraphs, inMap,
-                            mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
         }
         else if( algorithmName == "CachingDFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>>(
-                            dynGraph,
-                            overlayGraph,
-                            subGraphs, inMap,
-                            mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
         }
         else if( algorithmName == "CachingBFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>>(
-                            dynGraph,
-                            overlayGraph,
-                            subGraphs, inMap,
-                            mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>>(dynGraph,partitionMap, k));
         }
         else if( algorithmName == "SimpleInc") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>>(
-                            dynGraph,
-                            overlayGraph,
-                            subGraphs, inMap,
-                            mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>>(dynGraph,partitionMap, k));
         }
         else if( algorithmName == "ESTreeML") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeML>>(
-                            dynGraph,
-                            overlayGraph,
-                            subGraphs, inMap,
-                            mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeML>>(dynGraph,partitionMap, k));
         }
         else if( algorithmName == "OldESTree") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::OldESTree>>(
-                            dynGraph,
-                            overlayGraph,
-                            subGraphs, inMap,
-                            mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::OldESTree>>(dynGraph,partitionMap, k));
         }
         else if( algorithmName == "ESTreeQ") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeQ>>(
-                            dynGraph,
-                            overlayGraph,
-                            subGraphs, inMap,
-                            mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeQ>>(dynGraph,partitionMap, k));
         }
         else if( algorithmName == "SimpleESTree") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleESTree>>(
-                            dynGraph,
-                            overlayGraph,
-                            subGraphs, inMap,
-                            mainToOverlayMap));
+                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleESTree>>(dynGraph,partitionMap, k));
         }
         else{
             std::cerr << algorithmName << " not a viable algorithm" << std::endl;
             //TODO throw error
         }
     }
-    AlgorithmHandler handler(algorithms, &dynGraph);
-    handler.runInterface();
+    AlgorithmHandler handler(algorithms, provider);
+
+    if(runPerformanceTests){
+        handler.runTests();
+    }
+    else{
+        handler.runInterface();
+    }
 
     for(DynamicAPReachAlgorithm* algorithm: algorithms){
         delete algorithm;
-    }
-    for(Algora::DynamicDiGraph* graph: overlayGraphsSet){
-        delete graph;
-    }
-    for(std::vector<Algora::DynamicDiGraph*>* subGraphs : subGraphsSet){
-        for(Algora::DynamicDiGraph* subGraph: *subGraphs){
-            delete subGraph;
-        }
-        delete subGraphs;
-    }
-    for(std::map<const Algora::Vertex *, Algora::Vertex *>* map : mapsSet){
-        delete map;
     }
 
     delete provider;
@@ -407,20 +375,15 @@ int main(int argc, char *argv[]) {
      */
 
 
-template<typename T> DynamicAPReachAlgorithm * createAlgorithm(const Algora::DynamicDiGraph &mainGraph, Algora::DynamicDiGraph *overlayGraph,
-                                          std::vector<Algora::DynamicDiGraph *> *subGraphs,
-                                          std::map<const Algora::Vertex *, Algora::Vertex *> *inMap,
-                                          std::map<const Algora::Vertex *, Algora::Vertex *> *mainToOverlayMap) {
-    std::vector<Algora::DiGraph*> subDiGraphs;
-
-    for(Algora::DynamicDiGraph* dynamicDiGraph: *subGraphs){
-        subDiGraphs.push_back(dynamicDiGraph->getDiGraph());
-    }
+template<typename T>
+    DynamicAPReachAlgorithm *createAlgorithm(const Algora::DynamicDiGraph &mainGraph,
+                                             const Algora::FastPropertyMap<unsigned long long> &partitionMap,
+                                             const unsigned long long &k) {
 
 
     auto* algorithm = new PartitionedDAPReachAlgorithm<T>();
     algorithm->setGraph(mainGraph.getDiGraph());
-    algorithm->setGraphs(&subDiGraphs, overlayGraph->getDiGraph(), *inMap, *mainToOverlayMap);
+    algorithm->partition(partitionMap, k);
 
     return algorithm;
 }
