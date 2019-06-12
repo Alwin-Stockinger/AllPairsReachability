@@ -43,6 +43,7 @@ public:
 
         mainGraph = new Algora::DynamicDiGraph;
 
+        mainGraph->addVertex(0, 0);
         mainGraph->addVertex(1, 0);
         mainGraph->addVertex(2, 0);
         mainGraph->addVertex(3, 0);
@@ -50,6 +51,7 @@ public:
         mainGraph->addVertex(5, 0);
         mainGraph->addVertex(6, 0);
         mainGraph->addVertex(7, 0);
+        mainGraph->addArc(2,0,0);
         mainGraph->addArc(1,2,0);
         mainGraph->addArc(2,3,0);
         mainGraph->addArc(3,4,0);
@@ -63,6 +65,7 @@ public:
 
         Algora::FastPropertyMap<unsigned long long> partitionMap;
 
+        partitionMap[mainGraph->getCurrentVertexForId(0)] = 0;
         partitionMap[mainGraph->getCurrentVertexForId(1)]= 0;//graph1->getCurrentVertexForId(1);
         partitionMap[mainGraph->getCurrentVertexForId(2)]= 0;//graph1->getCurrentVertexForId(2);
         partitionMap[mainGraph->getCurrentVertexForId(3)]= 1;//graph2->getCurrentVertexForId(3);
@@ -239,5 +242,24 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testRemoveOverlayArc){
     this->mainGraph->applyNextDelta();
 
     ASSERT_FALSE(this->algorithm -> query(vertex2, vertex3));
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testDoubleOverlayQuery){
+
+    Algora::Vertex* vertex2 = this->mainGraph -> getCurrentVertexForId(2);
+    Algora::Vertex* vertex3 = this->mainGraph -> getCurrentVertexForId(3);
+
+    ASSERT_TRUE(this->algorithm -> query(vertex2, vertex3));
+    ASSERT_TRUE(this->algorithm -> query(vertex2, vertex3));
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testDoubleTwoWayOverlayQuery){
+
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex0 = this->mainGraph -> getCurrentVertexForId(0);
+    Algora::Vertex* vertex5 = this->mainGraph -> getCurrentVertexForId(5);
+
+    ASSERT_FALSE(this->algorithm -> query(vertex5, vertex1));
+    ASSERT_TRUE(this->algorithm -> query(vertex5, vertex0));
 }
 

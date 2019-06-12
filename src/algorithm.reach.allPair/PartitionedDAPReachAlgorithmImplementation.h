@@ -47,7 +47,7 @@ public:
     void onVertexRemove(Algora::Vertex *vertex) override;
 
 private:
-    void initAlgorithms(std::vector<Algora::DiGraph *> &graphs, Algora::DiGraph *overlayGraph);
+    void initAlgorithms(std::vector<Algora::DiGraph *> &graphs);
 
 
 protected:
@@ -57,7 +57,7 @@ protected:
 
 
 private:
-    T* overlayAlgorithm = nullptr;
+    DynamicAPReachAlgorithm* overlayAlgorithm = nullptr;
     Algora::DiGraph* overlayGraph = nullptr;
 
     Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;//cannot use FastPropertyMap, because of different graphs???
@@ -70,7 +70,7 @@ private:
     void deleteOldPartition();
 
 
-    void initEdges(const std::vector<Algora::DiGraph *> &graphs, Algora::DiGraph *overlayGraph);
+    void initEdges(const std::vector<Algora::DiGraph *> &graphs);
 };
 
 
