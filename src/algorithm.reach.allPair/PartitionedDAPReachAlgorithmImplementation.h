@@ -46,6 +46,10 @@ public:
 
     void onVertexRemove(Algora::Vertex *vertex) override;
 
+    bool isPartitioned(){
+        return partitioned;
+    }
+
 private:
     void initAlgorithms(std::vector<Algora::DiGraph *> &graphs);
 
@@ -61,16 +65,13 @@ private:
     Algora::DiGraph* overlayGraph = nullptr;
 
     Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;//cannot use FastPropertyMap, because of different graphs???
-    Algora::FastPropertyMap<Algora::Vertex*> inMap;
+    Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;
     Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
     Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;//cannot use FastPropertyMap, because of different graphs???
 
     bool partitioned = false;
 
     void deleteOldPartition();
-
-
-    void initEdges(const std::vector<Algora::DiGraph *> &graphs);
 };
 
 

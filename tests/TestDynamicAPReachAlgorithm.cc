@@ -83,3 +83,8 @@ TEST_P(TestDynamicAPReachAlgorithm, testMultipleArcWay) {
     ASSERT_TRUE(algorithm -> query(vertex1, vertex3));
 }
 
+TEST_P(TestDynamicAPReachAlgorithm, testVertexRemove){
+    dynamicDiGraph -> removeVertex(1, 1);
+    dynamicDiGraph->applyNextDelta();
+}
+

@@ -8,12 +8,13 @@ include_directories("../AlgoraDyn/src/")
 include_directories("../DyReach/src/")
 include_directories("../AlgoraCore/src/")
 
-link_directories("../AlgoraDyn/build/Release")
 link_directories("../AlgoraCore/build/Release")
+link_directories("../AlgoraDyn/build/Release")
 link_directories("../DyReach/build/Release")
 
-link_libraries("libAlgoraDyn.a")
 link_libraries("libAlgoraCore.a")
+link_libraries("libAlgoraDyn.a")
+
 
 
 SET(CONVERT src/converter/GraphFileConverter.cpp src/converter/GraphFileConverter.h )
