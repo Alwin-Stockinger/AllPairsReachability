@@ -180,6 +180,20 @@ void PartitionedDAPReachAlgorithmImplementation<T>::onArcAdd(Algora::Arc *arc) {
         static_cast<Algora::DiGraph*>(headGraph)->addArc(subTail, subHead);
     }
     else{
+        /*if(!overlayGraph->containsVertex(overlayHead)){
+            auto* newAlgorithm = overlayAlgorithm->prepareAlgorithm();
+            Algora::Vertex* overlayVertex = overlayGraph->addVertex();
+            overlayAlgorithm->newPair(newAlgorithm, vertex);
+            mainToOverlayMap[arc->getHead()] = overlayVertex;
+            //need map for main to sub find correct sub vertex to add to inMap, can delete inMap then, also have to change edgeVertices values to main vertices
+        }
+        if(!overlayGraph->containsVertex(overlayTail)){
+            auto* newAlgorithm = overlayAlgorithm->prepareAlgorithm();
+            Algora::Vertex* overlayVertex = overlayGraph->addVertex();
+            overlayAlgorithm->newPair(newAlgorithm, vertex);
+            mainToOverlayMap[arc->getTail()] = overlayVertex;
+            //need map for main to sub find correct sub vertex to add to inMap, can delete inMap then, also have to change edgeVertices values to main vertices
+        }*/
 
         static_cast<Algora::DiGraph*>(overlayHead->getParent())->addArc(overlayTail, overlayHead);
 

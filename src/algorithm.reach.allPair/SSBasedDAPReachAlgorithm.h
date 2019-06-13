@@ -20,7 +20,7 @@ class SSBasedDAPReachAlgorithm : public DynamicAPReachAlgorithm {
     static_assert(std::is_base_of<Algora::DynamicSSReachAlgorithm,T>::value, "Template Parameter has to inherit from Algora::DynamicSSReachAlgorithm");
 
 public:
-    typedef Algora::FastPropertyMap<T*> VertexAlgoMap;
+    typedef Algora::FastPropertyMap<Algora::DynamicSSReachAlgorithm*> VertexAlgoMap;
 
     std::string getName() const noexcept override;
 
