@@ -129,12 +129,41 @@ PartitionedDAPReachAlgorithmImplementation<T>::initAlgorithms(std::vector<Algora
 
 template<typename T>
 void PartitionedDAPReachAlgorithmImplementation<T>::onVertexAdd(Algora::Vertex *vertex) {
-    throw std::logic_error("Not implemented");
+    Algora::DiGraph* subGraph = nullptr;
+
+    //TODO chose smart or random graph
+
+    for(auto it = mainToSubMap.begin(); it != mainToSubMap.end(); it++){
+        auto* anyVertex = (*it);
+        if(anyVertex){
+            subGraph = static_cast<Algora::DiGraph*>(anyVertex->getParent());
+            break;
+        }
+    }
+    if(!subGraph){
+        throw std::logic_error("Could not find any non empty graph to insert new Vertex");  //TODO something better
+    }
+    auto* subVertex = subGraph->addVertex();
+    mainToSubMap[vertex] = subVertex;
+
+    DynamicDiGraphAlgorithm::onVertexAdd(vertex);
 }
 
 template<typename T>
 void PartitionedDAPReachAlgorithmImplementation<T>::onVertexRemove(Algora::Vertex *vertex) {
-    throw std::logic_error("Not implemented");
+    Algora::Vertex* subVertex = mainToSubMap[vertex];
+    Algora::Vertex* overlayVertex = mainToOverlayMap[vertex];
+
+    auto * subGraph = dynamic_cast<Algora::DiGraph*>(subVertex->getParent());
+    subGraph->removeVertex(subVertex);
+    mainToSubMap.resetToDefault(vertex);
+
+    if(overlayVertex){
+        overlayGraph->removeVertex(overlayVertex);
+        mainToOverlayMap.resetToDefault(vertex);
+        edgeVertices[subGraph].erase(vertex);
+    }
+    DynamicDiGraphAlgorithm::onVertexRemove(vertex);
 }
 
 template<typename T>

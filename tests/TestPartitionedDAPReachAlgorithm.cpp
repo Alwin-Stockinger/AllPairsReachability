@@ -263,3 +263,48 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testDoubleTwoWayOverlayQuery){
     ASSERT_TRUE(this->algorithm -> query(vertex5, vertex0));
 }
 
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testVertexAdditionWithArc){
+
+    this->mainGraph->addVertex(10, 1);
+    this->mainGraph->applyNextDelta();
+
+    this->mainGraph->addArc(4, 10, 2);
+    this->mainGraph->applyNextDelta();
+
+    Algora::Vertex* vertex4 = this->mainGraph -> getCurrentVertexForId(4);
+    Algora::Vertex* vertex10 = this->mainGraph -> getCurrentVertexForId(10);
+
+    ASSERT_TRUE(this->algorithm -> query(vertex4, vertex10));
+}
+
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testVertexRemoval){
+
+    this->mainGraph->removeVertex(3, 1);
+    this->mainGraph->applyNextDelta();
+
+    Algora::Vertex* vertex1 = this->mainGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex4 = this->mainGraph -> getCurrentVertexForId(4);
+
+    ASSERT_FALSE(this->algorithm -> query(vertex1, vertex4));
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testAlternativeNewOverlayVertex){
+
+    Algora::Vertex* vertex7 = this->mainGraph -> getCurrentVertexForId(7);
+    Algora::Vertex* vertex0 = this->mainGraph -> getCurrentVertexForId(0);
+
+
+    this->mainGraph->removeVertex(5,1);
+    this->mainGraph->addVertex(10, 1);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_FALSE(this->algorithm->query(vertex7, vertex0));
+
+    this->mainGraph->addArc(6, 10, 2);
+    this->mainGraph->addArc(10, 2, 2);
+    this->mainGraph->applyNextDelta();
+
+
+    ASSERT_TRUE(this->algorithm -> query(vertex7, vertex0));
+}
