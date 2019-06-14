@@ -40,7 +40,6 @@ template<typename T>
 void SSBasedDAPReachAlgorithm<T>::onVertexRemove(Algora::Vertex *vertex) {
     DynamicDiGraphAlgorithm::onVertexRemove(vertex);
 
-    vertexMap[vertex]->unsetGraph();
     delete vertexMap[vertex];
     vertexMap.resetToDefault(vertex);
 }
