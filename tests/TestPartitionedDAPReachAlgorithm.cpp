@@ -3,7 +3,7 @@
 //
 
 #include "../src/algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
-#include "../src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h"
+#include "../src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
 
 #include <gtest/gtest.h>
 
@@ -81,7 +81,7 @@ public:
     }
 };
 
-using TestTypes = ::testing::Types<SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>, SSBasedDAPReachAlgorithm<Algora::ESTreeQ>, SSBasedDAPReachAlgorithm<Algora::OldESTree>, SSBasedDAPReachAlgorithm<Algora::ESTreeML>, SSBasedDAPReachAlgorithm<Algora::SimpleESTree>>;
+using TestTypes = ::testing::Types<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>, SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>, SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>, SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>;
 TYPED_TEST_SUITE(TestPartitionedDAPReachAlgorithm, TestTypes);
 
 TYPED_TEST(TestPartitionedDAPReachAlgorithm, testSameRegion){

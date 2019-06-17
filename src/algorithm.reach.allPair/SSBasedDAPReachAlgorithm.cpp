@@ -17,44 +17,44 @@
 
 #include "SSBasedDAPReachAlgorithm.h"
 
-template<typename T>
-bool SSBasedDAPReachAlgorithm<T>::query(const Algora::Vertex *start, const Algora::Vertex *end) {
+
+bool SSBasedDAPReachAlgorithm::query(const Algora::Vertex *start, const Algora::Vertex *end) {
     return vertexMap[start]->query(end);
 }
 
-template<typename T>
-void SSBasedDAPReachAlgorithm<T>::run() {
+
+void SSBasedDAPReachAlgorithm::run() {
     for (auto &&algorithm : vertexMap) {
         algorithm->run();
     }
 }
 
-template<typename T>
-void SSBasedDAPReachAlgorithm<T>::onVertexAdd(Algora::Vertex *vertex) {
+
+void SSBasedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
     DynamicDiGraphAlgorithm::onVertexAdd(vertex);
 
     addVertexToMap(vertex);
 }
 
-template<typename T>
-void SSBasedDAPReachAlgorithm<T>::onVertexRemove(Algora::Vertex *vertex) {
+
+void SSBasedDAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
     DynamicDiGraphAlgorithm::onVertexRemove(vertex);
 
     delete vertexMap[vertex];
     vertexMap.resetToDefault(vertex);
 }
 
-template<typename T>
-void SSBasedDAPReachAlgorithm<T>::init() {
+
+void SSBasedDAPReachAlgorithm::init() {
     diGraph->mapVertices([this](Algora::Vertex *vertex) {
         addVertexToMap(vertex);
     });
 }
 
-template<typename T>
-void SSBasedDAPReachAlgorithm<T>::addVertexToMap(Algora::Vertex *vertex) {
 
-    auto *algorithm = new T;
+void SSBasedDAPReachAlgorithm::addVertexToMap(Algora::Vertex *vertex) {
+
+    Algora::DynamicSSReachAlgorithm *algorithm = createSSAlgorithm();
 
     algorithm->setGraph(diGraph);
     algorithm->setSource(vertex);
@@ -62,42 +62,30 @@ void SSBasedDAPReachAlgorithm<T>::addVertexToMap(Algora::Vertex *vertex) {
     vertexMap[vertex] = algorithm;
 }
 
-template<typename T>
-std::string SSBasedDAPReachAlgorithm<T>::getName() const noexcept {
+
+std::string SSBasedDAPReachAlgorithm::getName() const noexcept {
     return std::__cxx11::string("Single Source based All Pair Reachability based on " + vertexMap.getValue(diGraph->getAnyVertex()) -> getName());
 }
 
-template<typename T>
-std::string SSBasedDAPReachAlgorithm<T>::getShortName() const noexcept {
+
+std::string SSBasedDAPReachAlgorithm::getShortName() const noexcept {
     return std::__cxx11::string("SS AP based on " + vertexMap.getValue(diGraph->getAnyVertex()) -> getName());
 }
 
-template<typename T>
-void SSBasedDAPReachAlgorithm<T>::reset() {
+
+void SSBasedDAPReachAlgorithm::reset() {
     deleteAllAlgorithms();
     vertexMap.resetAll();
 }
 
-template<typename T>
-SSBasedDAPReachAlgorithm<T>::~SSBasedDAPReachAlgorithm() {
+
+SSBasedDAPReachAlgorithm::~SSBasedDAPReachAlgorithm() {
     deleteAllAlgorithms();
 }
 
-template<typename T>
-void SSBasedDAPReachAlgorithm<T>::deleteAllAlgorithms(){
+
+void SSBasedDAPReachAlgorithm::deleteAllAlgorithms(){
     for (auto &&algorithm : vertexMap) {
         delete algorithm;
     }
 }
-
-template class SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>;
-template class SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>;
-template class SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>;
-template class SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>;
-template class SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>;
-template class SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>;
-template class SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>;
-template class SSBasedDAPReachAlgorithm<Algora::ESTreeML>;
-template class SSBasedDAPReachAlgorithm<Algora::OldESTree>;
-template class SSBasedDAPReachAlgorithm<Algora::ESTreeQ>;
-template class SSBasedDAPReachAlgorithm<Algora::SimpleESTree>;

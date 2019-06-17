@@ -14,10 +14,8 @@
 #include <memory>
 #include <type_traits>
 
-template <typename T>
-class SSBasedDAPReachAlgorithm : public DynamicAPReachAlgorithm {
 
-    static_assert(std::is_base_of<Algora::DynamicSSReachAlgorithm,T>::value, "Template Parameter has to inherit from Algora::DynamicSSReachAlgorithm");
+class SSBasedDAPReachAlgorithm : public DynamicAPReachAlgorithm {
 
 public:
     typedef Algora::FastPropertyMap<Algora::DynamicSSReachAlgorithm*> VertexAlgoMap;
@@ -43,6 +41,8 @@ public:
     }
 
 protected:
+
+    virtual Algora::DynamicSSReachAlgorithm* createSSAlgorithm() = 0;
 
     // DynamicDiGraphAlgorithm interface
     void onVertexAdd(Algora::Vertex *vertex) override;

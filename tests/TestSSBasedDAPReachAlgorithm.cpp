@@ -6,7 +6,7 @@
 
 #include "TestDynamicAPReachAlgorithm.h"
 
-#include "../src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h"
+#include "../src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
 
 #include <algorithm.reach/staticbfsssreachalgorithm.h>
 #include <algorithm.reach/staticdfsssreachalgorithm.h>
@@ -20,4 +20,4 @@
 #include <algorithm.reach.es/estree-queue.h>
 #include <algorithm.reach.es/simpleestree.h>
 
-INSTANTIATE_TEST_SUITE_P(SSBasedDAPReachAlgorithmTests,TestDynamicAPReachAlgorithm, ::testing::Values(new SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>,new SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>, new SSBasedDAPReachAlgorithm<Algora::ESTreeQ>, new SSBasedDAPReachAlgorithm<Algora::OldESTree>, new SSBasedDAPReachAlgorithm<Algora::ESTreeML>, new SSBasedDAPReachAlgorithm<Algora::SimpleESTree>));
+INSTANTIATE_TEST_SUITE_P(SSBasedDAPReachAlgorithmImplementationTests,TestDynamicAPReachAlgorithm, ::testing::Values(new SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>,new SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>, new SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>, new SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>, new SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>, new SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>, new SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>));
