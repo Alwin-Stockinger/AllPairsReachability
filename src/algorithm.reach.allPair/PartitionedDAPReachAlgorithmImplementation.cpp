@@ -43,27 +43,26 @@ bool PartitionedDAPReachAlgorithmImplementation<T>::query(const Algora::Vertex *
     start = mainToSubMap[start];
     end = mainToSubMap[end];
 
-    //select subgraph algorithms
-    DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[start->getParent()];
-    DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[end->getParent()];
-
-    if(!startGraphAlgorithm || !endGraphAlgorithm){
-        throw std::logic_error("Vertex not in graph");
-    }
+    //select subgraphs
+    auto* startGraph = start->getParent();
+    auto* endGraph = end->getParent();
 
     //same subgraph? then normal Algorithm
-    if(startGraphAlgorithm == endGraphAlgorithm){
-        return startGraphAlgorithm -> query(start, end);
+    if(startGraph == endGraph){
+        return graphToAlgorithmMap[startGraph] -> query(start, end);
     }
     else {
-        std::set<Algora::Vertex *>& startEdgeVertices = edgeVertices[start->getParent()];
-        std::set<Algora::Vertex *> endEdgeVertices = edgeVertices[end->getParent()];    //must be copy, otherwise can't delete vertices from set
+        DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[startGraph];
+        DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[endGraph];
+
+        std::set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
+        std::set<Algora::Vertex *> endEdgeVertices = edgeVertices[endGraph];    //must be copy, otherwise can't erase vertices from set
 
         //find outgoing vertices
         for (Algora::Vertex *outVertex : startEdgeVertices) {
             if (startGraphAlgorithm->query(start, mainToSubMap[outVertex])) {
 
-                for(auto it = endEdgeVertices.begin(); it != endEdgeVertices.end();){//Algora::Vertex *inVertex : endEdgeVertices){
+                for(auto it = endEdgeVertices.begin(); it != endEdgeVertices.end();){
 
                     Algora::Vertex* inVertex = *it;
 
@@ -132,7 +131,6 @@ void PartitionedDAPReachAlgorithmImplementation<T>::onVertexAdd(Algora::Vertex *
     Algora::DiGraph* subGraph = nullptr;
 
     //TODO chose smart or random graph
-
     for(auto it = mainToSubMap.begin(); it != mainToSubMap.end(); it++){
         auto* anyVertex = (*it);
         if(anyVertex){
@@ -141,7 +139,7 @@ void PartitionedDAPReachAlgorithmImplementation<T>::onVertexAdd(Algora::Vertex *
         }
     }
     if(!subGraph){
-        throw std::logic_error("Could not find any non empty graph to insert new Vertex");  //TODO something better
+        throw std::logic_error("Could not find any non empty graph to insert new Vertex");  //TODO something better (can't use graphToAlgorithm map because graphs are const inside
     }
     auto* subVertex = subGraph->addVertex();
     mainToSubMap[vertex] = subVertex;
