@@ -14,7 +14,9 @@
 #include <algorithm.reach.es/estree-queue.h>
 #include <algorithm.reach.es/simpleestree.h>
 #include "converter/GraphFileConverter.h"
+
 #include "algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
+#include "algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
 #include "handler/AlgorithmHandler.h"
 
 #include <CLI11.hpp>
@@ -130,47 +132,47 @@ int main(int argc, char *argv[]) {
 
         if(algorithmName == "StaticBFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>(dynGraph));
         }
         else if(algorithmName == "StaticDFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "LazyDFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "LazyBFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "CachingDFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "CachingBFS") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "SimpleInc") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>(dynGraph));
         }
         else if( algorithmName == "ESTreeML") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeML>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>(dynGraph));
         }
         else if( algorithmName == "OldESTree") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::OldESTree>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>(dynGraph));
         }
         else if( algorithmName == "ESTreeQ") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeQ>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>(dynGraph));
         }
         else if( algorithmName == "SimpleESTree") {
             algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleESTree>>(dynGraph));
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>(dynGraph));
         }
         else{
             std::cerr << algorithmName << " not a viable algorithm" << std::endl;
