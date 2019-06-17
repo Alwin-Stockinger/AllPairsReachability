@@ -5,7 +5,7 @@
 #include "GraphFileConverter.h"
 
 int main(int argc, char *argv[]){
-
+/*
     std::string graphType = argv[1];
     std::string inputFile = argv[2];
     std::string outputFile = "graph";
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]){
     else {
         std::cerr << "graphType " + graphType + " not supported";
         return 1;
-    }
+    }*/
 
 
     return 0;
