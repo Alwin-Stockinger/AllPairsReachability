@@ -2,7 +2,7 @@
 // Created by Alwin Stockinger.
 //
 
-#include "PartitionedDAPReachAlgorithmImplementation.h"
+#include "PartitionedDAPReachAlgorithm.h"
 
 #include <algorithm.reach/staticbfsssreachalgorithm.h>
 #include <algorithm.reach/staticdfsssreachalgorithm.h>
@@ -18,8 +18,8 @@
 
 #include <graph.incidencelist/incidencelistgraph.h>
 
-template<typename T>
-void PartitionedDAPReachAlgorithmImplementation<T>::run() {
+
+void PartitionedDAPReachAlgorithm::run() {
     overlayAlgorithm -> run();
     for(const auto &[_,algorithm] : graphToAlgorithmMap){
         algorithm -> run();
@@ -27,18 +27,18 @@ void PartitionedDAPReachAlgorithmImplementation<T>::run() {
 
 }
 
-template<typename T>
-std::string PartitionedDAPReachAlgorithmImplementation<T>::getName() const noexcept {
+
+std::string PartitionedDAPReachAlgorithm::getName() const noexcept {
     return std::__cxx11::string("Partitioned Graph All Pair Reachability Algorithm based on " + overlayAlgorithm -> getName()+"");
 }
 
-template<typename T>
-std::string PartitionedDAPReachAlgorithmImplementation<T>::getShortName() const noexcept {
+
+std::string PartitionedDAPReachAlgorithm::getShortName() const noexcept {
     return std::__cxx11::string("Partitioned DAP Reach Algo(" + overlayAlgorithm -> getShortName()+")");
 }
 
-template<typename T>
-bool PartitionedDAPReachAlgorithmImplementation<T>::query(const Algora::Vertex *start, const Algora::Vertex *end) {
+
+bool PartitionedDAPReachAlgorithm::query(const Algora::Vertex *start, const Algora::Vertex *end) {
 
     start = mainToSubMap[start];
     end = mainToSubMap[end];
@@ -87,13 +87,13 @@ bool PartitionedDAPReachAlgorithmImplementation<T>::query(const Algora::Vertex *
 }
 
 
-template<typename T>
-PartitionedDAPReachAlgorithmImplementation<T>::~PartitionedDAPReachAlgorithmImplementation() {
+
+PartitionedDAPReachAlgorithm::~PartitionedDAPReachAlgorithm() {
     deleteOldPartition();
 }
 
-template<typename T>
-void PartitionedDAPReachAlgorithmImplementation<T>::deleteOldPartition() {
+
+void PartitionedDAPReachAlgorithm::deleteOldPartition() {
     for(auto [graph,algorithm] : graphToAlgorithmMap){
         delete algorithm;
         delete graph;
@@ -112,22 +112,22 @@ void PartitionedDAPReachAlgorithmImplementation<T>::deleteOldPartition() {
     edgeVertices.resetAll();
 }
 
-template<typename T>
+
 void
-PartitionedDAPReachAlgorithmImplementation<T>::initAlgorithms(std::vector<Algora::DiGraph *> &graphs) {
+PartitionedDAPReachAlgorithm::initAlgorithms(std::vector<Algora::DiGraph *> &graphs) {
 
     //create new Algorithms
-    overlayAlgorithm = new T();
+    overlayAlgorithm = createSubAlgorithm();
     overlayAlgorithm->setGraph(overlayGraph);
     for (Algora::DiGraph *graph : graphs) {
-        T* algorithm = new T();
+        DynamicAPReachAlgorithm* algorithm = createSubAlgorithm();
         algorithm -> setGraph(graph);
         graphToAlgorithmMap.setValue(graph, algorithm);
     }
 }
 
-template<typename T>
-void PartitionedDAPReachAlgorithmImplementation<T>::onVertexAdd(Algora::Vertex *vertex) {
+
+void PartitionedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
     Algora::DiGraph* subGraph = nullptr;
 
     //TODO chose smart or random graph
@@ -147,8 +147,8 @@ void PartitionedDAPReachAlgorithmImplementation<T>::onVertexAdd(Algora::Vertex *
     DynamicDiGraphAlgorithm::onVertexAdd(vertex);
 }
 
-template<typename T>
-void PartitionedDAPReachAlgorithmImplementation<T>::onVertexRemove(Algora::Vertex *vertex) {
+
+void PartitionedDAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
     Algora::Vertex* subVertex = mainToSubMap[vertex];
     Algora::Vertex* overlayVertex = mainToOverlayMap[vertex];
 
@@ -164,8 +164,8 @@ void PartitionedDAPReachAlgorithmImplementation<T>::onVertexRemove(Algora::Verte
     DynamicDiGraphAlgorithm::onVertexRemove(vertex);
 }
 
-template<typename T>
-void PartitionedDAPReachAlgorithmImplementation<T>::onArcAdd(Algora::Arc *arc) {
+
+void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
     DynamicDiGraphAlgorithm::onArcAdd(arc);
 
     auto* mainHead = arc->getHead();
@@ -198,8 +198,8 @@ void PartitionedDAPReachAlgorithmImplementation<T>::onArcAdd(Algora::Arc *arc) {
     }
 }
 
-template<typename T>
-void PartitionedDAPReachAlgorithmImplementation<T>::onArcRemove(Algora::Arc *arc) {
+
+void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
     DynamicDiGraphAlgorithm::onArcRemove(arc);
 
     auto * mainHead = arc->getHead();
@@ -236,9 +236,9 @@ void PartitionedDAPReachAlgorithmImplementation<T>::onArcRemove(Algora::Arc *arc
     }
 }
 
-template<typename T>
+
 void
-PartitionedDAPReachAlgorithmImplementation<T>::partition(const Algora::FastPropertyMap<unsigned long long> &partitionMap,
+PartitionedDAPReachAlgorithm::partition(const Algora::FastPropertyMap<unsigned long long> &partitionMap,
                                            const unsigned long long k) {
 
     deleteOldPartition();
@@ -295,28 +295,14 @@ PartitionedDAPReachAlgorithmImplementation<T>::partition(const Algora::FastPrope
     partitioned = true;
 }
 
-template<typename T>
-void PartitionedDAPReachAlgorithmImplementation<T>::onDiGraphSet() {
+
+void PartitionedDAPReachAlgorithm::onDiGraphSet() {
     partitioned = false;
     DynamicDiGraphAlgorithm::onDiGraphSet();
 }
 
-template<typename T>
-void PartitionedDAPReachAlgorithmImplementation<T>::onDiGraphUnset() {
+
+void PartitionedDAPReachAlgorithm::onDiGraphUnset() {
     partitioned = false;
     DynamicDiGraphAlgorithm::onDiGraphUnset();
 }
-
-
-
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::ESTreeML>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::OldESTree>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::ESTreeQ>>;
-template class PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithm<Algora::SimpleESTree>>;
