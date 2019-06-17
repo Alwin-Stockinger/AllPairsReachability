@@ -12,6 +12,7 @@
 #include <iostream>
 #include <graph/digraph.h>
 #include <graph.dyn/dynamicdigraph.h>
+#include <property/fastpropertymap.h>
 
 class GraphFileConverter {
 public:
