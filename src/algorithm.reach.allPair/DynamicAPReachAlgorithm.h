@@ -9,8 +9,11 @@
 #include <algorithm.reach/dynamicssreachalgorithm.h>
 #include <algorithm/dynamicdigraphalgorithm.h>
 
+template <class derived>
 class DynamicAPReachAlgorithm : public Algora::DynamicDiGraphAlgorithm{
 public:
+
+    static_assert(std::is_base_of<DynamicAPReachAlgorithm,derived>::value, "Template Parameter derived for sub algorithms has to inherit from DynamicApAlgorithm");
 
     explicit DynamicAPReachAlgorithm() : DynamicDiGraphAlgorithm(){ }
     ~DynamicAPReachAlgorithm() override = default;
@@ -19,6 +22,9 @@ public:
 
     virtual std::string const getBaseName() = 0;
 
+    static DynamicAPReachAlgorithm* createAlgorithm(){
+        return derived::createAlgorithmImplementation();
+    }
 };
 
 

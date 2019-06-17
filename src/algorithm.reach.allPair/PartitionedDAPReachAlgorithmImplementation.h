@@ -13,13 +13,14 @@
 #include "SSBasedDAPReachAlgorithm.h"
 #include "PartitionedDAPReachAlgorithm.h"
 
-template <typename T>
-class PartitionedDAPReachAlgorithmImplementation : public PartitionedDAPReachAlgorithm{
+template <class T, class S = T>
+class PartitionedDAPReachAlgorithmImplementation : public PartitionedDAPReachAlgorithm<PartitionedDAPReachAlgorithmImplementation<T,S>>{
 
 public:
-    static_assert(std::is_base_of<DynamicAPReachAlgorithm,T>::value, "Template Parameter has to inherit from DynamicApAlgorithm");
+    static_assert(std::is_base_of<DynamicAPReachAlgorithm<T>,T>::value, "Template Parameter for sub algorithms has to inherit from DynamicApAlgorithm");
+    static_assert(std::is_base_of<DynamicAPReachAlgorithm<S>,S>::value, "Template Parameter for overlay algorithmhas to inherit from DynamicApAlgorithm");
 
-    explicit PartitionedDAPReachAlgorithmImplementation() : PartitionedDAPReachAlgorithm(){};
+    explicit PartitionedDAPReachAlgorithmImplementation() : PartitionedDAPReachAlgorithm<PartitionedDAPReachAlgorithmImplementation<T,S>>(){};
 
     ~PartitionedDAPReachAlgorithmImplementation() override;
 
@@ -50,6 +51,10 @@ public:
         return partitioned;
     }
 
+    static DynamicAPReachAlgorithm<T>* createAlgorithmImplementation(){
+        return new PartitionedDAPReachAlgorithmImplementation<T,S>();
+    }
+
 private:
     void initAlgorithms(std::vector<Algora::DiGraph *> &graphs);
 
@@ -61,13 +66,13 @@ protected:
 
 
 private:
-    DynamicAPReachAlgorithm* overlayAlgorithm = nullptr;
+    DynamicAPReachAlgorithm<S>* overlayAlgorithm = nullptr;
     Algora::DiGraph* overlayGraph = nullptr;
 
     Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;//cannot use FastPropertyMap, because of different graphs???
     Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;
     Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
-    Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;//cannot use FastPropertyMap, because of different graphs???
+    Algora::PropertyMap<DynamicAPReachAlgorithm<T>*> graphToAlgorithmMap;//cannot use FastPropertyMap, because of different graphs???
 
     bool partitioned = false;
 

@@ -7,6 +7,7 @@
 
 
 #include "DynamicAPReachAlgorithm.h"
+#include "PartitionedDAPReachAlgorithm.h"
 
 
 #include <property/fastpropertymap.h>
@@ -15,7 +16,7 @@
 #include <type_traits>
 
 template <typename T>
-class SSBasedDAPReachAlgorithm : public DynamicAPReachAlgorithm {
+class SSBasedDAPReachAlgorithm : public PartitionedDAPReachAlgorithm<SSBasedDAPReachAlgorithm<T>> {
 
     static_assert(std::is_base_of<Algora::DynamicSSReachAlgorithm,T>::value, "Template Parameter has to inherit from Algora::DynamicSSReachAlgorithm");
 
@@ -26,8 +27,7 @@ public:
 
     std::string getShortName() const noexcept override;
 
-
-    explicit SSBasedDAPReachAlgorithm() : DynamicAPReachAlgorithm(){ }
+    explicit SSBasedDAPReachAlgorithm() : DynamicAPReachAlgorithm<SSBasedDAPReachAlgorithm<T>>(){ }
     ~SSBasedDAPReachAlgorithm() override;
 
 
@@ -39,7 +39,7 @@ public:
     bool query(const Algora::Vertex *start, const Algora::Vertex *end) override;
 
     std::string const getBaseName() override{
-        return vertexMap.getValue(diGraph->getAnyVertex())->getShortName();
+        return vertexMap.getValue(this->diGraph->getAnyVertex())->getShortName();
     }
 
 protected:
@@ -51,12 +51,12 @@ protected:
 
     // DiGraphAlgorithm interface
     void onDiGraphSet() override {
-        DynamicAPReachAlgorithm::onDiGraphSet();
+        DynamicAPReachAlgorithm<SSBasedDAPReachAlgorithm<T>>::onDiGraphSet();
         init();
     };
 
     void onDiGraphUnset() override {
-        DynamicAPReachAlgorithm::onDiGraphUnset();
+        DynamicAPReachAlgorithm<SSBasedDAPReachAlgorithm<T>>::onDiGraphUnset();
         reset();
     }
 

@@ -31,14 +31,13 @@ void SSBasedDAPReachAlgorithm<T>::run() {
 
 template<typename T>
 void SSBasedDAPReachAlgorithm<T>::onVertexAdd(Algora::Vertex *vertex) {
-    DynamicDiGraphAlgorithm::onVertexAdd(vertex);
 
     addVertexToMap(vertex);
 }
 
 template<typename T>
 void SSBasedDAPReachAlgorithm<T>::onVertexRemove(Algora::Vertex *vertex) {
-    DynamicDiGraphAlgorithm::onVertexRemove(vertex);
+    Algora::DynamicDiGraphAlgorithm::onVertexRemove(vertex);
 
     delete vertexMap[vertex];
     vertexMap.resetToDefault(vertex);
@@ -46,7 +45,7 @@ void SSBasedDAPReachAlgorithm<T>::onVertexRemove(Algora::Vertex *vertex) {
 
 template<typename T>
 void SSBasedDAPReachAlgorithm<T>::init() {
-    diGraph->mapVertices([this](Algora::Vertex *vertex) {
+    this->diGraph->mapVertices([this](Algora::Vertex *vertex) {
         addVertexToMap(vertex);
     });
 }
@@ -56,7 +55,7 @@ void SSBasedDAPReachAlgorithm<T>::addVertexToMap(Algora::Vertex *vertex) {
 
     auto *algorithm = new T;
 
-    algorithm->setGraph(diGraph);
+    algorithm->setGraph(this->diGraph);
     algorithm->setSource(vertex);
 
     vertexMap[vertex] = algorithm;
@@ -64,12 +63,12 @@ void SSBasedDAPReachAlgorithm<T>::addVertexToMap(Algora::Vertex *vertex) {
 
 template<typename T>
 std::string SSBasedDAPReachAlgorithm<T>::getName() const noexcept {
-    return std::__cxx11::string("Single Source based All Pair Reachability based on " + vertexMap.getValue(diGraph->getAnyVertex()) -> getName());
+    return std::__cxx11::string("Single Source based All Pair Reachability based on " + vertexMap.getValue(this->diGraph->getAnyVertex()) -> getName());
 }
 
 template<typename T>
 std::string SSBasedDAPReachAlgorithm<T>::getShortName() const noexcept {
-    return std::__cxx11::string("SS AP based on " + vertexMap.getValue(diGraph->getAnyVertex()) -> getName());
+    return std::__cxx11::string("SS AP based on " + vertexMap.getValue(this->diGraph->getAnyVertex()) -> getName());
 }
 
 template<typename T>

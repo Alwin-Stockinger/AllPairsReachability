@@ -9,7 +9,8 @@
 
 #include "DynamicAPReachAlgorithm.h"
 
-class PartitionedDAPReachAlgorithm : public DynamicAPReachAlgorithm{
+template <class derived>
+class PartitionedDAPReachAlgorithm : public DynamicAPReachAlgorithm<derived>{
 public:
     virtual void partition(const Algora::FastPropertyMap<unsigned long long int> &partitionMap,
                    unsigned long long int k) = 0;
