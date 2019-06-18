@@ -305,7 +305,7 @@ GraphFileConverter::handlePartitioning(unsigned long long int k, Algora::DiGraph
     if(kahipStatus != 0 || waitpid(pid, &kahipStatus, 0) == -1){
         throw std::runtime_error("kahip could not be executed");
     }
-    std::cout << "\n------------------KAHIP OUTPUT END----------------"<<std::endl;
+    std::cout << "------------------KAHIP OUTPUT END----------------"<<std::endl;
     return GraphFileConverter::makePartitionMap(kahipInputFileName, graph);
 }
 

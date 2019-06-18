@@ -33,12 +33,14 @@ typedef std::chrono::high_resolution_clock::time_point TimePoint;
 struct AlgorithmHandler::TimeCollector {
 
 
-    explicit TimeCollector(DynamicAPReachAlgorithm *algorithm, const unsigned long long int k) {
-        this->algorithm = algorithm;
+    explicit TimeCollector(const std::string& algorithmName,const unsigned long long int k) {
         this->k = k;
+        this->algorithmName = algorithmName;
     }
 
-    DynamicAPReachAlgorithm *algorithm = nullptr;
+
+    std::string algorithmName;
+
     unsigned long long k;
 
     std::vector<unsigned long long> queryTimes;
@@ -213,7 +215,7 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
             std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
 
-            auto* timer = new TimeCollector(algorithm, i);
+            auto* timer = new TimeCollector(algorithm->getBaseName(), i);
             timers.push_back(timer);
 
             auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
@@ -269,6 +271,8 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             dynGraph.resetToBigBang();
             dynGraph.applyNextDelta();
 
+            std::cout << "Finished\n";
+
             delete algorithm;
         }
         delete algorithms;
@@ -299,7 +303,7 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
 
     for(TimeCollector* timer: timers){
         file << timer->k;
-        file << "," << timer->algorithm->getBaseName();
+        file << "," << timer->algorithmName;
         file << "," << timer->getAvgQueryTime();
         file << "," << timer->getAvgAddArcTime();
         file << "," << timer->getAvgRemoveArcTime();
