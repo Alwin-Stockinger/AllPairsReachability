@@ -32,7 +32,7 @@ class SSBasedDAPReachAlgorithmImplementation <Algora::StaticDFSSSReachAlgorithm>
 template <>
 class SSBasedDAPReachAlgorithmImplementation <Algora::StaticBFSSSReachAlgorithm> : public StaticSSBasedDAPReachAlgorithm{
     Algora::DynamicSSReachAlgorithm *createSSAlgorithm() override {
-        return new Algora::StaticDFSSSReachAlgorithm;
+        return new Algora::StaticBFSSSReachAlgorithm;
     }
 };
 
