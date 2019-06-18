@@ -310,11 +310,12 @@ Algora::FastPropertyMap<unsigned long long> AlgorithmHandler::handlePartitioning
 
     char* kahipArgv[] = {kahipName.data(), kahipFileName.data(), kahipK.data(), preconfig.data(), kahipArgInputFileName.data(), nullptr};
     char* const envp[]={nullptr};
-    std::cout << "\n\nStarting Kahip with k=" + std::to_string(k) << std::endl;
+    std::cout << "\n\nStarting Kahip with k=" + std::to_string(k) <<"\n--------------KAHIP OUTPUT----------------"<< std::endl;
     int kahipStatus = posix_spawn(&pid, kahipName.data(), nullptr, nullptr, kahipArgv, envp);
 
     if(kahipStatus != 0 || waitpid(pid, &kahipStatus, 0) == -1){
         throw std::runtime_error("kahip could not be executed");
     }
+    std::cout << "\n------------------KAHIP OUTPUT END----------------"<<std::endl;
     return GraphFileConverter::makePartitionMap(kahipInputFileName, graph);
 }
