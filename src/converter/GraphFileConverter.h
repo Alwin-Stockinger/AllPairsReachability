@@ -47,9 +47,12 @@ public:
 
     static void convertDiGraphToKahip(Algora::DiGraph *graph, const std::string &outputFileName);
 
+    static Algora::FastPropertyMap<unsigned long long> handlePartitioning(unsigned long long int k, Algora::DiGraph *graph);
+
 private:
     static void writeMapToFile(const std::string &outFileName, Algora::DiGraph *graph,
                                std::map<unsigned long long, std::map<unsigned long long, unsigned long long>> vertexMap);
+
 
 
 };

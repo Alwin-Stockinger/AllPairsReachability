@@ -41,9 +41,7 @@ private:
     void reachabilityCheck();
 
     void writeResults(const std::vector<TimeCollector*>& timers);
-
-
-    Algora::FastPropertyMap<unsigned long long> handlePartitioning(unsigned long long int k, Algora::DiGraph *graph);
+    
 };
 
 

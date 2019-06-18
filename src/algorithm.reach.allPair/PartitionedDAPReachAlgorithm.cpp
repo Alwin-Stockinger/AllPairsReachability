@@ -238,8 +238,8 @@ void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
 
 
 void
-PartitionedDAPReachAlgorithm::partition(const Algora::FastPropertyMap<unsigned long long> &partitionMap,
-                                           const unsigned long long k) {
+PartitionedDAPReachAlgorithm::partition() {
+    const Algora::FastPropertyMap<unsigned long long> &partitionMap = partitionFunction(k,diGraph);
 
     deleteOldPartition();
 
@@ -291,18 +291,14 @@ PartitionedDAPReachAlgorithm::partition(const Algora::FastPropertyMap<unsigned l
     });
 
     initAlgorithms(subGraphs);
-
-    partitioned = true;
 }
 
 
 void PartitionedDAPReachAlgorithm::onDiGraphSet() {
-    partitioned = false;
     DynamicDiGraphAlgorithm::onDiGraphSet();
 }
 
 
 void PartitionedDAPReachAlgorithm::onDiGraphUnset() {
-    partitioned = false;
     DynamicDiGraphAlgorithm::onDiGraphUnset();
 }

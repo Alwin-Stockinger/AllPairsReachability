@@ -1,3 +1,7 @@
+#include <utility>
+
+#include <utility>
+
 //
 // Created by Alwin Stockinger.
 //
@@ -9,6 +13,8 @@
 #include "property/fastpropertymap.h"
 
 #include "DynamicAPReachAlgorithm.h"
+
+using PartFunc = std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>;
 
 class PartitionedDAPReachAlgorithm : public DynamicAPReachAlgorithm{
 public:
@@ -27,8 +33,7 @@ public:
         return overlayAlgorithm->getBaseName();
     }
 
-    void partition (const Algora::FastPropertyMap<unsigned long long int> &partitionMap,
-                    unsigned long long int k);
+
 
     void onArcAdd(Algora::Arc *arc) override;
 
@@ -38,12 +43,20 @@ public:
 
     void onVertexRemove(Algora::Vertex *vertex) override;
 
-    bool isPartitioned(){
-        return partitioned;
+    void setPartitionFunction(PartFunc newPartitionFunction,
+                              unsigned long long newK){
+        k = newK;
+        partitionFunction = std::move(newPartitionFunction);
     }
+    void setPartitionFunction(PartFunc newPartitionFunction){
+        partitionFunction = std::move(newPartitionFunction);
+    }
+
+    void partition ();
 
 private:
     void initAlgorithms(std::vector<Algora::DiGraph *> &graphs);
+
 
 
 protected:
@@ -61,7 +74,9 @@ private:
     Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
     Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;//cannot use FastPropertyMap, because of different graphs???
 
-    bool partitioned = false;
+    PartFunc partitionFunction;
+
+    unsigned long long k = 2;
 
     void deleteOldPartition();
 

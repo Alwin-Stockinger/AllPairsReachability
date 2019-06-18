@@ -77,7 +77,18 @@ public:
 
         algorithm = new PartitionedDAPReachAlgorithmImplementation<T>();
         algorithm->setGraph(mainGraph->getDiGraph());
-        algorithm->partition(partitionMap, 3);
+
+        /*Algora::FastPropertyMap<unsigned long long> (*partitionFunction) (unsigned long long int, Algora::DiGraph*) = [partitionMap] (unsigned long long k, Algora::DiGraph* diGraph){
+            return partitionMap;
+        };*/
+
+
+        algorithm->setPartitionFunction([partitionMap] (unsigned long long k, Algora::DiGraph* diGraph){
+            return partitionMap;
+        }, 3);
+
+        algorithm->partition();
+
     }
 };
 
