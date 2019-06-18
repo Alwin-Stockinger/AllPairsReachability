@@ -14,7 +14,7 @@ algorithms = "-A " \
              "SimpleESTree"
 
 k = "-k 10"
-vertices = " -s 10000"
+vertices = "-s 100000"
 arcs = "--arcSize 100000"
 
-subprocess.call(["./AllPairReach", k, algorithms, vertices, arcs], shell=True)
+subprocess.call(["./AllPairReach" + " "+ k + " " +  algorithms + " "  + vertices + " "  + arcs], shell=True)
