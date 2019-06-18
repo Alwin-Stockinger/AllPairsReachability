@@ -19,11 +19,11 @@
 class AlgorithmHandler {
 
 public:
-    AlgorithmHandler(std::vector<PartitionedDAPReachAlgorithm*> newAlgorithms, Algora::InstanceProvider* newProvider) : algorithms(std::move(newAlgorithms)), instanceProvider{newProvider}{}
+    explicit AlgorithmHandler(Algora::InstanceProvider* newProvider) : instanceProvider{newProvider}{}
 
     void runInterface();
 
-    void runTests(unsigned long long k);
+    void runTests(unsigned long long k,  const std::vector<std::string>& algorithmNames);
 
 private:
     void addArc();
@@ -34,14 +34,16 @@ private:
 
     struct TimeCollector;
 
-    std::vector<PartitionedDAPReachAlgorithm*> algorithms;
-
     Algora::InstanceProvider* instanceProvider;
 
     void reachabilityCheck();
 
     void writeResults(const std::vector<TimeCollector*>& timers);
-    
+
+    std::vector<PartitionedDAPReachAlgorithm*>* createAlgorithms(const std::vector<std::string>& algorithmNames);
+
+    template<typename T>
+    PartitionedDAPReachAlgorithm  *createAlgorithm();
 };
 
 

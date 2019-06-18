@@ -13,6 +13,20 @@
 #include <spawn.h>
 #include <wait.h>
 
+#include <algorithm.reach/staticbfsssreachalgorithm.h>
+#include <algorithm.reach/staticdfsssreachalgorithm.h>
+#include <algorithm.reach/lazydfsssreachalgorithm.h>
+#include <algorithm.reach/lazybfsssreachalgorithm.h>
+#include <algorithm.reach/cachingdfsssreachalgorithm.h>
+#include <algorithm.reach/cachingbfsssreachalgorithm.h>
+#include <algorithm.reach/simpleincssreachalgorithm.h>
+#include <algorithm.reach.es/estree-ml.h>
+#include <algorithm.reach.es/estree-bqueue.h>
+#include <algorithm.reach.es/estree-queue.h>
+#include <algorithm.reach.es/simpleestree.h>
+
+#include "../algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
+
 typedef std::chrono::high_resolution_clock HRC;
 typedef std::chrono::high_resolution_clock::time_point TimePoint;
 
@@ -133,7 +147,8 @@ void AlgorithmHandler::reachabilityCheck() {
 
     Algora::DynamicDiGraph& graph = instanceProvider->getGraph();
 
-    for( DynamicAPReachAlgorithm* algorithm : algorithms){
+    throw std::runtime_error("not implemented");
+    /*for( DynamicAPReachAlgorithm* algorithm : algorithms){
 
         std::cout << algorithm->getName() << ": ";
 
@@ -143,7 +158,7 @@ void AlgorithmHandler::reachabilityCheck() {
         else{
             std::cout << "False\n";
         }
-    }
+    }*/
 }
 
 void AlgorithmHandler::addArc() {
@@ -178,7 +193,7 @@ void AlgorithmHandler::removeArc(){
     graph.applyNextDelta();
 }
 
-void AlgorithmHandler::runTests(unsigned long long const k) {
+void AlgorithmHandler::runTests(unsigned long long const k, const std::vector<std::string>& algorithmNames) {
 
     std::vector<TimeCollector*> timers;
 
@@ -188,7 +203,8 @@ void AlgorithmHandler::runTests(unsigned long long const k) {
 
     for(unsigned long long i = 2; i <= k ; i++){
 
-        for(auto* algorithm:algorithms) {
+        auto* algorithms = createAlgorithms(algorithmNames);
+        for(auto* algorithm: (*algorithms)) {
 
             algorithm->setAutoUpdate(false);
             algorithm->setGraph(diGraph);
@@ -252,7 +268,10 @@ void AlgorithmHandler::runTests(unsigned long long const k) {
             //reset to initial graph
             dynGraph.resetToBigBang();
             dynGraph.applyNextDelta();
+
+            delete algorithm;
         }
+        delete algorithms;
     }
 
     writeResults(timers);
@@ -287,4 +306,68 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
         file << "," << timer->getAllTime();
         file << std::endl;
     }
+}
+
+std::vector<PartitionedDAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const std::vector<std::string>& algorithmNames){
+
+    auto *algorithms = new std::vector<PartitionedDAPReachAlgorithm*>;
+
+    for(const std::string& algorithmName: algorithmNames){
+
+
+        if(algorithmName == "StaticBFS") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>());
+        }
+        else if(algorithmName == "StaticDFS") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>());
+        }
+        else if( algorithmName == "LazyDFS") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>());
+        }
+        else if( algorithmName == "LazyBFS") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>());
+        }
+        else if( algorithmName == "CachingDFS") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>());
+        }
+        else if( algorithmName == "CachingBFS") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>());
+        }
+        else if( algorithmName == "SimpleInc") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>());
+        }
+        else if( algorithmName == "ESTreeML") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>());
+        }
+        else if( algorithmName == "OldESTree") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>());
+        }
+        else if( algorithmName == "ESTreeQ") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>());
+        }
+        else if( algorithmName == "SimpleESTree") {
+            algorithms->push_back(
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>());
+        }
+        else{
+            std::cerr << algorithmName << " not a viable algorithm" << std::endl;
+            //TODO throw error
+        }
+    }
+    return algorithms;
+}
+
+template<typename T>
+PartitionedDAPReachAlgorithm  *AlgorithmHandler::createAlgorithm() {
+    return new PartitionedDAPReachAlgorithmImplementation<T>();
 }

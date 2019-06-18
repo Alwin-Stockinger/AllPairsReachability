@@ -2,17 +2,7 @@
 #include <cstring>
 
 
-#include <algorithm.reach/staticbfsssreachalgorithm.h>
-#include <algorithm.reach/staticdfsssreachalgorithm.h>
-#include <algorithm.reach/lazydfsssreachalgorithm.h>
-#include <algorithm.reach/lazybfsssreachalgorithm.h>
-#include <algorithm.reach/cachingdfsssreachalgorithm.h>
-#include <algorithm.reach/cachingbfsssreachalgorithm.h>
-#include <algorithm.reach/simpleincssreachalgorithm.h>
-#include <algorithm.reach.es/estree-ml.h>
-#include <algorithm.reach.es/estree-bqueue.h>
-#include <algorithm.reach.es/estree-queue.h>
-#include <algorithm.reach.es/simpleestree.h>
+
 #include "converter/GraphFileConverter.h"
 
 #include "algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
@@ -125,71 +115,14 @@ int main(int argc, char *argv[]) {
 
 
 
-    std::vector<PartitionedDAPReachAlgorithm*> algorithms;
 
-    for(const std::string& algorithmName: algorithmNames){
-
-
-        if(algorithmName == "StaticBFS") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>(dynGraph));
-        }
-        else if(algorithmName == "StaticDFS") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>(dynGraph));
-        }
-        else if( algorithmName == "LazyDFS") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>(dynGraph));
-        }
-        else if( algorithmName == "LazyBFS") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>(dynGraph));
-        }
-        else if( algorithmName == "CachingDFS") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>(dynGraph));
-        }
-        else if( algorithmName == "CachingBFS") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>(dynGraph));
-        }
-        else if( algorithmName == "SimpleInc") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>(dynGraph));
-        }
-        else if( algorithmName == "ESTreeML") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>(dynGraph));
-        }
-        else if( algorithmName == "OldESTree") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>(dynGraph));
-        }
-        else if( algorithmName == "ESTreeQ") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>(dynGraph));
-        }
-        else if( algorithmName == "SimpleESTree") {
-            algorithms.push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>(dynGraph));
-        }
-        else{
-            std::cerr << algorithmName << " not a viable algorithm" << std::endl;
-            //TODO throw error
-        }
-    }
-    AlgorithmHandler handler(algorithms, provider);
+    AlgorithmHandler handler(provider);
 
     if(runPerformanceTests){
-        handler.runTests(k);
+        handler.runTests(k, algorithmNames);
     }
     else{
         handler.runInterface();
-    }
-
-    for(DynamicAPReachAlgorithm* algorithm: algorithms){
-        delete algorithm;
     }
 
     delete provider;
@@ -348,13 +281,3 @@ int main(int argc, char *argv[]) {
     }
     deleteAll(mainGraph);
      */
-
-
-template<typename T>
-    PartitionedDAPReachAlgorithm  *createAlgorithm(const Algora::DynamicDiGraph &mainGraph) {
-        return new PartitionedDAPReachAlgorithmImplementation<T>();
-}
-
-void deleteAll(Algora::DynamicDiGraph *mainGraph) {
-    delete mainGraph;
-}
