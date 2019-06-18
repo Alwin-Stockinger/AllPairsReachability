@@ -18,4 +18,4 @@ vertices = " -s 10000"
 arcs = "--arcSize 100000"
 
 
-subprocess.call(["AllPair", k, algorithms, vertices, arcs])
+subprocess.call(["AllPairReach", k, algorithms, vertices, arcs])
