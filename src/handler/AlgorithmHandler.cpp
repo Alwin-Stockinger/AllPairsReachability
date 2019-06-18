@@ -193,7 +193,7 @@ void AlgorithmHandler::removeArc(){
     graph.applyNextDelta();
 }
 
-void AlgorithmHandler::runTests(unsigned long long const k, const std::vector<std::string>& algorithmNames) {
+void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector<std::string>& algorithmNames) {
 
     std::vector<TimeCollector*> timers;
 
@@ -201,14 +201,14 @@ void AlgorithmHandler::runTests(unsigned long long const k, const std::vector<st
     auto &dynGraph = instanceProvider->getGraph();
     auto* diGraph = dynGraph.getDiGraph();
 
-    for(unsigned long long i = 2; i <= k ; i++){
+    for(unsigned long long i = 2; i <= kMax ; i++){
 
         auto* algorithms = createAlgorithms(algorithmNames);
         for(auto* algorithm: (*algorithms)) {
 
             algorithm->setAutoUpdate(false);
             algorithm->setGraph(diGraph);
-            algorithm->setPartitionFunction(GraphFileConverter::handlePartitioning, k);
+            algorithm->setPartitionFunction(GraphFileConverter::handlePartitioning, i);
             algorithm->partition();
 
             std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
