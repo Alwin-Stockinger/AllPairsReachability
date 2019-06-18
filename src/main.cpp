@@ -236,28 +236,28 @@ int main(int argc, char *argv[]) {
 
             if(algorithmName == "StaticBFS") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>(mainGraph,
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::StaticBFSSSReachAlgorithm>>(mainGraph,
                                                                                                      overlayGraph,
                                                                                                      subGraphs, inMap,
                                                                                                      mainToOverlayMap));
             }
             else if(algorithmName == "StaticDFS") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>>(mainGraph,
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::StaticDFSSSReachAlgorithm>>(mainGraph,
                                                                                                      overlayGraph,
                                                                                                      subGraphs, inMap,
                                                                                                      mainToOverlayMap));
             }
             else if( algorithmName == "LazyDFS") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>>(mainGraph,
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::LazyDFSSSReachAlgorithm>>(mainGraph,
                                 overlayGraph,
                         subGraphs, inMap,
                         mainToOverlayMap));
             }
             else if( algorithmName == "LazyBFS") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>>(
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::LazyBFSSSReachAlgorithm>>(
                                 mainGraph,
                                 overlayGraph,
                                 subGraphs, inMap,
@@ -265,7 +265,7 @@ int main(int argc, char *argv[]) {
             }
             else if( algorithmName == "CachingDFS") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>>(
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::CachingDFSSSReachAlgorithm>>(
                                 mainGraph,
                                 overlayGraph,
                                 subGraphs, inMap,
@@ -273,7 +273,7 @@ int main(int argc, char *argv[]) {
             }
             else if( algorithmName == "CachingBFS") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>>(
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::CachingBFSSSReachAlgorithm>>(
                                 mainGraph,
                                 overlayGraph,
                                 subGraphs, inMap,
@@ -281,7 +281,7 @@ int main(int argc, char *argv[]) {
             }
             else if( algorithmName == "SimpleInc") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>>(
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::SimpleIncSSReachAlgorithm>>(
                                 mainGraph,
                                 overlayGraph,
                                 subGraphs, inMap,
@@ -289,7 +289,7 @@ int main(int argc, char *argv[]) {
             }
             else if( algorithmName == "ESTreeML") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeML>>(
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::ESTreeML>>(
                                 mainGraph,
                                 overlayGraph,
                                 subGraphs, inMap,
@@ -297,7 +297,7 @@ int main(int argc, char *argv[]) {
             }
             else if( algorithmName == "OldESTree") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::OldESTree>>(
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::OldESTree>>(
                                 mainGraph,
                                 overlayGraph,
                                 subGraphs, inMap,
@@ -305,7 +305,7 @@ int main(int argc, char *argv[]) {
             }
             else if( algorithmName == "ESTreeQ") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::ESTreeQ>>(
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::ESTreeQ>>(
                                 mainGraph,
                                 overlayGraph,
                                 subGraphs, inMap,
@@ -313,7 +313,7 @@ int main(int argc, char *argv[]) {
             }
             else if( algorithmName == "SimpleESTree") {
                 algorithms.push_back(
-                        createAlgorithm<SSBasedDAPReachAlgorithm<Algora::SimpleESTree>>(
+                        createAlgorithm<DynamicSSBasedDAPReachAlgorithm<Algora::SimpleESTree>>(
                                 mainGraph,
                                 overlayGraph,
                                 subGraphs, inMap,

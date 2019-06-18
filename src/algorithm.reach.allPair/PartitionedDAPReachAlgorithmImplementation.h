@@ -10,7 +10,7 @@
 #include <property/propertymap.h>
 
 #include "DynamicAPReachAlgorithm.h"
-#include "SSBasedDAPReachAlgorithm.h"
+#include "DynamicSSBasedDAPReachAlgorithm.h"
 #include "PartitionedDAPReachAlgorithm.h"
 
 template <typename T>

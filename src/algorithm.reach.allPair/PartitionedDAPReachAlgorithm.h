@@ -21,7 +21,7 @@ public:
 
     std::string getShortName() const noexcept override;
 
-    bool query(const Algora::Vertex *start, const Algora::Vertex *end) override;
+    bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
 
     std::string const getBaseName() override {
         return overlayAlgorithm->getBaseName();

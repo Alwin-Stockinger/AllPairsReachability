@@ -38,7 +38,7 @@ std::string PartitionedDAPReachAlgorithm::getShortName() const noexcept {
 }
 
 
-bool PartitionedDAPReachAlgorithm::query(const Algora::Vertex *start, const Algora::Vertex *end) {
+bool PartitionedDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
 
     start = mainToSubMap[start];
     end = mainToSubMap[end];

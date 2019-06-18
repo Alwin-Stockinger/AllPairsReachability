@@ -15,7 +15,7 @@ public:
     explicit DynamicAPReachAlgorithm() : DynamicDiGraphAlgorithm(){ }
     ~DynamicAPReachAlgorithm() override = default;
 
-    virtual bool query(const Algora::Vertex *start,const  Algora::Vertex *end) = 0;
+    virtual bool query(Algora::Vertex *start, const Algora::Vertex *end) = 0;
 
     virtual std::string const getBaseName() = 0;
 
