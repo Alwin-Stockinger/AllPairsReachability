@@ -8,6 +8,8 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraDyn/src/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../DyReach/src/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraCore/src/")
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/")
+
 link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraCore/build/Release")
 link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraDyn/build/Release")
 link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../DyReach/build/Release")
