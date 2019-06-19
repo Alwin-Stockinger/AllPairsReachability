@@ -41,9 +41,11 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 #unit tests
 SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestSSBasedDAPReachAlgorithm.cpp tests/TestPartitionedDAPReachAlgorithm.cpp src/generator/RandomDoubleQueryGenerator.cpp src/generator/RandomDoubleQueryGenerator.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h)
 
-add_executable(runTests ${OBJS} ${TESTS} ${CONVERT})
+if(NOT(CMAKE_BUILD_TYPE STREQUAL "Release"))
+    add_executable(runTests ${OBJS} ${TESTS} ${CONVERT})
+    target_link_libraries(runTests  gtest_main)
+endif()
 
-target_link_libraries(runTests  gtest_main)
 
 
-add_executable(converter src/converter/ConverterMain.cpp ${CONVERT})
+#add_executable(converter src/converter/ConverterMain.cpp ${CONVERT})
