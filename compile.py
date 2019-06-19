@@ -1,4 +1,4 @@
 import subprocess
 
-subprocess.call(["cmake", "CMakeLists.txt"])
+subprocess.call(["cmake", "-DCMAKE_BUILD_TYPE=Release", "CMakeLists.txt"])
 subprocess.call(["make"])
