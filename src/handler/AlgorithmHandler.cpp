@@ -43,22 +43,27 @@ struct AlgorithmHandler::TimeCollector {
 
     unsigned long long k;
 
+    unsigned long long partitionTime;
     std::vector<unsigned long long> queryTimes;
     std::vector<unsigned long long> addArcTimes;
     std::vector<unsigned long long> removeArcTimes;
 
+    void addPartitionTime(TimePoint start, TimePoint end){
+        partitionTime = std::chrono::duration_cast<std::chrono::nanoseconds(end -start).count();
+    }
+
     void addQueryTime(TimePoint start, TimePoint end) {
-        unsigned long long duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
         queryTimes.push_back(duration);
     }
 
     void addAddArcTime(TimePoint start, TimePoint end) {
-        unsigned long long duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
         addArcTimes.push_back(duration);
     }
 
     void addRemoveArcTime(TimePoint start, TimePoint end) {
-        unsigned long long duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
         removeArcTimes.push_back(duration);
     }
 
@@ -87,7 +92,7 @@ struct AlgorithmHandler::TimeCollector {
     }
 
     const unsigned long long getAllTime(){
-        return getQueryTime() + getAddArcTime() + getRemoveArcTime();
+        return getQueryTime() + getAddArcTime() + getRemoveArcTime() + partitionTime;
     }
 
 private:
@@ -208,15 +213,20 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
         auto* algorithms = createAlgorithms(algorithmNames);
         for(auto* algorithm: (*algorithms)) {
 
+            auto* timer = new TimeCollector(algorithm->getBaseName(), i);
+            timers.push_back(timer);
+
             algorithm->setAutoUpdate(false);
             algorithm->setGraph(diGraph);
             algorithm->setPartitionFunction(GraphFileConverter::handlePartitioning, i);
+
+            auto startTime = HRC::now();
             algorithm->partition();
+            auto endTime = HRC::now();
+            timer->addPartitionTime(startTime, endTime);
+
 
             std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
-
-            auto* timer = new TimeCollector(algorithm->getBaseName(), i);
-            timers.push_back(timer);
 
             auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
                 auto startTime = HRC::now();
@@ -297,6 +307,7 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
     file << ",avg query time(ns)";
     file << ",avg add Arc time(ns)";
     file << ",avg remove Arc time(ns)";
+    file << "partition time(ns)";
     file << ",whole Time(ns)";
 
     file << std::endl;
@@ -307,6 +318,7 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
         file << "," << timer->getAvgQueryTime();
         file << "," << timer->getAvgAddArcTime();
         file << "," << timer->getAvgRemoveArcTime();
+        file << "," << timer->partitionTime;
         file << "," << timer->getAllTime();
         file << std::endl;
     }
