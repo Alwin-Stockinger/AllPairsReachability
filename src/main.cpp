@@ -17,8 +17,7 @@
 #include <wait.h>
 
 
-template<typename T>
-PartitionedDAPReachAlgorithm  *createAlgorithm(const Algora::DynamicDiGraph &mainGraph);
+
 
 int main(int argc, char *argv[]) {
 
@@ -74,6 +73,8 @@ int main(int argc, char *argv[]) {
     double queriesPerDelta = -0.5;
     auto queriesPerDeltaOption = app.add_option("-D, --queriesPerDelta", queriesPerDelta, "Queries per delta to generate for konect graphs, negative numbers are relative to delta size");
 
+    double squashRatio = 1.;
+    auto squashOption = app.add_option("-S, --squash", squashRatio, "squash until arcs/vertices = squashRatio");
 
     CLI11_PARSE(app, argc, argv)
 
@@ -104,6 +105,11 @@ int main(int argc, char *argv[]) {
 
         bool relative = queriesPerDelta < 0.0;
         konectProvider->generateQueriesAfterEachDelta( relative ? -queriesPerDelta : queriesPerDelta, relative);
+
+        if(squashOption){
+            konectProvider->squash(true);
+            konectProvider->squashRatio(squashRatio);
+        }
 
         provider = konectProvider;
     }

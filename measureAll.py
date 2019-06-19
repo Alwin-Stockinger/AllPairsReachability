@@ -23,7 +23,9 @@ if len(sys.argv) == 1:
 elif len(sys.argv) == 2:
     inputFile = "-i " + sys.argv[1]
     subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms], shell=True)
+elif len(sys.argv) == 3:
+    inputFile = "-i " + sys.argv[1]
+    squashRatio = "-S " + sys.argv[2]
+    subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms + " " + squashRatio], shell=True)
 else:
     print("too many arguments")
-
-
