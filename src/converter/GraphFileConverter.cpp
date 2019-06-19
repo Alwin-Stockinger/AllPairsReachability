@@ -13,122 +13,6 @@
 #include "GraphFileConverter.h"
 
 
-//TODO make ids unsigned long long
-
-
-
-void GraphFileConverter::convertDiGraphToKahip(Algora::DiGraph *graph, const std::string& outputFileName){
-    std::map<unsigned long long int, std::map<unsigned long long int, unsigned long long int>> vertexMap = generateVertexMapFromGraph(graph);
-    writeMapToFile(outputFileName, graph, vertexMap);
-}
-
-void GraphFileConverter::writeMapToFile(const std::string &outFileName, Algora::DiGraph *graph,
-                                        std::map<unsigned long long, std::map<unsigned long long, unsigned long long>> vertexMap) {
-
-
-    std::ofstream outFile(outFileName, std::ios::trunc);
-
-    unsigned long long arcSize = 0;
-
-    for(const auto& [_,map]: vertexMap){
-        arcSize += map.size();
-    }
-    arcSize /= 2;
-
-    if(outFile.good() && outFile.is_open()){
-        outFile << graph->getSize() << " " << arcSize << " 1\n";
-        //outFile.flush();
-    }
-
-    for(unsigned long long i = 0; i < graph->getSize(); i++){
-        if(vertexMap.find(i) != vertexMap.end()){
-            for(const auto &[tail, weight]: vertexMap[i]){
-                outFile << tail + 1 << " " << weight << " ";
-            }
-        }
-        outFile << "\n";
-        //outFile.flush();
-    }
-
-    outFile.close();
-}
-
-std::map<unsigned long long int, std::map<unsigned long long int, unsigned long long int>> GraphFileConverter::generateVertexMapFromGraph(
-        Algora::DiGraph *graph) {
-
-
-    std::map<unsigned long long , std::map<unsigned long long, unsigned long long>> vertexMap;
-
-    graph->mapArcs([&vertexMap](Algora::Arc* arc){
-        if(!arc->isLoop()){
-            unsigned long long headId = arc->getHead()->getId();
-            unsigned long long tailId = arc->getTail()->getId();
-
-            if(vertexMap.find(headId) == vertexMap.end()){
-                vertexMap[headId][tailId] = 1;
-                vertexMap[tailId][headId] = 1;
-            } else{
-                vertexMap[headId][tailId]++;
-                vertexMap[tailId][headId]++;
-            }
-        }
-    });
-
-    return vertexMap;
-}
-
-
-void GraphFileConverter::convertKahipDiToUnDi(const std::string &inName, const std::string &outName) {
-    std::ifstream inFile(inName);
-    std::ofstream outFile(outName, std::ios::trunc);
-
-    //TODO Error check
-
-    std::string line;
-    std::getline(inFile, line);
-
-
-    if(outFile.good() && outFile.is_open()){
-        outFile << line <<" 1\n";
-
-        outFile.flush();
-    }
-
-
-    std::map<unsigned , std::set<unsigned >> vertexMap;
-
-    for(unsigned i = 1; std::getline(inFile, line); i++){
-        //TODO Fix reading last empty line
-
-        std::string arcString;
-        std::stringstream ss(line);
-
-        if(line.empty()){
-            vertexMap[i] = std::set<unsigned>();
-        }
-        else while(std::getline(ss, arcString,' ')){
-            unsigned neighbour = std::stoul(arcString);
-            vertexMap[i].insert(neighbour);
-        }
-    }
-
-    for( const auto &[id, set] : vertexMap){
-        for( const auto &[neighbourId, neighbourSet] : vertexMap){
-            if(set.find(neighbourId) != set.end() && neighbourSet.find(id) != neighbourSet.end()){
-                outFile << neighbourId << " 2 ";
-            }
-            else if(set.find(neighbourId) != set.end() || neighbourSet.find(id) != neighbourSet.end()){
-                outFile << neighbourId << " 1 ";
-            }
-        }
-        outFile << '\n';
-        outFile.flush();
-    }
-
-
-    outFile.close();
-}
-
 
 
 Algora::DynamicDiGraph * GraphFileConverter::readGraph(const std::string &fileName) {
@@ -189,34 +73,7 @@ void GraphFileConverter::addVertices(const Algora::DynamicDiGraph &oldGraph, Alg
     });
 }
 
-Algora::FastPropertyMap<unsigned long long> GraphFileConverter::makePartitionMap(const std::string &partitionFileName, Algora::DiGraph* graph) {
 
-
-    std::map<unsigned long long, Algora::Vertex*> vertices;
-
-    unsigned long long vertexI = 0ULL;
-    graph->mapVertices([&vertices, &vertexI](Algora::Vertex* vertex){
-        vertices.insert({vertexI++, vertex});
-    });
-
-    Algora::FastPropertyMap<unsigned long long> partitionMap;
-
-    std::ifstream file(partitionFileName);
-
-    if(file.good()) {
-        std::string line;
-        for (unsigned long long i = 0ULL; std::getline(file, line); i++) {
-            partitionMap[vertices[i]] = std::stoul(line);
-        }
-    }
-    else{
-        //TODO error
-        std::cerr << "PartitionFile not good" << std::endl;
-        std::cerr << "Error: " << strerror(errno);
-    }
-
-    return partitionMap;
-}
 
 
 std::vector<Algora::DynamicDiGraph *> *
@@ -282,32 +139,7 @@ GraphFileConverter::makeInMap(Algora::DynamicDiGraph *overlayGraph, std::vector<
     return vertexMap;
 }
 
-Algora::FastPropertyMap<unsigned long long>
-GraphFileConverter::handlePartitioning(unsigned long long int k, Algora::DiGraph *graph) {
-    std::string kahipFileName = "forKahip";
 
-    GraphFileConverter::convertDiGraphToKahip(graph, kahipFileName);
-    //TODO implement Kahip options
-    pid_t pid;
-
-    std::string kahipName = "kaffpa";
-    std::string preconfig = "--preconfiguration=eco";   //TODO
-
-    std::string kahipInputFileName = "k";
-    std::string kahipArgInputFileName = "--output_filename=" + kahipInputFileName;
-    std::string kahipK = "--k=" + std::to_string(k);
-
-    char* kahipArgv[] = {kahipName.data(), kahipFileName.data(), kahipK.data(), preconfig.data(), kahipArgInputFileName.data(), nullptr};
-    char* const envp[]={nullptr};
-    std::cout << "\n\nStarting Kahip with k=" + std::to_string(k) <<"\n--------------KAHIP OUTPUT----------------"<< std::endl;
-    int kahipStatus = posix_spawn(&pid, kahipName.data(), nullptr, nullptr, kahipArgv, envp);
-
-    if(kahipStatus != 0 || waitpid(pid, &kahipStatus, 0) == -1){
-        throw std::runtime_error("kahip could not be executed");
-    }
-    std::cout << "------------------KAHIP OUTPUT END----------------"<<std::endl;
-    return GraphFileConverter::makePartitionMap(kahipInputFileName, graph);
-}
 
 
 

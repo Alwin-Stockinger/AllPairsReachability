@@ -11,8 +11,6 @@
 
 
 #include <property/fastpropertymap.h>
-
-#include <memory>
 #include <type_traits>
 
 

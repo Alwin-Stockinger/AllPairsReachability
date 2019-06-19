@@ -17,7 +17,7 @@
 class GraphFileConverter {
 public:
 
-    static void convertKahipDiToUnDi(const std::string &inName, const std::string &outName);
+
 
     static Algora::DynamicDiGraph * readGraph(const std::string &fileName);
 
@@ -26,7 +26,7 @@ public:
 
     static void addVertices(const Algora::DynamicDiGraph &oldGraph, Algora::DynamicDiGraph *newGraph);
 
-    static Algora::FastPropertyMap< unsigned long long> makePartitionMap(const std::string &partitionFileName, Algora::DiGraph* graph);
+
 
     static std::vector<Algora::DynamicDiGraph *> *
     makeSubGraphs(const Algora::DynamicDiGraph& mainGraph, const std::map<unsigned long long, unsigned long long> &partitionMap);
@@ -41,17 +41,6 @@ public:
     makeInMap(Algora::DynamicDiGraph *overlayGraph, std::vector<Algora::DynamicDiGraph *> *subGraphs,
               std::map<unsigned long long int, unsigned long long int> partitionMap);
 
-
-    static std::map<unsigned long long int, std::map<unsigned long long int, unsigned long long int>>
-    generateVertexMapFromGraph(Algora::DiGraph *graph);
-
-    static void convertDiGraphToKahip(Algora::DiGraph *graph, const std::string &outputFileName);
-
-    static Algora::FastPropertyMap<unsigned long long> handlePartitioning(unsigned long long int k, Algora::DiGraph *graph);
-
-private:
-    static void writeMapToFile(const std::string &outFileName, Algora::DiGraph *graph,
-                               std::map<unsigned long long, std::map<unsigned long long, unsigned long long>> vertexMap);
 
 
 

@@ -40,10 +40,10 @@ private:
 
     void writeResults(const std::vector<TimeCollector*>& timers);
 
-    std::vector<PartitionedDAPReachAlgorithm*>* createAlgorithms(const std::vector<std::string>& algorithmNames);
+    std::vector<DynamicAPReachAlgorithm*>* createAlgorithms(const std::vector<std::string>& algorithmNames);
 
     template<typename T>
-    PartitionedDAPReachAlgorithm  *createAlgorithm();
+    DynamicAPReachAlgorithm  *createAlgorithm();
 };
 
 

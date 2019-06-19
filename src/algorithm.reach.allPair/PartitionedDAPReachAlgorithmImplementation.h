@@ -13,7 +13,7 @@
 #include "DynamicSSBasedDAPReachAlgorithm.h"
 #include "PartitionedDAPReachAlgorithm.h"
 
-template <typename T>
+template <typename T, const auto depth = 0U>
 class PartitionedDAPReachAlgorithmImplementation : public PartitionedDAPReachAlgorithm{
 
 public:
@@ -21,10 +21,27 @@ public:
 
     explicit PartitionedDAPReachAlgorithmImplementation() : PartitionedDAPReachAlgorithm(){};
 
+
     ~PartitionedDAPReachAlgorithmImplementation() override = default;
 
-protected:
+private:
     DynamicAPReachAlgorithm *createSubAlgorithm() override {
+        auto* newAlgo = new PartitionedDAPReachAlgorithmImplementation<T, depth - 1>();
+        newAlgo->setPartitionFunction(partitionFunction, k);
+        return newAlgo;
+    }
+};
+template <typename T>
+class PartitionedDAPReachAlgorithmImplementation<T, 0U> : public PartitionedDAPReachAlgorithm{
+
+public:
+    static_assert(std::is_base_of<DynamicAPReachAlgorithm,T>::value, "Template Parameter has to inherit from DynamicApAlgorithm");
+
+    explicit PartitionedDAPReachAlgorithmImplementation() : PartitionedDAPReachAlgorithm(){};
+    ~PartitionedDAPReachAlgorithmImplementation() override = default;
+
+private:
+    DynamicAPReachAlgorithm* createSubAlgorithm() override {
         return new T();
     }
 };

@@ -134,7 +134,7 @@ void PartitionedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
     for(auto it = mainToSubMap.begin(); it != mainToSubMap.end(); it++){
         auto* anyVertex = (*it);
         if(anyVertex){
-            subGraph = static_cast<Algora::DiGraph*>(anyVertex->getParent());
+            subGraph = dynamic_cast<Algora::DiGraph*>(anyVertex->getParent());
             break;
         }
     }
@@ -296,6 +296,7 @@ PartitionedDAPReachAlgorithm::partition() {
 
 void PartitionedDAPReachAlgorithm::onDiGraphSet() {
     DynamicDiGraphAlgorithm::onDiGraphSet();
+    partition();
 }
 
 

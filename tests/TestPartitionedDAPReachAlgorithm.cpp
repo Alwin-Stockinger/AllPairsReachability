@@ -19,6 +19,7 @@
 #include <algorithm.reach.es/estree-bqueue.h>
 #include <algorithm.reach.es/estree-ml.h>
 #include <algorithm.reach.es/simpleestree.h>
+#include <graph.incidencelist/incidencelistgraph.h>
 
 
 template <typename T>
@@ -76,7 +77,7 @@ public:
 
 
         algorithm = new PartitionedDAPReachAlgorithmImplementation<T>();
-        algorithm->setGraph(mainGraph->getDiGraph());
+
 
         /*Algora::FastPropertyMap<unsigned long long> (*partitionFunction) (unsigned long long int, Algora::DiGraph*) = [partitionMap] (unsigned long long k, Algora::DiGraph* diGraph){
             return partitionMap;
@@ -87,7 +88,7 @@ public:
             return partitionMap;
         }, 3);
 
-        algorithm->partition();
+        algorithm->setGraph(mainGraph->getDiGraph());
 
     }
 };
@@ -318,4 +319,33 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testAlternativeNewOverlayVertex){
 
 
     ASSERT_TRUE(this->algorithm -> query(vertex7, vertex0));
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testNewGraph){
+
+    auto newGraph = Algora::IncidenceListGraph();
+
+    auto* vertex1 = newGraph.addVertex();
+    auto* vertex2 = newGraph.addVertex();
+
+    this->algorithm->setPartitionFunction([vertex1, vertex2] (unsigned long long k, Algora::DiGraph* diGraph){
+
+        Algora::FastPropertyMap<unsigned long long> map;
+        map[vertex1] = 0;
+        map[vertex2] = 1;
+
+        return map;
+    }, 2);
+
+    this->algorithm->setGraph(&newGraph);
+
+
+
+    ASSERT_FALSE(this->algorithm->query(vertex1, vertex2));
+
+    newGraph.addArc(vertex1, vertex2);
+
+    ASSERT_TRUE(this->algorithm -> query(vertex1, vertex2));
+
+    this->algorithm->unsetGraph();
 }

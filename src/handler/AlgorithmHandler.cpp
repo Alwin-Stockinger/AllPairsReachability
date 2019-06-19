@@ -26,6 +26,7 @@
 #include <algorithm.reach.es/simpleestree.h>
 
 #include "../algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
+#include "../partition/Partitioner.h"
 
 typedef std::chrono::high_resolution_clock HRC;
 typedef std::chrono::high_resolution_clock::time_point TimePoint;
@@ -49,7 +50,7 @@ struct AlgorithmHandler::TimeCollector {
     std::vector<unsigned long long> removeArcTimes;
 
     void addPartitionTime(TimePoint start, TimePoint end){
-        partitionTime = std::chrono::duration_cast<std::chrono::nanoseconds(end -start).count();
+        partitionTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end -start).count();
     }
 
     void addQueryTime(TimePoint start, TimePoint end) {
@@ -216,12 +217,11 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             auto* timer = new TimeCollector(algorithm->getBaseName(), i);
             timers.push_back(timer);
 
-            algorithm->setAutoUpdate(false);
-            algorithm->setGraph(diGraph);
-            algorithm->setPartitionFunction(GraphFileConverter::handlePartitioning, i);
 
+            //graph set + partitioning
+            algorithm->setAutoUpdate(false);
             auto startTime = HRC::now();
-            algorithm->partition();
+            algorithm->setGraph(diGraph);
             auto endTime = HRC::now();
             timer->addPartitionTime(startTime, endTime);
 
@@ -324,9 +324,9 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
     }
 }
 
-std::vector<PartitionedDAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const std::vector<std::string>& algorithmNames){
+std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const std::vector<std::string>& algorithmNames){
 
-    auto *algorithms = new std::vector<PartitionedDAPReachAlgorithm*>;
+    auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
 
     for(const std::string& algorithmName: algorithmNames){
 
@@ -384,6 +384,6 @@ std::vector<PartitionedDAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(c
 }
 
 template<typename T>
-PartitionedDAPReachAlgorithm  *AlgorithmHandler::createAlgorithm() {
+DynamicAPReachAlgorithm  *AlgorithmHandler::createAlgorithm() {
     return new PartitionedDAPReachAlgorithmImplementation<T>();
 }

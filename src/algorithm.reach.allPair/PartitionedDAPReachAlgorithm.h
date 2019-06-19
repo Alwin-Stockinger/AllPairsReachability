@@ -13,6 +13,7 @@
 #include "property/fastpropertymap.h"
 
 #include "DynamicAPReachAlgorithm.h"
+#include "../partition/Partitioner.h"
 
 using PartFunc = std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>;
 
@@ -52,7 +53,7 @@ public:
         partitionFunction = std::move(newPartitionFunction);
     }
 
-    void partition ();
+
 
 private:
     void initAlgorithms(std::vector<Algora::DiGraph *> &graphs);
@@ -74,14 +75,18 @@ private:
     Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
     Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;//cannot use FastPropertyMap, because of different graphs???
 
-    PartFunc partitionFunction;
 
-    unsigned long long k = 2;
 
     void deleteOldPartition();
 
+    void partition ();
+
 protected:
     virtual DynamicAPReachAlgorithm* createSubAlgorithm() = 0;
+
+    PartFunc partitionFunction = Partitioner::handlePartitioning;
+
+    unsigned long long k = 2;
 };
 
 
