@@ -15,8 +15,7 @@ link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraDyn/build/Release")
 link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../DyReach/build/Release")
 
 
-set(optimization-flags -O3)
-set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} --optimization-flags")
+set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 SET(CONVERT src/converter/GraphFileConverter.cpp src/converter/GraphFileConverter.h )
 
