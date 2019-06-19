@@ -25,11 +25,8 @@ int main(int argc, char *argv[]) {
 
     CLI::App app{"Dynamic All Pairs Reachability program"};
 
-    std::string graphType = "random";
-    auto typeOption = app.add_option("-t, --type", graphType, "Type of input Graph(e.g. random, konect)");
-
     std::string inputFileName = "input";
-    app.add_option("-i, --inputFile", inputFileName, "File name of the input Graph");
+    auto inputOption = app.add_option("-i, --inputFile", inputFileName, "File name of the input Graph");
 
     std::string kahipFileName = "forKahip";
     app.add_option(" --kahipFile", kahipFileName, "File name for kahip files");
@@ -71,11 +68,18 @@ int main(int argc, char *argv[]) {
     bool runPerformanceTests = true;
     auto runPerformanceTestsOption = app.add_option("-b, --performance", runPerformanceTests, "To run performance tests");
 
+
+    //for konect files
+
+    double queriesPerDelta = -0.5;
+    auto queriesPerDeltaOption = app.add_option("-D, --queriesPerDelta", queriesPerDelta, "Queries per delta to generate for konect graphs, negative numbers are relative to delta size");
+
+
     CLI11_PARSE(app, argc, argv)
 
     Algora::InstanceProvider* provider = nullptr;
 
-    if(graphType == "random"){
+    if(!inputOption){
         auto randomProvider = new Algora::RandomInstanceProvider;
         randomProvider->setGraphSize(vertexSize);
         if(arcSizeOption ){
@@ -94,19 +98,17 @@ int main(int argc, char *argv[]) {
 
         provider = randomProvider;
     }
-    else if(graphType == "konect"){
+    else{
         auto konectProvider = new Algora::KonectNetworkInstanceProvider;
         konectProvider->addInputFile(inputFileName);
 
+        bool relative = queriesPerDelta < 0.0;
+        konectProvider->generateQueriesAfterEachDelta( relative ? -queriesPerDelta : queriesPerDelta, relative);
+
         provider = konectProvider;
     }
-    else{
-        //TODO error
 
-        std::cerr << graphType << " is not a viable graph type\n";
-        return 1;
-    }
-
+    std::cout << "Generating Algora Graph" << std::endl;
     provider->nextInstance();
 
     auto& dynGraph = provider->getGraph();
