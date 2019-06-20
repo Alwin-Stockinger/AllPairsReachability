@@ -19,7 +19,7 @@ Partitioner::handlePartitioning(unsigned long long int k, Algora::DiGraph *graph
     //TODO implement Kahip options
     pid_t pid;
 
-    std::string kahipName = "kaffpaE";
+    std::string kahipName = "kaffpa";
     std::string preconfig = "--preconfiguration=eco";   //TODO
 
     std::string kahipInputFileName = "k";
