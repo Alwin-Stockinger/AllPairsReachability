@@ -34,17 +34,14 @@ typedef std::chrono::high_resolution_clock::time_point TimePoint;
 struct AlgorithmHandler::TimeCollector {
 
 
-    explicit TimeCollector(const std::string& algorithmName,const unsigned long long int k) {
-        this->k = k;
-        this->algorithmName = algorithmName;
-    }
+    TimeCollector(const unsigned long long int k) : k(k) {}
 
 
     std::string algorithmName;
 
-    unsigned long long k;
+    const unsigned long long k;
 
-    unsigned long long partitionTime;
+    unsigned long long partitionTime{};
     std::vector<unsigned long long> queryTimes;
     std::vector<unsigned long long> addArcTimes;
     std::vector<unsigned long long> removeArcTimes;
@@ -211,10 +208,10 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
     for(unsigned long long i = 2; i <= kMax ; i++){
 
-        auto* algorithms = createAlgorithms(algorithmNames);
+        auto* algorithms = createAlgorithms(algorithmNames, i);
         for(auto* algorithm: (*algorithms)) {
 
-            auto* timer = new TimeCollector(algorithm->getBaseName(), i);
+            auto* timer = new TimeCollector(i);
             timers.push_back(timer);
 
 
@@ -224,6 +221,8 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             algorithm->setGraph(diGraph);
             auto endTime = HRC::now();
             timer->addPartitionTime(startTime, endTime);
+
+            timer->algorithmName = algorithm->getBaseName();
 
 
             std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
@@ -324,7 +323,7 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
     }
 }
 
-std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const std::vector<std::string>& algorithmNames){
+std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const std::vector<std::string>& algorithmNames, const unsigned long long k){
 
     auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
 
@@ -333,47 +332,47 @@ std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const 
 
         if(algorithmName == "StaticBFS") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>(k));
         }
         else if(algorithmName == "StaticDFS") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>(k));
         }
         else if( algorithmName == "LazyDFS") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>(k));
         }
         else if( algorithmName == "LazyBFS") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>(k));
         }
         else if( algorithmName == "CachingDFS") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>(k));
         }
         else if( algorithmName == "CachingBFS") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>(k));
         }
         else if( algorithmName == "SimpleInc") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>(k));
         }
         else if( algorithmName == "ESTreeML") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>(k));
         }
         else if( algorithmName == "OldESTree") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>(k));
         }
         else if( algorithmName == "ESTreeQ") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>(k));
         }
         else if( algorithmName == "SimpleESTree") {
             algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>());
+                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>(k));
         }
         else{
             std::cerr << algorithmName << " not a viable algorithm" << std::endl;
@@ -384,6 +383,8 @@ std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const 
 }
 
 template<typename T>
-DynamicAPReachAlgorithm  *AlgorithmHandler::createAlgorithm() {
-    return new PartitionedDAPReachAlgorithmImplementation<T>();
+DynamicAPReachAlgorithm  *AlgorithmHandler::createAlgorithm(unsigned long long k) {
+    auto* algorithm = new PartitionedDAPReachAlgorithmImplementation<T>();
+    algorithm->setK(k);>>(
+    return algorithm;
 }

@@ -34,7 +34,9 @@ public:
         return overlayAlgorithm->getBaseName();
     }
 
-
+    void setK(unsigned long long newK){
+        this->k = newK;
+    }
 
     void onArcAdd(Algora::Arc *arc) override;
 

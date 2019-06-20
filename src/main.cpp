@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
     std::string inputFileName = "input";
     auto inputOption = app.add_option("-i, --inputFile", inputFileName, "File name of the input Graph");
 
-    std::string kahipFileName = "forKahip";
-    app.add_option(" --kahipFile", kahipFileName, "File name for kahip files");
+    /*std::string kahipFileName = "forKahip";
+    app.add_option(" --kahipFile", kahipFileName, "File name for kahip files");*/
 
     unsigned long long k = 10;
     app.add_option(" -k, --partitions", k, "Amount of partitions");
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     Algora::InstanceProvider* provider = nullptr;
 
-    if(!inputOption){
+    if(!*inputOption){
         auto randomProvider = new Algora::RandomInstanceProvider;
         randomProvider->setGraphSize(vertexSize);
         if(arcSizeOption ){

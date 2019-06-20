@@ -40,10 +40,10 @@ private:
 
     void writeResults(const std::vector<TimeCollector*>& timers);
 
-    std::vector<DynamicAPReachAlgorithm*>* createAlgorithms(const std::vector<std::string>& algorithmNames);
+    std::vector<DynamicAPReachAlgorithm*>* createAlgorithms(const std::vector<std::string>& algorithmNames, unsigned long long i);
 
     template<typename T>
-    DynamicAPReachAlgorithm  *createAlgorithm();
+    DynamicAPReachAlgorithm  *createAlgorithm(unsigned long long k);
 };
 
 

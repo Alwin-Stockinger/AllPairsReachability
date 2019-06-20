@@ -7,6 +7,8 @@
 #include <wait.h>
 #include <fstream>
 #include <cstring>
+
+
 #include "Partitioner.h"
 
 Algora::FastPropertyMap<unsigned long long>
@@ -17,7 +19,7 @@ Partitioner::handlePartitioning(unsigned long long int k, Algora::DiGraph *graph
     //TODO implement Kahip options
     pid_t pid;
 
-    std::string kahipName = "kaffpa";
+    std::string kahipName = "kaffpaE";
     std::string preconfig = "--preconfiguration=eco";   //TODO
 
     std::string kahipInputFileName = "k";
@@ -30,6 +32,7 @@ Partitioner::handlePartitioning(unsigned long long int k, Algora::DiGraph *graph
     int kahipStatus = posix_spawn(&pid, kahipName.data(), nullptr, nullptr, kahipArgv, envp);
 
     if(kahipStatus != 0 || waitpid(pid, &kahipStatus, 0) == -1){
+        if(kahipStatus == 2) std::cerr << strerror(kahipStatus) << ": " << kahipName << std::endl;
         throw std::runtime_error("kahip could not be executed");
     }
     std::cout << "------------------KAHIP OUTPUT END----------------"<<std::endl;
