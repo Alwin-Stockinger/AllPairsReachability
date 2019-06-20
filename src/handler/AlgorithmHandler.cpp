@@ -385,6 +385,6 @@ std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const 
 template<typename T>
 DynamicAPReachAlgorithm  *AlgorithmHandler::createAlgorithm(unsigned long long k) {
     auto* algorithm = new PartitionedDAPReachAlgorithmImplementation<T>();
-    algorithm->setK(k);>>(
+    algorithm->setK(k);
     return algorithm;
 }
