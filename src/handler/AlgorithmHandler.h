@@ -38,7 +38,10 @@ private:
 
     void reachabilityCheck();
 
-    void writeResults(const std::vector<TimeCollector*>& timers);
+    void writeAllResults(const std::vector<TimeCollector*>& timers);
+
+    void writeResults(TimeCollector& timer);
+    void writeHeader();
 
     std::vector<DynamicAPReachAlgorithm*>* createAlgorithms(const std::vector<std::string>& algorithmNames, unsigned long long i);
 

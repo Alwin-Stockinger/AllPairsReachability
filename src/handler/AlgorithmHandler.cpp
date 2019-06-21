@@ -104,7 +104,6 @@ private:
     }
 };
 
-
 enum class MenuOptions{ reach=1, addArc=2, removeArc=3, quit=0} option;
 
 void AlgorithmHandler::runInterface() {
@@ -200,19 +199,18 @@ void AlgorithmHandler::removeArc(){
 
 void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector<std::string>& algorithmNames) {
 
-    std::vector<TimeCollector*> timers;
-
     auto &queries = instanceProvider->getQueries();
     auto &dynGraph = instanceProvider->getGraph();
     auto* diGraph = dynGraph.getDiGraph();
+
+    writeHeader();
 
     for(unsigned long long i = 2; i <= kMax ; i++){
 
         auto* algorithms = createAlgorithms(algorithmNames, i);
         for(auto* algorithm: (*algorithms)) {
 
-            auto* timer = new TimeCollector(i);
-            timers.push_back(timer);
+            TimeCollector timer(i);
 
 
             //graph set + partitioning
@@ -220,9 +218,9 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             auto startTime = HRC::now();
             algorithm->setGraph(diGraph);
             auto endTime = HRC::now();
-            timer->addPartitionTime(startTime, endTime);
+            timer.addPartitionTime(startTime, endTime);
 
-            timer->algorithmName = algorithm->getBaseName();
+            timer.algorithmName = algorithm->getBaseName();
 
 
             std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
@@ -231,7 +229,7 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
                 auto startTime = HRC::now();
                 algorithm->onArcAdd(arc);
                 auto endTime = HRC::now();
-                timer->addAddArcTime(startTime, endTime);
+                timer.addAddArcTime(startTime, endTime);
             };
             diGraph->onArcAdd(algorithm,onArcAdded);
 
@@ -239,7 +237,7 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
                 auto startTime = HRC::now();
                 algorithm->onArcRemove(arc);
                 auto endTime = HRC::now();
-                timer->addRemoveArcTime(startTime, endTime);
+                timer.addRemoveArcTime(startTime, endTime);
             };
             diGraph->onArcRemove(algorithm, onArcRemoved);
 
@@ -263,7 +261,7 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
                     auto startTime = std::chrono::high_resolution_clock::now();
                     algorithm->query(startVertex, endVertex);
                     auto endTime = std::chrono::high_resolution_clock::now();
-                    timer->addQueryTime(startTime, endTime);
+                    timer.addQueryTime(startTime, endTime);
                 }
                 dynGraph.applyNextDelta();
             }
@@ -283,21 +281,17 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             std::cout << "Finished\n";
 
             delete algorithm;
+
+            writeResults(timer);
         }
         delete algorithms;
     }
-
-    writeResults(timers);
-
-    for(TimeCollector* timer : timers){
-        delete timer;
-    }
 }
 
-void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
-
+void AlgorithmHandler::writeHeader(){
     std::ofstream file;
-    file.open("results.csv");
+
+    file.open("results.csv", std::ios_base::app);
 
     file << instanceProvider->getConfiguration() << std::endl;
 
@@ -308,8 +302,29 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
     file << ",avg remove Arc time(ns)";
     file << "partition time(ns)";
     file << ",whole Time(ns)";
+    file << std::endl;
+
+}
+
+void AlgorithmHandler::writeResults(TimeCollector& timer) {
+    std::ofstream file;
+    file.open("results.csv", std::ios_base::app);
+
+    file << timer.k;
+    file << "," << timer.algorithmName;
+    file << "," << timer.getAvgQueryTime();
+    file << "," << timer.getAvgAddArcTime();
+    file << "," << timer.getAvgRemoveArcTime();
+    file << "," << timer.partitionTime;
+    file << "," << timer.getAllTime();
 
     file << std::endl;
+}
+
+void AlgorithmHandler::writeAllResults (const std::vector<TimeCollector*>& timers){
+
+    std::ofstream file;
+    file.open("results.csv", std::ios_base::app);
 
     for(TimeCollector* timer: timers){
         file << timer->k;
@@ -321,6 +336,7 @@ void AlgorithmHandler::writeResults (const std::vector<TimeCollector*>& timers){
         file << "," << timer->getAllTime();
         file << std::endl;
     }
+    file << std::endl;
 }
 
 std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const std::vector<std::string>& algorithmNames, const unsigned long long k){
