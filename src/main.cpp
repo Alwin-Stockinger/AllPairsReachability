@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     bool multiArcs = false;
     auto multiArcsOption = app.add_option("-M, --multiArcs", multiArcs, "Multi Arcs are allowed");
 
-    unsigned long long numOperations = 100;
+    unsigned long long numOperations = 100000;
     auto numOperationsOption = app.add_option("-o, --numOperations", numOperations, "Number of Operations");
 
     unsigned queryProp = 70;
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
         randomProvider->allowMultiArcs(multiArcs);
 
         randomProvider->setNumOperations(numOperations);
-        randomProvider->setQueriesProportion(2*queryProp);  //TODO use new Query Generator
+        randomProvider->setQueriesProportion(2 * queryProp);  //TODO use new Query Generator
         randomProvider->setArcRemovalProportion(removalProp);
         randomProvider->setArcAdditionProportion(additionProp);
         randomProvider->setMultiplier(multiplier);
@@ -103,6 +103,8 @@ int main(int argc, char *argv[]) {
         auto konectProvider = new Algora::KonectNetworkInstanceProvider;
         konectProvider->addInputFile(inputFileName);
 
+
+        queriesPerDelta *=2;    //because two SS queries for one AP query
         bool relative = queriesPerDelta < 0.0;
         konectProvider->generateQueriesAfterEachDelta( relative ? -queriesPerDelta : queriesPerDelta, relative);
 
