@@ -43,9 +43,9 @@ private:
     void writeResults(TimeCollector& timer);
     void writeHeader();
 
-    std::vector<DynamicAPReachAlgorithm*>* createAlgorithms(const std::vector<std::string>& algorithmNames, unsigned long long i);
+    std::vector<DynamicAPReachAlgorithm*>* createAlgorithms(const std::vector<std::string>& algorithmNames, unsigned long long i, std::vector<unsigned> levels);
 
-    template<typename T>
+    template<typename T, unsigned Level = 0U>
     DynamicAPReachAlgorithm  *createAlgorithm(unsigned long long k);
 };
 

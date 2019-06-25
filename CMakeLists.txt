@@ -27,21 +27,18 @@ link_libraries("libAlgoraCore.a")
 add_executable(AllPairReach src/main.cpp ${OBJS} ${CONVERT})
 
 
-
-
-
-#gtest
-
-ADD_SUBDIRECTORY(tests/googletest)
-enable_testing()
-
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-
-
-#unit tests
-SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestSSBasedDAPReachAlgorithm.cpp tests/TestPartitionedDAPReachAlgorithm.cpp src/generator/RandomDoubleQueryGenerator.cpp src/generator/RandomDoubleQueryGenerator.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h)
-
 if(NOT(CMAKE_BUILD_TYPE STREQUAL "Release"))
+    #gtest
+
+    ADD_SUBDIRECTORY(tests/googletest)
+    enable_testing()
+
+    include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+
+
+    #unit tests
+    SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestSSBasedDAPReachAlgorithm.cpp tests/TestPartitionedDAPReachAlgorithm.cpp src/generator/RandomDoubleQueryGenerator.cpp src/generator/RandomDoubleQueryGenerator.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h)
+
     add_executable(runTests ${OBJS} ${TESTS} ${CONVERT})
     target_link_libraries(runTests  gtest_main)
 endif()

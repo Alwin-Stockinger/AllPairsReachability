@@ -60,6 +60,12 @@ bool PartitionedDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Ve
 
         //find outgoing vertices
         for (Algora::Vertex *outVertex : startEdgeVertices) {
+
+            /*if(endEdgeVertices.empty()){ very unlikely to improve algorithm, because there would have to be a connection between every startEdgeVertex and endEdgeVertex, but the connections should be minimized by partitioning
+                //there is not a single endEdgeVertex that has a connection to the end vertex
+                return false;
+            }*/
+
             if (startGraphAlgorithm->query(start, mainToSubMap[outVertex])) {
 
                 for(auto it = endEdgeVertices.begin(); it != endEdgeVertices.end();){

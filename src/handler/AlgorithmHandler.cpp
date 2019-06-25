@@ -104,6 +104,8 @@ private:
     }
 };
 
+DynamicAPReachAlgorithm *createLevel1Algorithm(unsigned long long int k);
+
 enum class MenuOptions{ reach=1, addArc=2, removeArc=3, quit=0} option;
 
 void AlgorithmHandler::runInterface() {
@@ -207,7 +209,7 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
     for(unsigned long long i = 2; i <= kMax ; i++){
 
-        auto* algorithms = createAlgorithms(algorithmNames, i);
+        auto* algorithms = createAlgorithms(algorithmNames, i, {0U});
         for(auto* algorithm: (*algorithms)) {
 
             TimeCollector timer(i);
@@ -300,7 +302,7 @@ void AlgorithmHandler::writeHeader(){
     file << ",avg query time(ns)";
     file << ",avg add Arc time(ns)";
     file << ",avg remove Arc time(ns)";
-    file << "partition time(ns)";
+    file << ",partition time(ns)";
     file << ",whole Time(ns)";
     file << std::endl;
 
@@ -339,12 +341,11 @@ void AlgorithmHandler::writeAllResults (const std::vector<TimeCollector*>& timer
     file << std::endl;
 }
 
-std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const std::vector<std::string>& algorithmNames, const unsigned long long k){
+std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const std::vector<std::string>& algorithmNames, const unsigned long long k, std::vector<unsigned> levels){
 
     auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
 
     for(const std::string& algorithmName: algorithmNames){
-
 
         if(algorithmName == "StaticBFS") {
             algorithms->push_back(
@@ -398,9 +399,9 @@ std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const 
     return algorithms;
 }
 
-template<typename T>
+template<typename T, unsigned Level>
 DynamicAPReachAlgorithm  *AlgorithmHandler::createAlgorithm(unsigned long long k) {
-    auto* algorithm = new PartitionedDAPReachAlgorithmImplementation<T>();
+    auto* algorithm = new PartitionedDAPReachAlgorithmImplementation<T,Level>();
     algorithm->setK(k);
     return algorithm;
 }
