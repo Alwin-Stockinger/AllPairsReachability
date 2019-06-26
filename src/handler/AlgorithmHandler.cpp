@@ -38,6 +38,7 @@ struct AlgorithmHandler::TimeCollector {
 
 
     std::string algorithmName;
+    std::string error ="";
 
     const unsigned long long k;
 
@@ -212,7 +213,6 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
             TimeCollector timer(i);
 
-
             //graph set + partitioning
             algorithm->setAutoUpdate(false);
             auto startTime = HRC::now();
@@ -221,7 +221,6 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             timer.addPartitionTime(startTime, endTime);
 
             timer.algorithmName = algorithm->getBaseName();
-
 
             std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
 
@@ -251,19 +250,24 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             };
             diGraph->onVertexRemove(algorithm, onVertexRemoved);
 
-            for (auto &currentQueries : queries) {
-                for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
+            try {
+                for (auto &currentQueries : queries) {
+                    for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
 
-                    auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
-                    auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[j + 1]);
+                        auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
+                        auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[j + 1]);
 
 
-                    auto startQueryTime = std::chrono::high_resolution_clock::now();
-                    algorithm->query(startVertex, endVertex);
-                    auto endQueryTime = std::chrono::high_resolution_clock::now();
-                    timer.addQueryTime(startQueryTime, endQueryTime);
+                        auto startQueryTime = std::chrono::high_resolution_clock::now();
+                        algorithm->query(startVertex, endVertex);
+                        auto endQueryTime = std::chrono::high_resolution_clock::now();
+                        timer.addQueryTime(startQueryTime, endQueryTime);
+                    }
+                    dynGraph.applyNextDelta();
                 }
-                dynGraph.applyNextDelta();
+            } catch (std::bad_alloc){
+                delete algorithm;
+                timer.error = "Bad_alloc (probably ran out of memory)";
             }
 
             algorithm->unsetGraph();
@@ -302,6 +306,7 @@ void AlgorithmHandler::writeHeader(){
     file << ",avg remove Arc time(ns)";
     file << ",partition time(ns)";
     file << ",whole Time(ns)";
+    file << ",error";
     file << std::endl;
 
 }
@@ -317,6 +322,7 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
     file << "," << timer.getAvgRemoveArcTime();
     file << "," << timer.partitionTime;
     file << "," << timer.getAllTime();
+    file << "," << timer.error;
 
     file << std::endl;
 }
