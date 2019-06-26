@@ -34,7 +34,7 @@ typedef std::chrono::high_resolution_clock::time_point TimePoint;
 struct AlgorithmHandler::TimeCollector {
 
 
-    TimeCollector(const unsigned long long int k) : k(k) {}
+    explicit TimeCollector(const unsigned long long int k) : k(k) {}
 
 
     std::string algorithmName;
@@ -103,8 +103,6 @@ private:
         return avg/times.size();
     }
 };
-
-DynamicAPReachAlgorithm *createLevel1Algorithm(unsigned long long int k);
 
 enum class MenuOptions{ reach=1, addArc=2, removeArc=3, quit=0} option;
 
@@ -209,7 +207,7 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
     for(unsigned long long i = 2; i <= kMax ; i++){
 
-        auto* algorithms = createAlgorithms(algorithmNames, i, {0U});
+        auto* algorithms = createAlgorithms(algorithmNames, i);
         for(auto* algorithm: (*algorithms)) {
 
             TimeCollector timer(i);
@@ -260,10 +258,10 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
                     auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[j + 1]);
 
 
-                    auto startTime = std::chrono::high_resolution_clock::now();
+                    auto startQueryTime = std::chrono::high_resolution_clock::now();
                     algorithm->query(startVertex, endVertex);
-                    auto endTime = std::chrono::high_resolution_clock::now();
-                    timer.addQueryTime(startTime, endTime);
+                    auto endQueryTime = std::chrono::high_resolution_clock::now();
+                    timer.addQueryTime(startQueryTime, endQueryTime);
                 }
                 dynGraph.applyNextDelta();
             }
@@ -323,25 +321,8 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
     file << std::endl;
 }
 
-void AlgorithmHandler::writeAllResults (const std::vector<TimeCollector*>& timers){
-
-    std::ofstream file;
-    file.open("results.csv", std::ios_base::app);
-
-    for(TimeCollector* timer: timers){
-        file << timer->k;
-        file << "," << timer->algorithmName;
-        file << "," << timer->getAvgQueryTime();
-        file << "," << timer->getAvgAddArcTime();
-        file << "," << timer->getAvgRemoveArcTime();
-        file << "," << timer->partitionTime;
-        file << "," << timer->getAllTime();
-        file << std::endl;
-    }
-    file << std::endl;
-}
-
-std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAlgorithms(const std::vector<std::string>& algorithmNames, const unsigned long long k, std::vector<unsigned> levels){
+std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createAlgorithms(
+        const std::vector<std::string> &algorithmNames, const unsigned long long k) {
 
     auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
 

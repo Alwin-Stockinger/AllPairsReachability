@@ -36,7 +36,10 @@ public:
     bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
 
     std::string const getBaseName() override{
-        return vertexMap.getValue(diGraph->getAnyVertex())->getShortName();
+        auto* algorithm = createSSAlgorithm();
+        std::string name = algorithm->getShortName();
+        delete algorithm;
+        return name;
     }
 
 protected:

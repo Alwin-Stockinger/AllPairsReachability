@@ -38,12 +38,11 @@ private:
 
     void reachabilityCheck();
 
-    void writeAllResults(const std::vector<TimeCollector*>& timers);
-
-    void writeResults(TimeCollector& timer);
+    static void writeResults(TimeCollector& timer);
     void writeHeader();
 
-    std::vector<DynamicAPReachAlgorithm*>* createAlgorithms(const std::vector<std::string>& algorithmNames, unsigned long long i, std::vector<unsigned> levels);
+    std::vector<DynamicAPReachAlgorithm *> *
+    createAlgorithms(const std::vector<std::string> &algorithmNames, const unsigned long long k);
 
     template<typename T, unsigned Level = 0U>
     DynamicAPReachAlgorithm  *createAlgorithm(unsigned long long k);
