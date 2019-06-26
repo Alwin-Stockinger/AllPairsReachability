@@ -265,9 +265,10 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
                     }
                     dynGraph.applyNextDelta();
                 }
-            } catch (std::bad_alloc){
+            } catch (std::bad_alloc& error){
                 delete algorithm;
-                timer.error = "Bad_alloc (probably ran out of memory)";
+                timer.error = "Bad_alloc (probably ran out of memory):\n";
+                timer.error += error.what();
             }
 
             algorithm->unsetGraph();
