@@ -108,10 +108,6 @@ void PartitionedDAPReachAlgorithm::deleteOldPartition() {
     delete overlayAlgorithm;
     delete overlayGraph;
 
-    /*if(diGraph && mainToOverlayMap[diGraph->getAnyVertex()]){
-        delete mainToOverlayMap[diGraph->getAnyVertex()]->getParent();  //why is there a memory leak when done this way???
-    }*/
-
     mainToOverlayMap.resetAll();
     mainToSubMap.resetAll();
     graphToAlgorithmMap.resetAll();
@@ -218,7 +214,7 @@ void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
     auto* tailGraph = subTail->getParent();
 
     if(headGraph == tailGraph){
-        auto* subGraph = static_cast<Algora::DiGraph*>(headGraph);
+        auto* subGraph = dynamic_cast<Algora::DiGraph*>(headGraph);
         Algora::Arc* subArc = subGraph->findArc(subTail, subHead);
         subGraph->removeArc(subArc);
     }
