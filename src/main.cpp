@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     bool multiArcs = false;
     app.add_option("-M, --multiArcs", multiArcs, "Multi Arcs are allowed");
 
-    unsigned long long numOperations = 10000;
+    unsigned long long numOperations = 100000;
     app.add_option("-o, --numOperations", numOperations, "Number of Operations");
 
     unsigned queryProp = 70;
