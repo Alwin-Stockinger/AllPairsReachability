@@ -250,25 +250,20 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             };
             diGraph->onVertexRemove(algorithm, onVertexRemoved);
 
-            try {
-                for (auto &currentQueries : queries) {
-                    for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
 
-                        auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
-                        auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[j + 1]);
+            for (auto &currentQueries : queries) {
+                for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
+
+                    auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
+                    auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[j + 1]);
 
 
-                        auto startQueryTime = std::chrono::high_resolution_clock::now();
-                        algorithm->query(startVertex, endVertex);
-                        auto endQueryTime = std::chrono::high_resolution_clock::now();
-                        timer.addQueryTime(startQueryTime, endQueryTime);
-                    }
-                    dynGraph.applyNextDelta();
+                    auto startQueryTime = std::chrono::high_resolution_clock::now();
+                    algorithm->query(startVertex, endVertex);
+                    auto endQueryTime = std::chrono::high_resolution_clock::now();
+                    timer.addQueryTime(startQueryTime, endQueryTime);
                 }
-            } catch (std::bad_alloc& error){
-                delete algorithm;
-                timer.error = "Bad_alloc (probably ran out of memory):\n";
-                timer.error += error.what();
+                dynGraph.applyNextDelta();
             }
 
             algorithm->unsetGraph();
