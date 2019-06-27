@@ -42,7 +42,7 @@ struct AlgorithmHandler::TimeCollector {
     const unsigned long long k;
 
     unsigned long long initTime{};
-    unsigned long long kahipTime{};
+    unsigned long long partitionTime{};
     std::vector<unsigned long long> queryTimes;
     std::vector<unsigned long long> addArcTimes;
     std::vector<unsigned long long> removeArcTimes;
@@ -92,6 +92,11 @@ struct AlgorithmHandler::TimeCollector {
 
     const unsigned long long getAllTime(){
         return getQueryTime() + getAddArcTime() + getRemoveArcTime() + initTime;
+    }
+
+    void addPartitionTime(TimePoint start, TimePoint end) {
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        partitionTime = duration;
     }
 
 private:
@@ -206,14 +211,23 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
     writeHeader();
 
+
+
     for(unsigned long long i = 2; i <= kMax ; i++){
 
-        auto* algorithms = createAlgorithms(algorithmNames, i);
+        auto parStartTime = HRC::now();
+        Algora::FastPropertyMap<unsigned long long> partition = Partitioner::handlePartitioning(i, diGraph);
+        auto parEndTime = HRC::now();
+
+        auto* algorithms = createPartitionedAlgorithms(algorithmNames, i, partition);
         for(auto* algorithm: (*algorithms)) {
 
             TimeCollector timer(i);
+            timer.addPartitionTime(parStartTime, parEndTime);
 
+            //measurement specific
             algorithm->setAutoUpdate(false);
+
             algorithm->setGraph(diGraph);
 
             auto startTime = HRC::now();
@@ -303,6 +317,7 @@ void AlgorithmHandler::writeHeader(){
     file << ",avg remove Arc time(ns)";
     file << ",init time(ns)";
     file << ",whole Time(ns)";
+    file << ",partition time(ns)";
     file << ",error";
     file << std::endl;
 
@@ -319,73 +334,83 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
     file << "," << timer.getAvgRemoveArcTime();
     file << "," << timer.initTime;
     file << "," << timer.getAllTime();
+    file << "," << timer.partitionTime;
     file << "," << "\"" << timer.error << "\"";
 
     file << std::endl;
 }
 
-std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createAlgorithms(
-        const std::vector<std::string> &algorithmNames, const unsigned long long k) {
+std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgorithms(
+        const std::vector<std::string> &algorithmNames, const unsigned long long int k,
+        const Algora::FastPropertyMap<unsigned long long int>& partition) {
 
     auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
 
+    std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>
+            partitionFunction = [partition] (unsigned long long k, Algora::DiGraph* diGraph){
+                    return partition;
+                };
+
     for(const std::string& algorithmName: algorithmNames){
 
+        PartitionedDAPReachAlgorithm *algorithm = nullptr;
+
         if(algorithmName == "StaticBFS") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>();
         }
         else if(algorithmName == "StaticDFS") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>();
         }
         else if( algorithmName == "LazyDFS") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>();
         }
         else if( algorithmName == "LazyBFS") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>();
         }
         else if( algorithmName == "CachingDFS") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>();
         }
         else if( algorithmName == "CachingBFS") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>();
         }
         else if( algorithmName == "SimpleInc") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>();
         }
         else if( algorithmName == "ESTreeML") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>();
         }
         else if( algorithmName == "OldESTree") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>();
         }
         else if( algorithmName == "ESTreeQ") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>();
         }
         else if( algorithmName == "SimpleESTree") {
-            algorithms->push_back(
-                    createAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>(k));
+            algorithm =
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>();
         }
         else{
             std::cerr << algorithmName << " not a viable algorithm" << std::endl;
             //TODO throw error
         }
+        algorithm->setPartitionFunction(partitionFunction, k);
+        algorithms->push_back(algorithm);
     }
     return algorithms;
 }
 
 template<typename T, unsigned Level>
-DynamicAPReachAlgorithm  *AlgorithmHandler::createAlgorithm(unsigned long long k) {
+PartitionedDAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm() {
     auto* algorithm = new PartitionedDAPReachAlgorithmImplementation<T,Level>();
-    algorithm->setK(k);
     return algorithm;
 }

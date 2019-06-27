@@ -42,10 +42,11 @@ private:
     void writeHeader();
 
     std::vector<DynamicAPReachAlgorithm *> *
-    createAlgorithms(const std::vector<std::string> &algorithmNames, const unsigned long long k);
+    createPartitionedAlgorithms(const std::vector<std::string> &algorithmNames, const unsigned long long int k,
+                                const Algora::FastPropertyMap<unsigned long long int>& partition);
 
     template<typename T, unsigned Level = 0U>
-    DynamicAPReachAlgorithm  *createAlgorithm(unsigned long long k);
+    PartitionedDAPReachAlgorithm *createPartitionAlgorithm();
 };
 
 
