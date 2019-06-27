@@ -312,13 +312,13 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
     file.open("results.csv", std::ios_base::app);
 
     file << timer.k;
-    file << "," << timer.algorithmName;
+    file << "," << "\"" << timer.algorithmName << "\"";
     file << "," << timer.getAvgQueryTime();
     file << "," << timer.getAvgAddArcTime();
     file << "," << timer.getAvgRemoveArcTime();
     file << "," << timer.partitionTime;
     file << "," << timer.getAllTime();
-    file << "," << timer.error;
+    file << "," << "\"" << timer.error << "\"";
 
     file << std::endl;
 }
