@@ -23,14 +23,16 @@ if len(sys.argv) == 1:
         vertices = "-s 100000"
         arcs = "--arcSize " + str(arcsNumber)
         arcs *= 2
+        subprocess.call(["./AllPairReach" + " " + k + " " + algorithms + " " + vertices + " " + arcs], shell=True)
 
-    subprocess.call(["./AllPairReach" + " " + k + " " + algorithms + " " + vertices + " " + arcs], shell=True)
 elif len(sys.argv) == 2:
     inputFile = "-i " + sys.argv[1]
     subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms], shell=True)
+
 elif len(sys.argv) == 3:
     inputFile = "-i " + sys.argv[1]
     squashRatio = "-S " + sys.argv[2]
     subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms + " " + squashRatio], shell=True)
+
 else:
     print("too many arguments")
