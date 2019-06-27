@@ -20,11 +20,21 @@
 
 
 void PartitionedDAPReachAlgorithm::run() {
+
+    if(initialized){
+        return;
+    }
+
+    partition();
+
     overlayAlgorithm -> run();
     for(const auto &[_,algorithm] : graphToAlgorithmMap){
         algorithm -> run();
+
+        (void)(_);  //unused warning
     }
 
+    initialized = true;
 }
 
 
@@ -39,6 +49,9 @@ std::string PartitionedDAPReachAlgorithm::getShortName() const noexcept {
 
 
 bool PartitionedDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
+    if(!initialized){
+        run();
+    }
 
     start = mainToSubMap[start];
     end = mainToSubMap[end];
@@ -130,6 +143,11 @@ PartitionedDAPReachAlgorithm::initAlgorithms(std::vector<Algora::DiGraph *> &gra
 
 
 void PartitionedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
+
+    if(!initialized){
+        return;
+    }
+
     Algora::DiGraph* subGraph = nullptr;
 
     //TODO chose smart or random graph
@@ -151,6 +169,11 @@ void PartitionedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
 
 
 void PartitionedDAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
+
+    if(!initialized){
+        return;
+    }
+
     Algora::Vertex* subVertex = mainToSubMap[vertex];
     Algora::Vertex* overlayVertex = mainToOverlayMap[vertex];
 
@@ -168,6 +191,11 @@ void PartitionedDAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
 
 
 void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
+
+    if(!initialized){
+        return;
+    }
+
     DynamicDiGraphAlgorithm::onArcAdd(arc);
 
     auto* mainHead = arc->getHead();
@@ -202,6 +230,11 @@ void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
 
 
 void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
+
+    if(!initialized){
+        return;
+    }
+
     DynamicDiGraphAlgorithm::onArcRemove(arc);
 
     auto * mainHead = arc->getHead();
@@ -298,7 +331,8 @@ PartitionedDAPReachAlgorithm::partition() {
 
 void PartitionedDAPReachAlgorithm::onDiGraphSet() {
     DynamicDiGraphAlgorithm::onDiGraphSet();
-    partition();
+
+    initialized = false;
 }
 
 

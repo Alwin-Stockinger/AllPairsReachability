@@ -89,6 +89,7 @@ protected:
     PartFunc partitionFunction = Partitioner::handlePartitioning;
 
     unsigned long long k = 2;
+    bool initialized = false;
 };
 
 

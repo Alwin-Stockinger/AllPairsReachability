@@ -26,7 +26,6 @@
 #include <algorithm.reach.es/simpleestree.h>
 
 #include "../algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
-#include "../partition/Partitioner.h"
 
 typedef std::chrono::high_resolution_clock HRC;
 typedef std::chrono::high_resolution_clock::time_point TimePoint;
@@ -42,13 +41,14 @@ struct AlgorithmHandler::TimeCollector {
 
     const unsigned long long k;
 
-    unsigned long long partitionTime{};
+    unsigned long long initTime{};
+    unsigned long long kahipTime{};
     std::vector<unsigned long long> queryTimes;
     std::vector<unsigned long long> addArcTimes;
     std::vector<unsigned long long> removeArcTimes;
 
-    void addPartitionTime(TimePoint start, TimePoint end){
-        partitionTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end -start).count();
+    void addInitTime(TimePoint start, TimePoint end){
+        initTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end -start).count();
     }
 
     void addQueryTime(TimePoint start, TimePoint end) {
@@ -91,7 +91,7 @@ struct AlgorithmHandler::TimeCollector {
     }
 
     const unsigned long long getAllTime(){
-        return getQueryTime() + getAddArcTime() + getRemoveArcTime() + partitionTime;
+        return getQueryTime() + getAddArcTime() + getRemoveArcTime() + initTime;
     }
 
 private:
@@ -118,7 +118,7 @@ void AlgorithmHandler::runInterface() {
                 << "1. Check reachable\n"
                 << "2. Add arc\n"
                 << "3. Remove arc\n"
-                <<"0. Exit\n";
+                << "0. Exit\n";
 
         int intOption = 0;
         std::cin >> intOption;
@@ -213,12 +213,13 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
             TimeCollector timer(i);
 
-            //graph set + partitioning
             algorithm->setAutoUpdate(false);
-            auto startTime = HRC::now();
             algorithm->setGraph(diGraph);
+
+            auto startTime = HRC::now();
+            algorithm->run();
             auto endTime = HRC::now();
-            timer.addPartitionTime(startTime, endTime);
+            timer.addInitTime(startTime, endTime);
 
             timer.algorithmName = algorithm->getBaseName();
 
@@ -300,7 +301,7 @@ void AlgorithmHandler::writeHeader(){
     file << ",avg query time(ns)";
     file << ",avg add Arc time(ns)";
     file << ",avg remove Arc time(ns)";
-    file << ",partition time(ns)";
+    file << ",init time(ns)";
     file << ",whole Time(ns)";
     file << ",error";
     file << std::endl;
@@ -316,7 +317,7 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
     file << "," << timer.getAvgQueryTime();
     file << "," << timer.getAvgAddArcTime();
     file << "," << timer.getAvgRemoveArcTime();
-    file << "," << timer.partitionTime;
+    file << "," << timer.initTime;
     file << "," << timer.getAllTime();
     file << "," << "\"" << timer.error << "\"";
 
