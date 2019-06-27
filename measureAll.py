@@ -22,7 +22,7 @@ if len(sys.argv) == 1:
         k = "-k 10"
         vertices = "-s 100000"
         arcs = "--arcSize " + str(arcsNumber)
-        arcs *= 2
+        arcsNumber *= 2
         subprocess.call(["./AllPairReach" + " " + k + " " + algorithms + " " + vertices + " " + arcs], shell=True)
 
 elif len(sys.argv) == 2:
