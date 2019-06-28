@@ -23,7 +23,8 @@ public:
 
     void runInterface();
 
-    void runTests(unsigned long long kMax,  const std::vector<std::string>& algorithmNames);
+    void runTests(unsigned long long const kMax, const std::vector<std::string> &algorithmNames,
+                  const bool detailedResults);
 
 private:
     void addArc();
@@ -47,6 +48,10 @@ private:
 
     template<typename T, unsigned Level = 0U>
     PartitionedDAPReachAlgorithm *createPartitionAlgorithm();
+
+    void writeDetailedResults(const TimeCollector& collector);
+
+    void writeDetailedHeader();
 };
 
 

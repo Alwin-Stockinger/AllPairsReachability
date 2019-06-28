@@ -67,6 +67,9 @@ int main(int argc, char *argv[]) {
     bool runPerformanceTests = true;
     app.add_option("-b, --performance", runPerformanceTests, "To run performance tests");
 
+    bool detailedResults = false;
+    app.add_option("--detailed", detailedResults, "Also write detailed Results");
+
 
     //for konect files
 
@@ -131,7 +134,7 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        handler.runTests(k, algorithmNames);
+        handler.runTests(k, algorithmNames, detailedResults);
     }
     else{
         handler.runInterface();

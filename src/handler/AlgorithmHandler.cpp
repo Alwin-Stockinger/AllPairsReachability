@@ -203,7 +203,8 @@ void AlgorithmHandler::removeArc(){
     graph.applyNextDelta();
 }
 
-void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector<std::string>& algorithmNames) {
+void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector<std::string> &algorithmNames,
+                                const bool detailedResults = false) {
 
     auto &queries = instanceProvider->getQueries();
     auto &dynGraph = instanceProvider->getGraph();
@@ -211,6 +212,9 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
     writeHeader();
 
+    if(detailedResults){
+        writeDetailedHeader();
+    }
 
 
     for(unsigned long long i = 2; i <= kMax ; i++){
@@ -298,6 +302,11 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             delete algorithm;
 
             writeResults(timer);
+
+            if(detailedResults){
+                writeDetailedResults(timer);
+            }
+
         }
         delete algorithms;
     }
@@ -413,4 +422,41 @@ template<typename T, unsigned Level>
 PartitionedDAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm() {
     auto* algorithm = new PartitionedDAPReachAlgorithmImplementation<T,Level>();
     return algorithm;
+}
+
+void AlgorithmHandler::writeDetailedResults(const AlgorithmHandler::TimeCollector& collector) {
+    std::ofstream file;
+    file.open("detailedResults.csv", std::ios_base::app);
+    file << "k = " << collector.k << "\n";
+    file << "algorithm = " << collector.algorithmName << "\n";
+
+    file << std::endl;
+
+    file << "Query times" << "\n";
+    for( unsigned long long time : collector.queryTimes){
+        file << time << "\n";
+    }
+    file << "\n";
+
+    file << "Insertion times " << "\n";
+    for(unsigned long long time : collector.addArcTimes){
+        file << time << "\n";
+    }
+    file << "\n";
+
+    file << "Deletion times" << "\n";
+    for(unsigned long long time : collector.removeArcTimes){
+        file << time << "\n";
+    }
+    file << "\n";
+
+    file << std::endl; //flush and double empty lines to tell algorithms apart
+}
+
+void AlgorithmHandler::writeDetailedHeader() {
+    std::ofstream file;
+
+    file.open("detailedResults.csv", std::ios_base::app);
+
+    file << instanceProvider->getConfiguration() << std::endl << std::endl;
 }
