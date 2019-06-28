@@ -9,21 +9,28 @@ algorithms = "-A " \
              "CachingDFS " \
              "CachingBFS " \
              "SimpleInc " \
+             "SimpleESTree"\
              "ESTreeML " \
              "OldESTree " \
-             "ESTreeQ " \
-             "SimpleESTree"
+             "ESTreeQ "
+
 
 if len(sys.argv) == 1:
 
-    arcsNumber = 50000
+    verticesNumber = 10000
+    arcsNumber = 5000
+    operationsNumber = 10000
 
     for i in range(1, 5):
         k = "-k 10"
-        vertices = "-s 100000"
+        vertices = "-s " + str(verticesNumber)
         arcs = "--arcSize " + str(arcsNumber)
+        operations = "-o " + str(operationsNumber)
+
+        callString = "./AllPairReach" + " " + k + " " + algorithms + " " + vertices + " " + arcs + " " + operations
+        subprocess.call([callString], shell=True)
+
         arcsNumber *= 2
-        subprocess.call(["./AllPairReach" + " " + k + " " + algorithms + " " + vertices + " " + arcs], shell=True)
 
 elif len(sys.argv) == 2:
     inputFile = "-i " + sys.argv[1]
