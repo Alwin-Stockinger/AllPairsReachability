@@ -13,7 +13,7 @@
 #include <property/fastpropertymap.h>
 #include <type_traits>
 
-
+template < bool immediateInit = false>
 class DynamicSSBasedDAPReachAlgorithm : public SSBasedDAPReachAlgorithm {
 
 public:
@@ -25,7 +25,9 @@ public:
 
 
     explicit DynamicSSBasedDAPReachAlgorithm() : SSBasedDAPReachAlgorithm(){ }
-    ~DynamicSSBasedDAPReachAlgorithm() override;
+    ~DynamicSSBasedDAPReachAlgorithm() override {
+        deleteAllAlgorithms();
+    }
 
 
     // DiGraphAlgorithm interface

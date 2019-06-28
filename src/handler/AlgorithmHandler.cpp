@@ -365,39 +365,39 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgo
         }
         else if( algorithmName == "LazyDFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm,true>>();
         }
         else if( algorithmName == "LazyBFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm,true>>();
         }
         else if( algorithmName == "CachingDFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm,true>>();
         }
         else if( algorithmName == "CachingBFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm,true>>();
         }
         else if( algorithmName == "SimpleInc") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm,true>>();
         }
         else if( algorithmName == "ESTreeML") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML,true>>();
         }
         else if( algorithmName == "OldESTree") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree,true>>();
         }
         else if( algorithmName == "ESTreeQ") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ,true>>();
         }
         else if( algorithmName == "SimpleESTree") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree,true>>();
         }
         else{
             std::cerr << algorithmName << " not a viable algorithm" << std::endl;

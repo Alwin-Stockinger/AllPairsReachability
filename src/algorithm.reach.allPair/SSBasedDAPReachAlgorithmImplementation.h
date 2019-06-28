@@ -13,8 +13,8 @@
 #include "StaticSSBasedDAPReachAlgorithm.h"
 
 
-template <class T>
-class SSBasedDAPReachAlgorithmImplementation : public DynamicSSBasedDAPReachAlgorithm {
+template <class T, bool immediateInit = false>
+class SSBasedDAPReachAlgorithmImplementation : public DynamicSSBasedDAPReachAlgorithm<immediateInit> {
     static_assert(std::is_base_of<Algora::DynamicSSReachAlgorithm,T>::value, "Template Parameter has to inherit from Algora::DynamicSSReachAlgorithm");
 
     Algora::DynamicSSReachAlgorithm *createSSAlgorithm() override {

@@ -18,41 +18,46 @@
 #include "DynamicSSBasedDAPReachAlgorithm.h"
 
 
-bool DynamicSSBasedDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
+template<bool immediateInit>
+bool DynamicSSBasedDAPReachAlgorithm<immediateInit>::query(Algora::Vertex *start, const Algora::Vertex *end) {
     return vertexMap[start]->query(end);
 }
 
-
-void DynamicSSBasedDAPReachAlgorithm::run() {
+template<bool immediateInit>
+void DynamicSSBasedDAPReachAlgorithm<immediateInit>::run() {
     for (auto &&algorithm : vertexMap) {
         algorithm->run();
     }
 }
 
-
-void DynamicSSBasedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
+template<bool immediateInit>
+void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onVertexAdd(Algora::Vertex *vertex) {
     DynamicDiGraphAlgorithm::onVertexAdd(vertex);
 
     addVertexToMap(vertex);
+
+    if(immediateInit){
+        vertexMap[vertex]->run();
+    }
 }
 
-
-void DynamicSSBasedDAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
+template<bool immediateInit>
+void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onVertexRemove(Algora::Vertex *vertex) {
     DynamicDiGraphAlgorithm::onVertexRemove(vertex);
 
     delete vertexMap[vertex];
     vertexMap.resetToDefault(vertex);
 }
 
-
-void DynamicSSBasedDAPReachAlgorithm::init() {
+template<bool immediateInit>
+void DynamicSSBasedDAPReachAlgorithm<immediateInit>::init() {
     diGraph->mapVertices([this](Algora::Vertex *vertex) {
         addVertexToMap(vertex);
     });
 }
 
-
-void DynamicSSBasedDAPReachAlgorithm::addVertexToMap(Algora::Vertex *vertex) {
+template<bool immediateInit>
+void DynamicSSBasedDAPReachAlgorithm<immediateInit>::addVertexToMap(Algora::Vertex *vertex) {
 
     Algora::DynamicSSReachAlgorithm *algorithm = createSSAlgorithm();
 
@@ -62,30 +67,28 @@ void DynamicSSBasedDAPReachAlgorithm::addVertexToMap(Algora::Vertex *vertex) {
     vertexMap[vertex] = algorithm;
 }
 
-
-std::string DynamicSSBasedDAPReachAlgorithm::getName() const noexcept {
+template<bool immediateInit>
+std::string DynamicSSBasedDAPReachAlgorithm<immediateInit>::getName() const noexcept {
     return std::__cxx11::string("Single Source based All Pair Reachability based on " + vertexMap.getValue(diGraph->getAnyVertex()) -> getName());
 }
 
-
-std::string DynamicSSBasedDAPReachAlgorithm::getShortName() const noexcept {
+template<bool immediateInit>
+std::string DynamicSSBasedDAPReachAlgorithm<immediateInit>::getShortName() const noexcept {
     return std::__cxx11::string("SS AP based on " + vertexMap.getValue(diGraph->getAnyVertex()) -> getShortName());
 }
 
-
-void DynamicSSBasedDAPReachAlgorithm::reset() {
+template<bool immediateInit>
+void DynamicSSBasedDAPReachAlgorithm<immediateInit>::reset() {
     deleteAllAlgorithms();
     vertexMap.resetAll();
 }
 
-
-DynamicSSBasedDAPReachAlgorithm::~DynamicSSBasedDAPReachAlgorithm() {
-    deleteAllAlgorithms();
-}
-
-
-void DynamicSSBasedDAPReachAlgorithm::deleteAllAlgorithms(){
+template<bool immediateInit>
+void DynamicSSBasedDAPReachAlgorithm<immediateInit>::deleteAllAlgorithms(){
     for (auto &&algorithm : vertexMap) {
         delete algorithm;
     }
 }
+
+template class DynamicSSBasedDAPReachAlgorithm<false>;
+template class DynamicSSBasedDAPReachAlgorithm<true>;
