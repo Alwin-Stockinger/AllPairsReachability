@@ -217,16 +217,17 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
     }
 
 
-    for(unsigned long long i = 2; i <= kMax ; i++){
+    for(unsigned long long k = 2; k <= kMax ; k++){
 
         auto parStartTime = HRC::now();
-        Algora::FastPropertyMap<unsigned long long> partition = Partitioner::handlePartitioning(i, diGraph);
+        Algora::FastPropertyMap<unsigned long long> partition = Partitioner::handlePartitioning(k, diGraph);
         auto parEndTime = HRC::now();
 
-        auto* algorithms = createPartitionedAlgorithms(algorithmNames, i, partition);
+        auto* algorithms = createPartitionedAlgorithms(algorithmNames, k, partition);
+
         for(auto* algorithm: (*algorithms)) {
 
-            TimeCollector timer(i);
+            TimeCollector timer(k);
             timer.addPartitionTime(parStartTime, parEndTime);
 
             //measurement specific
@@ -269,8 +270,8 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             };
             diGraph->onVertexRemove(algorithm, onVertexRemoved);
 
+            for (const auto &currentQueries : queries) {
 
-            for (auto &currentQueries : queries) {
                 for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
 
                     auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
@@ -294,6 +295,9 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
 
             //reset to initial graph
+            dynGraph.resetToBigBang();
+            dynGraph.applyNextDelta();
+            //second Time for Algora Bug
             dynGraph.resetToBigBang();
             dynGraph.applyNextDelta();
 
