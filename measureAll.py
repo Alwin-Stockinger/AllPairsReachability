@@ -9,7 +9,7 @@ algorithms = "-A " \
              "CachingDFS " \
              "CachingBFS " \
              "SimpleInc " \
-             "SimpleESTree"\
+             "SimpleESTree "\
              "ESTreeML " \
              "OldESTree " \
              "ESTreeQ "
