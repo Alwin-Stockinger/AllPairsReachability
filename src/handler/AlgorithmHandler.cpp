@@ -28,7 +28,7 @@
 #include "../algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
 
 typedef std::chrono::high_resolution_clock HRC;
-typedef std::chrono::high_resolution_clock::time_point TimePoint;
+typedef HRC::time_point TimePoint;
 
 struct AlgorithmHandler::TimeCollector {
 
@@ -208,6 +208,7 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
 
     auto &queries = instanceProvider->getQueries();
     auto &dynGraph = instanceProvider->getGraph();
+
     auto* diGraph = dynGraph.getDiGraph();
 
     writeHeader();
@@ -294,16 +295,18 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
             diGraph->removeOnVertexRemove(algorithm);
 
 
+
             //reset to initial graph
             dynGraph.resetToBigBang();
             dynGraph.applyNextDelta();
             //second Time for Algora Bug
-            dynGraph.resetToBigBang();
-            dynGraph.applyNextDelta();
+            //dynGraph.resetToBigBang();
+            //std::cout << dynGraph.applyNextDelta() << std::endl;
 
             std::cout << "Finished\n";
 
             delete algorithm;
+
 
             writeResults(timer);
 
