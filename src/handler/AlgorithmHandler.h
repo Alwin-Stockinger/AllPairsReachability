@@ -23,8 +23,8 @@ public:
 
     void runInterface();
 
-    void runTests(unsigned long long kMax, const std::vector<std::string> &algorithmNames,
-                  bool detailedResults);
+    void runTests(unsigned long long const kMax, const std::vector<std::string> &algorithmNames,
+                  const unsigned long long timeOut, const bool detailedResults);
 
 private:
     void addArc();

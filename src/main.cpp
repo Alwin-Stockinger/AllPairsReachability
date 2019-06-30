@@ -70,6 +70,9 @@ int main(int argc, char *argv[]) {
     bool detailedResults = false;
     app.add_option("--detailed", detailedResults, "Also write detailed Results");
 
+    unsigned long long timeOut = 0;
+    app.add_option("-t, --timeOut", timeOut, "Time out time for algorithms");
+
 
     //for konect files
 
@@ -134,7 +137,7 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        handler.runTests(k, algorithmNames, detailedResults);
+        handler.runTests(k, algorithmNames, timeOut, detailedResults);
     }
     else{
         handler.runInterface();

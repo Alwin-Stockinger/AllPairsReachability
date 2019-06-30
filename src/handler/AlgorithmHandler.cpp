@@ -38,6 +38,7 @@ struct AlgorithmHandler::TimeCollector {
 
     std::string algorithmName;
     std::string error ="";
+    bool timedOut = false;
 
     const unsigned long long k;
 
@@ -204,7 +205,7 @@ void AlgorithmHandler::removeArc(){
 }
 
 void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector<std::string> &algorithmNames,
-                                const bool detailedResults = false) {
+                                const unsigned long long timeOut = 0, const bool detailedResults = false) {
 
     auto &queries = instanceProvider->getQueries();
     auto &dynGraph = instanceProvider->getGraph();
@@ -284,6 +285,13 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
                     auto endQueryTime = std::chrono::high_resolution_clock::now();
                     timer.addQueryTime(startQueryTime, endQueryTime);
                 }
+
+                if(timeOut && timeOut < timer.getAllTime()){
+                    std::cout << "TIMEOUT" << std::endl;
+                    timer.timedOut = true;
+                    break;
+                }
+
                 dynGraph.applyNextDelta();
             }
 
@@ -334,6 +342,7 @@ void AlgorithmHandler::writeHeader(){
     file << ",init time(ns)";
     file << ",whole Time(ns)";
     file << ",partition time(ns)";
+    file << ",timeout";
     file << ",error";
     file << std::endl;
 
@@ -351,6 +360,7 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
     file << "," << timer.initTime;
     file << "," << timer.getAllTime();
     file << "," << timer.partitionTime;
+    file << "," << timer.timedOut;
     file << "," << "\"" << timer.error << "\"";
 
     file << std::endl;
