@@ -204,8 +204,9 @@ void AlgorithmHandler::removeArc(){
     graph.applyNextDelta();
 }
 
-void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector<std::string> &algorithmNames,
-                                const unsigned long long timeOut = 0, const bool detailedResults = false) {
+void AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, unsigned long long const kMax = 2,
+                                const unsigned long long int kMin = 2, const unsigned long long int timeOut = 0,
+                                const bool detailedResults = false) {
 
     auto &queries = instanceProvider->getQueries();
     auto &dynGraph = instanceProvider->getGraph();
@@ -219,7 +220,7 @@ void AlgorithmHandler::runTests(unsigned long long const kMax, const std::vector
     }
 
 
-    for(unsigned long long k = 2; k <= kMax ; k++){
+    for(unsigned long long k = kMin; k <= kMax ; k++){
 
         auto parStartTime = HRC::now();
         Algora::FastPropertyMap<unsigned long long> partition = Partitioner::handlePartitioning(k, diGraph);

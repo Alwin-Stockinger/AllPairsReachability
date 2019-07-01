@@ -31,7 +31,10 @@ int main(int argc, char *argv[]) {
     app.add_option(" --kahipFile", kahipFileName, "File name for kahip files");*/
 
     unsigned long long k = 10;
-    app.add_option(" -k, --partitions", k, "Amount of partitions");
+    app.add_option("-k, --partitions", k, "Amount of partitions");
+
+    unsigned long long kMin = 2;
+    app.add_option(" --kMin", kMin, "Minimum partitions for tests");
 
 
     std::vector<std::string> algorithmNames;
@@ -137,7 +140,7 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        handler.runTests(k, algorithmNames, timeOut, detailedResults);
+        handler.runTests(algorithmNames, k, kMin, timeOut, detailedResults);
     }
     else{
         handler.runInterface();

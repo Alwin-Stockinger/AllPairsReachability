@@ -9,11 +9,10 @@ algorithms = "-A " \
              "CachingDFS " \
              "CachingBFS " \
              "SimpleInc " \
-             "SimpleESTree "\
+             "SimpleESTree " \
              "ESTreeML " \
              "OldESTree " \
              "ESTreeQ "
-
 
 if len(sys.argv) == 1:
 
@@ -21,20 +20,22 @@ if len(sys.argv) == 1:
     arcsNumber = 5000
     operationsNumber = 10000
 
-    timeOutHours = 6
+    timeOutHours = 3
     timeOutSeconds = 60 * 60 * timeOutHours
-    nanoConverter = 1000*1000*1000 #seconds to nanoseconds
+    nanoConverter = 1000 * 1000 * 1000  # seconds to nanoseconds
     timeOutNumber = nanoConverter * timeOutSeconds
 
     for i in range(1, 5):
         k = "-k 10"
+        kMin = "--kMin 2"
         vertices = "-s " + str(verticesNumber)
         arcs = "--arcSize " + str(arcsNumber)
         operations = "-o " + str(operationsNumber)
         timeOut = "-t " + str(timeOutNumber)
 
         callString = "./AllPairReach"
-        callString += " " + k + " " + algorithms + " " + vertices + " " + arcs + " " + operations + " " + timeOut
+        callString += " " + k + " " + algorithms + " " + vertices + " " + arcs + " " + operations + " " + timeOut \
+                      + " " + kMin
         subprocess.call([callString], shell=True)
 
         arcsNumber *= 2
