@@ -58,6 +58,8 @@ private:
     void writeDetailedHeader();
 
     void runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &timer, const unsigned long long &timeOut);
+
+    static std::vector<DynamicAPReachAlgorithm *>* createAPAlgorithms(const std::vector<std::string> &algorithmNames);
 };
 
 

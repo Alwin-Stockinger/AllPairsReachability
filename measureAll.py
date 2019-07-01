@@ -20,6 +20,12 @@ if len(sys.argv) == 1:
     arcsNumber = 5000
     operationsNumber = 10000
 
+    minDepthNumber = 0
+    maxDepthNumber = 2
+
+    withoutPartitionNumber = 0
+
+
     timeOutHours = 3
     timeOutSeconds = 60 * 60 * timeOutHours
     nanoConverter = 1000 * 1000 * 1000  # seconds to nanoseconds
@@ -32,10 +38,13 @@ if len(sys.argv) == 1:
         arcs = "--arcSize " + str(arcsNumber)
         operations = "-o " + str(operationsNumber)
         timeOut = "-t " + str(timeOutNumber)
+        minDepth = "--minDepth " + str(minDepthNumber)
+        maxDepth = "--maxDepth " + str(maxDepthNumber)
+        withoutPartition = "--withoutPartition " + str(withoutPartitionNumber)
 
         callString = "./AllPairReach"
         callString += " " + k + " " + algorithms + " " + vertices + " " + arcs + " " + operations + " " + timeOut \
-                      + " " + kMin
+                      + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition
         subprocess.call([callString], shell=True)
 
         arcsNumber *= 2

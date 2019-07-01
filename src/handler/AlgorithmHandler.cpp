@@ -310,6 +310,26 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
     }
 
 
+    if(withoutPartition){
+        auto* algorithms = createAPAlgorithms(algorithmNames);
+
+        for(auto* algorithm : (*algorithms)) {
+
+            TimeCollector timer( 1U, 0U);
+
+            runTest(algorithm, timer, timeOut);
+
+            delete algorithm;
+
+            writeResults(timer);
+
+            if(detailedResults){
+                writeDetailedResults(timer);
+            }
+
+        }
+        delete algorithms;
+    }
 
     for(unsigned long long k = kMin; k <= kMax ; k++){
         //auto parStartTime = HRC::now();
@@ -497,4 +517,66 @@ void AlgorithmHandler::writeDetailedHeader() {
     file.open("detailedResults.csv", std::ios_base::app);
 
     file << instanceProvider->getConfiguration() << std::endl << std::endl;
+}
+
+std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAPAlgorithms(const std::vector<std::string> &algorithmNames) {
+
+    auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
+
+    for(const std::string& algorithmName: algorithmNames){
+
+        DynamicAPReachAlgorithm *algorithm = nullptr;
+
+        if(algorithmName == "StaticBFS") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>();
+        }
+        else if(algorithmName == "StaticDFS") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>();
+        }
+        else if( algorithmName == "LazyDFS") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm,true>();
+        }
+        else if( algorithmName == "LazyBFS") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm,true>();
+        }
+        else if( algorithmName == "CachingDFS") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm,true>();
+        }
+        else if( algorithmName == "CachingBFS") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm,true>();
+        }
+        else if( algorithmName == "SimpleInc") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm,true>();
+        }
+        else if( algorithmName == "ESTreeML") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML,true>();
+        }
+        else if( algorithmName == "OldESTree") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree,true>();
+        }
+        else if( algorithmName == "ESTreeQ") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ,true>();
+        }
+        else if( algorithmName == "SimpleESTree") {
+            algorithm =
+                    new SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree,true>();
+        }
+        else{
+            std::cerr << algorithmName << " not a viable algorithm" << std::endl;
+            //TODO throw error
+        }
+
+        algorithms->push_back(algorithm);
+    }
+    return algorithms;
 }
