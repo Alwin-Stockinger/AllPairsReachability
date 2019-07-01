@@ -91,7 +91,7 @@ protected:
     unsigned long long k = 2;
     bool initialized = false;
 
-    static unsigned long long graphIds;
+    unsigned long long* graphIds;
 };
 
 

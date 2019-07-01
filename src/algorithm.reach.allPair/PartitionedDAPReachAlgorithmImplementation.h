@@ -19,7 +19,15 @@ class PartitionedDAPReachAlgorithmImplementation : public PartitionedDAPReachAlg
 public:
     static_assert(std::is_base_of<DynamicAPReachAlgorithm,T>::value, "Template Parameter has to inherit from DynamicApAlgorithm");
 
-    explicit PartitionedDAPReachAlgorithmImplementation(const unsigned depth) : PartitionedDAPReachAlgorithm(), depth(depth){};
+    explicit PartitionedDAPReachAlgorithmImplementation(const unsigned depth, unsigned long long* graphIds = nullptr) : PartitionedDAPReachAlgorithm(), depth(depth){
+        if(graphIds){
+            this->graphIds = graphIds;
+        }
+        else{
+            unsigned long long originalId = 1ULL;
+            graphIds = &originalId;
+        }
+    };
 
 
     ~PartitionedDAPReachAlgorithmImplementation() override = default;
@@ -30,7 +38,7 @@ private:
 
     DynamicAPReachAlgorithm *createSubAlgorithm() override {
         if( depth > 0U){
-            auto* newAlgo = new PartitionedDAPReachAlgorithmImplementation<T>(depth - 1);
+            auto* newAlgo = new PartitionedDAPReachAlgorithmImplementation<T>(depth - 1, graphIds);
             newAlgo->setPartitionFunction(partitionFunction, k);
             return newAlgo;
         } else{

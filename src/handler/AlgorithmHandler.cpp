@@ -416,7 +416,8 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgo
 
     std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>
             partitionFunction = [&partitions] (unsigned long long k, Algora::DiGraph* diGraph){
-                    return partitions[diGraph->getName()];
+                    std::string name = diGraph->getName();
+                    return partitions.at(name);
             };
 
     for(const std::string& algorithmName: algorithmNames){

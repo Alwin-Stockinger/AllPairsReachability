@@ -18,8 +18,6 @@
 
 #include <graph.incidencelist/incidencelistgraph.h>
 
-unsigned long long PartitionedDAPReachAlgorithm::graphIds = 1ULL;
-
 void PartitionedDAPReachAlgorithm::run() {
 
     if(initialized){
