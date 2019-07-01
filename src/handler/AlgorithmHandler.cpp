@@ -219,14 +219,18 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
 
     algorithm->setGraph(diGraph);
 
+    std::cout << "Initializing next Algorithm " << std::endl;
+
     auto startTime = HRC::now();
     algorithm->run();
     auto endTime = HRC::now();
     timer.addInitTime(startTime, endTime);
 
+    std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
+
     timer.algorithmName = algorithm->getBaseName();
 
-    std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
+
 
     auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
         auto startTime = HRC::now();
@@ -335,13 +339,13 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
     for(unsigned long long k = kMin; k <= kMax ; k++){
         //auto parStartTime = HRC::now();
 
-        std::map<std::string,Algora::FastPropertyMap<unsigned long long>> partitions
-            = Partitioner::handleMultiPartitioning(diGraph, k, maxLevel);
+        Algora::FastPropertyMap<unsigned long long> partition
+            = Partitioner::handlePartitioning(k, diGraph);
         //auto parEndTime = HRC::now();
 
         for(unsigned depth = minLevel; depth <= maxLevel; depth++){
 
-            auto* algorithms = createPartitionedAlgorithms(algorithmNames, k, partitions, depth);
+            auto* algorithms = createPartitionedAlgorithms(algorithmNames, k, partition, depth);
 
             for(auto* algorithm: (*algorithms)) {
 
@@ -409,14 +413,15 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
 std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgorithms(
         const std::vector<std::string> &algorithmNames,
         const unsigned long long int k,
-        std::map<std::string, Algora::FastPropertyMap<unsigned long long int>> &partitions,
+        Algora::FastPropertyMap<unsigned long long int> partitions,
         const unsigned depth = 0U) {
 
     auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
 
     std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>
-            partitionFunction = [&partitions] (unsigned long long k, Algora::DiGraph* diGraph){
-                    return partitions[diGraph->getName()];
+            partitionFunction = [partitions] (unsigned long long k, Algora::DiGraph* diGraph){
+
+                            return partitions;
             };
 
     for(const std::string& algorithmName: algorithmNames){
@@ -480,7 +485,8 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgo
 template<typename T>
 PartitionedDAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm(const unsigned depth) {
 
-    return new PartitionedDAPReachAlgorithmImplementation<T>(depth);
+    //false to not propagate partition function
+    return new PartitionedDAPReachAlgorithmImplementation<T, false>(depth);
 }
 
 void AlgorithmHandler::writeDetailedResults(const AlgorithmHandler::TimeCollector& collector) {

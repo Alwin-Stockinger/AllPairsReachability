@@ -47,7 +47,7 @@ private:
     std::vector<DynamicAPReachAlgorithm *> *
     createPartitionedAlgorithms(const std::vector<std::string> &algorithmNames,
                                 const unsigned long long int k,
-                                std::map<std::string, Algora::FastPropertyMap<unsigned long long int>> &partitions,
+                                Algora::FastPropertyMap<unsigned long long int> partitions,
                                 const unsigned depth);
 
     template<typename T>

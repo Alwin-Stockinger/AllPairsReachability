@@ -13,7 +13,7 @@
 #include "DynamicSSBasedDAPReachAlgorithm.h"
 #include "PartitionedDAPReachAlgorithm.h"
 
-template <typename T>
+template <typename T, bool propagatePartitionFunction = true>
 class PartitionedDAPReachAlgorithmImplementation : public PartitionedDAPReachAlgorithm{
 
 public:
@@ -31,7 +31,9 @@ private:
     DynamicAPReachAlgorithm *createSubAlgorithm() override {
         if( depth > 0U){
             auto* newAlgo = new PartitionedDAPReachAlgorithmImplementation<T>(depth - 1);
-            newAlgo->setPartitionFunction(partitionFunction, k);
+            if(propagatePartitionFunction){
+                newAlgo->setPartitionFunction(partitionFunction, k);
+            }
             return newAlgo;
         } else{
             return new T;

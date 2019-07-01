@@ -18,8 +18,6 @@
 
 #include <graph.incidencelist/incidencelistgraph.h>
 
-unsigned long long PartitionedDAPReachAlgorithm::graphIds = 1ULL;
-
 void PartitionedDAPReachAlgorithm::run() {
 
     if(initialized){
@@ -285,14 +283,11 @@ PartitionedDAPReachAlgorithm::partition() {
         auto* graph = new Algora::IncidenceListGraph;
 
         graph->setParent(diGraph);
-        std::string name = std::to_string(graphIds++);
-        graph->setName(name);
 
         subGraphs.push_back(graph);
     }
     overlayGraph = new Algora::IncidenceListGraph;
     overlayGraph->setParent(diGraph);
-    overlayGraph->setName(std::to_string(graphIds++));
 
 
 
