@@ -13,38 +13,29 @@
 #include "DynamicSSBasedDAPReachAlgorithm.h"
 #include "PartitionedDAPReachAlgorithm.h"
 
-template <typename T, const auto depth = 0U>
+template <typename T>
 class PartitionedDAPReachAlgorithmImplementation : public PartitionedDAPReachAlgorithm{
 
 public:
     static_assert(std::is_base_of<DynamicAPReachAlgorithm,T>::value, "Template Parameter has to inherit from DynamicApAlgorithm");
 
-    explicit PartitionedDAPReachAlgorithmImplementation() : PartitionedDAPReachAlgorithm(){};
+    explicit PartitionedDAPReachAlgorithmImplementation(const unsigned depth = 0U) : PartitionedDAPReachAlgorithm(), depth(depth){};
 
 
     ~PartitionedDAPReachAlgorithmImplementation() override = default;
 
 private:
+
+    const unsigned depth = 0U;
+
     DynamicAPReachAlgorithm *createSubAlgorithm() override {
-        auto* newAlgo = new PartitionedDAPReachAlgorithmImplementation<T, depth - 1>();
-        newAlgo->setPartitionFunction(partitionFunction, k);
-        return newAlgo;
+        if( depth > 0U){
+            auto* newAlgo = new PartitionedDAPReachAlgorithmImplementation<T>();
+            newAlgo->setPartitionFunction(partitionFunction, k);
+            return newAlgo;
+        } else{
+            return new T;
+        }
     }
 };
-template <typename T>
-class PartitionedDAPReachAlgorithmImplementation<T, 0U> : public PartitionedDAPReachAlgorithm{
-
-public:
-    static_assert(std::is_base_of<DynamicAPReachAlgorithm,T>::value, "Template Parameter has to inherit from DynamicApAlgorithm");
-
-    explicit PartitionedDAPReachAlgorithmImplementation() : PartitionedDAPReachAlgorithm(){};
-    ~PartitionedDAPReachAlgorithmImplementation() override = default;
-
-private:
-    DynamicAPReachAlgorithm* createSubAlgorithm() override {
-        return new T();
-    }
-};
-
-
 #endif //ALLPAIRREACH_PARTITIONEDDAPREACHALGORITHM_H

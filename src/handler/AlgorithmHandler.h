@@ -23,9 +23,10 @@ public:
 
     void runInterface();
 
-    void runTests(const std::vector<std::string> &algorithmNames, unsigned long long const kMax,
+    void runTests(const std::vector<std::string> &algorithmNames, const unsigned long long int kMax,
                   const unsigned long long int kMin, const unsigned long long int timeOut,
-                  const bool detailedResults);
+                  const bool detailedResults, const unsigned int minLevel, const unsigned int maxLevel,
+                  const bool withoutPartition);
 
 private:
     void addArc();
@@ -44,15 +45,19 @@ private:
     void writeHeader();
 
     std::vector<DynamicAPReachAlgorithm *> *
-    createPartitionedAlgorithms(const std::vector<std::string> &algorithmNames, unsigned long long int k,
-                                const Algora::FastPropertyMap<unsigned long long int>& partition);
+    createPartitionedAlgorithms(const std::vector<std::string> &algorithmNames,
+                                const unsigned long long int k,
+                                std::map<std::string, Algora::FastPropertyMap<unsigned long long int>> &partitions,
+                                const unsigned depth);
 
-    template<typename T, unsigned Level = 0U>
-    PartitionedDAPReachAlgorithm *createPartitionAlgorithm();
+    template<typename T>
+    PartitionedDAPReachAlgorithm *createPartitionAlgorithm(unsigned depth = 0U);
 
     static void writeDetailedResults(const TimeCollector& collector);
 
     void writeDetailedHeader();
+
+    void runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &timer, const unsigned long long &timeOut);
 };
 
 

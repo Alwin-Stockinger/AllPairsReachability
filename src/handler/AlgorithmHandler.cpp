@@ -33,7 +33,7 @@ typedef HRC::time_point TimePoint;
 struct AlgorithmHandler::TimeCollector {
 
 
-    explicit TimeCollector(const unsigned long long int k) : k(k) {}
+    explicit TimeCollector(const unsigned long long int k, unsigned int depth) : k(k), depth(depth)  {}
 
 
     std::string algorithmName;
@@ -41,6 +41,7 @@ struct AlgorithmHandler::TimeCollector {
     bool timedOut = false;
 
     const unsigned long long k;
+    const unsigned depth;
 
     unsigned long long initTime{};
     unsigned long long partitionTime{};
@@ -110,6 +111,8 @@ private:
         return avg/times.size();
     }
 };
+
+
 
 enum class MenuOptions{ reach=1, addArc=2, removeArc=3, quit=0} option;
 
@@ -204,14 +207,101 @@ void AlgorithmHandler::removeArc(){
     graph.applyNextDelta();
 }
 
-void AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, unsigned long long const kMax = 2,
-                                const unsigned long long int kMin = 2, const unsigned long long int timeOut = 0,
-                                const bool detailedResults = false) {
+void
+AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &timer, const unsigned long long &timeOut) {
 
     auto &queries = instanceProvider->getQueries();
     auto &dynGraph = instanceProvider->getGraph();
-
     auto* diGraph = dynGraph.getDiGraph();
+
+    //measurement specific
+    algorithm->setAutoUpdate(false);
+
+    algorithm->setGraph(diGraph);
+
+    auto startTime = HRC::now();
+    algorithm->run();
+    auto endTime = HRC::now();
+    timer.addInitTime(startTime, endTime);
+
+    timer.algorithmName = algorithm->getBaseName();
+
+    std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
+
+    auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
+        auto startTime = HRC::now();
+        algorithm->onArcAdd(arc);
+        auto endTime = HRC::now();
+        timer.addAddArcTime(startTime, endTime);
+    };
+    diGraph->onArcAdd(algorithm,onArcAdded);
+
+    auto onArcRemoved = [algorithm, &timer](Algora::Arc* arc){
+        auto startTime = HRC::now();
+        algorithm->onArcRemove(arc);
+        auto endTime = HRC::now();
+        timer.addRemoveArcTime(startTime, endTime);
+    };
+    diGraph->onArcRemove(algorithm, onArcRemoved);
+
+    auto onVertexAdded = [algorithm, &timer](Algora::Vertex* vertex){
+        algorithm->onVertexAdd(vertex);
+    };
+    diGraph->onVertexAdd(algorithm, onVertexAdded);
+
+    auto onVertexRemoved = [algorithm, &timer](Algora::Vertex* vertex){
+        algorithm->onVertexRemove(vertex);
+    };
+    diGraph->onVertexRemove(algorithm, onVertexRemoved);
+
+    for (const auto &currentQueries : queries) {
+
+        for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
+
+            auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
+            auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[j + 1]);
+
+
+            auto startQueryTime = std::chrono::high_resolution_clock::now();
+            algorithm->query(startVertex, endVertex);
+            auto endQueryTime = std::chrono::high_resolution_clock::now();
+            timer.addQueryTime(startQueryTime, endQueryTime);
+        }
+
+        if(timeOut && timeOut < timer.getAllTime()){
+            std::cout << "TIMEOUT" << std::endl;
+            timer.timedOut = true;
+            break;
+        }
+
+        dynGraph.applyNextDelta();
+    }
+
+    algorithm->unsetGraph();
+
+    diGraph->removeOnArcAdd(algorithm);
+    diGraph->removeOnArcRemove(algorithm);
+    diGraph->removeOnVertexAdd(algorithm);
+    diGraph->removeOnVertexRemove(algorithm);
+
+
+
+    //reset to initial graph
+    dynGraph.resetToBigBang();
+    dynGraph.applyNextDelta();
+
+    std::cout << "Finished\n";
+
+}
+
+void
+AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const unsigned long long int kMax = 2ULL,
+                           const unsigned long long int kMin = 2ULL, const unsigned long long int timeOut = 0ULL,
+                           const bool detailedResults = false, const unsigned int minLevel = 0U,
+                           const unsigned int maxLevel = 0U, const bool withoutPartition = false) {
+
+
+
 
     writeHeader();
 
@@ -220,111 +310,36 @@ void AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, 
     }
 
 
+
     for(unsigned long long k = kMin; k <= kMax ; k++){
+        //auto parStartTime = HRC::now();
+        std::map<std::string,Algora::FastPropertyMap<unsigned long long>> partitions
+            = Partitioner::handleMultiPartitioning(instanceProvider->getGraph().getDiGraph(), k, maxLevel);
+        //auto parEndTime = HRC::now();
 
-        auto parStartTime = HRC::now();
-        Algora::FastPropertyMap<unsigned long long> partition = Partitioner::handlePartitioning(k, diGraph);
-        auto parEndTime = HRC::now();
+        for(unsigned depth = minLevel; depth <= maxLevel; depth++){
 
-        auto* algorithms = createPartitionedAlgorithms(algorithmNames, k, partition);
+            auto* algorithms = createPartitionedAlgorithms(algorithmNames, k, partitions, depth);
 
-        for(auto* algorithm: (*algorithms)) {
+            for(auto* algorithm: (*algorithms)) {
 
-            TimeCollector timer(k);
-            timer.addPartitionTime(parStartTime, parEndTime);
+                TimeCollector timer(k, depth);
 
-            //measurement specific
-            algorithm->setAutoUpdate(false);
+                runTest(algorithm, timer, timeOut);
 
-            algorithm->setGraph(diGraph);
-
-            auto startTime = HRC::now();
-            algorithm->run();
-            auto endTime = HRC::now();
-            timer.addInitTime(startTime, endTime);
-
-            timer.algorithmName = algorithm->getBaseName();
-
-            std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
-
-            auto onArcAdded = [algorithm, &timer](Algora::Arc* arc){
-                auto startTime = HRC::now();
-                algorithm->onArcAdd(arc);
-                auto endTime = HRC::now();
-                timer.addAddArcTime(startTime, endTime);
-            };
-            diGraph->onArcAdd(algorithm,onArcAdded);
-
-            auto onArcRemoved = [algorithm, &timer](Algora::Arc* arc){
-                auto startTime = HRC::now();
-                algorithm->onArcRemove(arc);
-                auto endTime = HRC::now();
-                timer.addRemoveArcTime(startTime, endTime);
-            };
-            diGraph->onArcRemove(algorithm, onArcRemoved);
-
-            auto onVertexAdded = [algorithm, &timer](Algora::Vertex* vertex){
-                algorithm->onVertexAdd(vertex);
-            };
-            diGraph->onVertexAdd(algorithm, onVertexAdded);
-
-            auto onVertexRemoved = [algorithm, &timer](Algora::Vertex* vertex){
-                algorithm->onVertexRemove(vertex);
-            };
-            diGraph->onVertexRemove(algorithm, onVertexRemoved);
-
-            for (const auto &currentQueries : queries) {
-
-                for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
-
-                    auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
-                    auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[j + 1]);
+                delete algorithm;
 
 
-                    auto startQueryTime = std::chrono::high_resolution_clock::now();
-                    algorithm->query(startVertex, endVertex);
-                    auto endQueryTime = std::chrono::high_resolution_clock::now();
-                    timer.addQueryTime(startQueryTime, endQueryTime);
+                writeResults(timer);
+
+                if(detailedResults){
+                    writeDetailedResults(timer);
                 }
 
-                if(timeOut && timeOut < timer.getAllTime()){
-                    std::cout << "TIMEOUT" << std::endl;
-                    timer.timedOut = true;
-                    break;
-                }
-
-                dynGraph.applyNextDelta();
             }
 
-            algorithm->unsetGraph();
-
-            diGraph->removeOnArcAdd(algorithm);
-            diGraph->removeOnArcRemove(algorithm);
-            diGraph->removeOnVertexAdd(algorithm);
-            diGraph->removeOnVertexRemove(algorithm);
-
-
-
-            //reset to initial graph
-            dynGraph.resetToBigBang();
-            dynGraph.applyNextDelta();
-            //second Time for Algora Bug
-            //dynGraph.resetToBigBang();
-            //std::cout << dynGraph.applyNextDelta() << std::endl;
-
-            std::cout << "Finished\n";
-
-            delete algorithm;
-
-
-            writeResults(timer);
-
-            if(detailedResults){
-                writeDetailedResults(timer);
-            }
-
+            delete algorithms;
         }
-        delete algorithms;
     }
 }
 
@@ -336,6 +351,7 @@ void AlgorithmHandler::writeHeader(){
     file << instanceProvider->getConfiguration() << std::endl;
 
     file << "k";
+    file << ",depth";
     file << ",SS Base Algorithm";
     file << ",avg query time(ns)";
     file << ",avg add Arc time(ns)";
@@ -354,6 +370,7 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
     file.open("results.csv", std::ios_base::app);
 
     file << timer.k;
+    file << "," << timer.depth;
     file << "," << "\"" << timer.algorithmName << "\"";
     file << "," << timer.getAvgQueryTime();
     file << "," << timer.getAvgAddArcTime();
@@ -368,15 +385,17 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
 }
 
 std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgorithms(
-        const std::vector<std::string> &algorithmNames, const unsigned long long int k,
-        const Algora::FastPropertyMap<unsigned long long int>& partition) {
+        const std::vector<std::string> &algorithmNames,
+        const unsigned long long int k,
+        std::map<std::string, Algora::FastPropertyMap<unsigned long long int>> &partitions,
+        const unsigned depth = 0U) {
 
     auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
 
     std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>
-            partitionFunction = [partition] (unsigned long long k, Algora::DiGraph* diGraph){
-                    return partition;
-                };
+            partitionFunction = [&partitions] (unsigned long long k, Algora::DiGraph* diGraph){
+                    return partitions[diGraph->getName()];
+            };
 
     for(const std::string& algorithmName: algorithmNames){
 
@@ -384,47 +403,47 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgo
 
         if(algorithmName == "StaticBFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>(depth);
         }
         else if(algorithmName == "StaticDFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>(depth);
         }
         else if( algorithmName == "LazyDFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm,true>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm,true>>(depth);
         }
         else if( algorithmName == "LazyBFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm,true>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm,true>>(depth);
         }
         else if( algorithmName == "CachingDFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm,true>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm,true>>(depth);
         }
         else if( algorithmName == "CachingBFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm,true>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm,true>>(depth);
         }
         else if( algorithmName == "SimpleInc") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm,true>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm,true>>(depth);
         }
         else if( algorithmName == "ESTreeML") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML,true>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML,true>>(depth);
         }
         else if( algorithmName == "OldESTree") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree,true>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree,true>>(depth);
         }
         else if( algorithmName == "ESTreeQ") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ,true>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ,true>>(depth);
         }
         else if( algorithmName == "SimpleESTree") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree,true>>();
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree,true>>(depth);
         }
         else{
             std::cerr << algorithmName << " not a viable algorithm" << std::endl;
@@ -436,16 +455,17 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgo
     return algorithms;
 }
 
-template<typename T, unsigned Level>
-PartitionedDAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm() {
-    auto* algorithm = new PartitionedDAPReachAlgorithmImplementation<T,Level>();
-    return algorithm;
+template<typename T>
+PartitionedDAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm(const unsigned depth) {
+
+    return new PartitionedDAPReachAlgorithmImplementation<T>(depth);
 }
 
 void AlgorithmHandler::writeDetailedResults(const AlgorithmHandler::TimeCollector& collector) {
     std::ofstream file;
     file.open("detailedResults.csv", std::ios_base::app);
     file << "k = " << collector.k << "\n";
+    file << "depth = " << collector.depth << "\n";
     file << "algorithm = " << collector.algorithmName << "\n";
 
     file << std::endl;

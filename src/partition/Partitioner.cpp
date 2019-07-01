@@ -8,6 +8,7 @@
 #include <fstream>
 #include <cstring>
 
+#include <graph.incidencelist/incidencelistgraph.h>
 
 #include "Partitioner.h"
 
@@ -126,4 +127,83 @@ void Partitioner::writeMapToFile(const std::string &outFileName, Algora::DiGraph
     }
 
     outFile.close();
+}
+
+std::map<std::string, Algora::FastPropertyMap<unsigned long long int>>
+Partitioner::handleMultiPartitioning(Algora::DiGraph *diGraph, unsigned long long k, unsigned depth) {
+    std::cout << "\nStarting Multi Level Partitioning with k=" << k << std::endl;
+
+    unsigned long long id = 0ULL;
+
+    std::map<std::string, Algora::FastPropertyMap<unsigned long long int>> returnMap;
+
+    std::vector<Algora::DiGraph*> graphsToPartition {diGraph};
+
+    // given graph should not be deleted!!!!
+    std::vector<Algora::DiGraph*> allGraphs;
+
+    for(unsigned level = depth; level != depth - 1; level --){
+
+        std::vector<Algora::DiGraph*> nextGraphs;
+
+        for(Algora::DiGraph* partitionGraph : graphsToPartition){
+
+            Algora::FastPropertyMap<unsigned long long> partition = handlePartitioning(k, partitionGraph);
+            returnMap[std::to_string(id++)] = partition;
+
+            nextGraphs = buildGraphs(partition, partitionGraph, k);
+            allGraphs.insert(std::end(allGraphs), std::begin(nextGraphs), std::end(nextGraphs));
+        }
+
+        graphsToPartition = nextGraphs;
+    }
+
+    for( Algora::DiGraph* graph : allGraphs){
+        delete graph;
+    }
+
+    std::cout << "Finished Multi Level Partitioning\n" << std::endl;
+
+    return returnMap;
+}
+
+
+std::vector<Algora::DiGraph *>
+Partitioner::buildGraphs(const Algora::FastPropertyMap<unsigned long long int> &partition, Algora::DiGraph *mainGraph,
+                         const unsigned long long k) {
+
+    std::vector<Algora::DiGraph*> subGraphs;
+
+    for(auto i = 0ULL; i < k; i++){
+        auto* graph = new Algora::IncidenceListGraph;
+
+        subGraphs.push_back(graph);
+    }
+
+    Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;
+
+    mainGraph->mapVertices([&subGraphs, partition, &mainToSubMap](Algora::Vertex* vertex){
+        subGraphs.at(partition.getValue(vertex))->addVertex();
+        auto* subVertex = subGraphs.at(partition.getValue(vertex))->addVertex();
+        mainToSubMap[vertex] = subVertex;
+    });
+
+    mainGraph->mapArcs([&subGraphs, partition, &mainToSubMap](Algora::Arc* arc){
+
+        auto* mainHead = arc->getHead();
+        auto * mainTail = arc->getTail();
+
+        unsigned long long headPartition = partition.getValue(mainHead);
+        unsigned long long tailPartition = partition.getValue(mainTail);
+
+        Algora::Vertex* subTail = mainToSubMap[mainTail];
+        Algora::Vertex* subHead = mainToSubMap[mainHead];
+
+
+        if( headPartition == tailPartition){
+            subGraphs.at(headPartition)->addArc(subTail, subHead);
+        }
+    });
+
+    return subGraphs;
 }
