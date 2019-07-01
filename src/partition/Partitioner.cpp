@@ -138,11 +138,12 @@ Partitioner::handleMultiPartitioning(Algora::DiGraph *diGraph, unsigned long lon
     std::map<std::string, Algora::FastPropertyMap<unsigned long long int>> returnMap;
 
     std::vector<Algora::DiGraph*> graphsToPartition {diGraph};
+    diGraph->setName("0");
 
     // given graph should not be deleted!!!!
     std::vector<Algora::DiGraph*> allGraphs;
 
-    for(unsigned level = depth; level != depth - 1; level --){
+    for(unsigned level = depth; level != 0U - 1; level --){
 
         std::vector<Algora::DiGraph*> nextGraphs;
 
@@ -151,10 +152,12 @@ Partitioner::handleMultiPartitioning(Algora::DiGraph *diGraph, unsigned long lon
             Algora::FastPropertyMap<unsigned long long> partition = handlePartitioning(k, partitionGraph);
             returnMap[std::to_string(id++)] = partition;
 
-            nextGraphs = buildGraphs(partition, partitionGraph, k);
-            allGraphs.insert(std::end(allGraphs), std::begin(nextGraphs), std::end(nextGraphs));
+            std::vector<Algora::DiGraph*> builded = buildGraphs(partition, partitionGraph, k);
+
+            nextGraphs.insert(std::end(nextGraphs), std::begin(builded), std::end(builded));
         }
 
+        allGraphs.insert(std::end(allGraphs), std::begin(nextGraphs), std::end(nextGraphs));
         graphsToPartition = nextGraphs;
     }
 
@@ -183,7 +186,7 @@ Partitioner::buildGraphs(const Algora::FastPropertyMap<unsigned long long int> &
     Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;
 
     mainGraph->mapVertices([&subGraphs, partition, &mainToSubMap](Algora::Vertex* vertex){
-        subGraphs.at(partition.getValue(vertex))->addVertex();
+
         auto* subVertex = subGraphs.at(partition.getValue(vertex))->addVertex();
         mainToSubMap[vertex] = subVertex;
     });

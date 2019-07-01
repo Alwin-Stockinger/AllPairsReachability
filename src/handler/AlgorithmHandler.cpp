@@ -309,6 +309,7 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
         writeDetailedHeader();
     }
 
+    Algora::DiGraph* diGraph = instanceProvider->getGraph().getDiGraph();
 
     if(withoutPartition){
         auto* algorithms = createAPAlgorithms(algorithmNames);
@@ -333,8 +334,9 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
 
     for(unsigned long long k = kMin; k <= kMax ; k++){
         //auto parStartTime = HRC::now();
+
         std::map<std::string,Algora::FastPropertyMap<unsigned long long>> partitions
-            = Partitioner::handleMultiPartitioning(instanceProvider->getGraph().getDiGraph(), k, maxLevel);
+            = Partitioner::handleMultiPartitioning(diGraph, k, maxLevel);
         //auto parEndTime = HRC::now();
 
         for(unsigned depth = minLevel; depth <= maxLevel; depth++){
