@@ -293,6 +293,9 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
     //reset to initial graph
     dynGraph.resetToBigBang();
     dynGraph.applyNextDelta();
+    //Fix for very strange Algora Bug that doesn't always happen
+    dynGraph.resetToBigBang();
+    dynGraph.applyNextDelta();
 
     std::cout << "Finished\n";
 
