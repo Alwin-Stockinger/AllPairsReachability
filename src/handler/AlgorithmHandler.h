@@ -23,10 +23,10 @@ public:
 
     void runInterface();
 
-    void runTests(const std::vector<std::string> &algorithmNames, const unsigned long long int kMax,
-                  const unsigned long long int kMin, const unsigned long long int timeOut,
-                  const bool detailedResults, const unsigned int minLevel, const unsigned int maxLevel,
-                  const bool withoutPartition);
+    void runTests(const std::vector<std::string> &algorithmNames, const bool exponentialK,
+                  const unsigned long long int kMax, const unsigned long long int kMin,
+                  const unsigned long long int timeOut, const bool detailedResults,
+                  const unsigned int minLevel, const unsigned int maxLevel, const bool withoutPartition);
 
 private:
     void addArc();

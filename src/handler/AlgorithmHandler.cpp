@@ -302,10 +302,11 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
 }
 
 void
-AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const unsigned long long int kMax = 2ULL,
-                           const unsigned long long int kMin = 2ULL, const unsigned long long int timeOut = 0ULL,
-                           const bool detailedResults = false, const unsigned int minLevel = 0U,
-                           const unsigned int maxLevel = 0U, const bool withoutPartition = false) {
+AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const bool exponentialK = false,
+                           const unsigned long long int kMax = 2ULL, const unsigned long long int kMin = 2ULL,
+                           const unsigned long long int timeOut = 0ULL, const bool detailedResults = false,
+                           const unsigned int minLevel = 0U, const unsigned int maxLevel = 0U,
+                           const bool withoutPartition = false) {
 
 
 
@@ -339,9 +340,13 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
         delete algorithms;
     }
 
-    for(unsigned long long k = kMin; k <= kMax ; k++){
-        //auto parStartTime = HRC::now();
 
+
+    for(unsigned long long k = kMin; k <= kMax ; [exponentialK, &k](){
+        exponentialK ? (k *= 2ULL) : (k++);
+    }()){
+
+        //auto parStartTime = HRC::now();
         Algora::FastPropertyMap<unsigned long long> partition
             = Partitioner::handlePartitioning(k, diGraph);
         //auto parEndTime = HRC::now();

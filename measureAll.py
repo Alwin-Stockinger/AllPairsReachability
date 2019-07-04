@@ -30,6 +30,7 @@ if len(sys.argv) == 1:
     nanoConverter = 1000 * 1000 * 1000  # seconds to nanoseconds
     timeOutNumber = nanoConverter * timeOutSeconds
     multiArcsNumber = 0
+    exponentialKNumber = 0
 
     for i in range(1, 5):
         k = "-k 10"
@@ -41,7 +42,8 @@ if len(sys.argv) == 1:
         minDepth = "--minDepth " + str(minDepthNumber)
         maxDepth = "--maxDepth " + str(maxDepthNumber)
         withoutPartition = "--withoutPartition " + str(withoutPartitionNumber)
-        multiArcs = "--multiArcs" + str(multiArcsNumber)
+        multiArcs = "--multiArcs " + str(multiArcsNumber)
+        exponentialK = "--exponentialK " + str(exponentialKNumber)
 
         callString = "./AllPairReach"
         callString += " " + k + " " + algorithms + " " + vertices + " " + arcs + " " + operations + " " + timeOut \
