@@ -45,7 +45,7 @@ if len(sys.argv) == 1:
 
         callString = "./AllPairReach"
         callString += " " + k + " " + algorithms + " " + vertices + " " + arcs + " " + operations + " " + timeOut \
-                      + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition
+                      + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs
         subprocess.call([callString], shell=True)
 
         arcsNumber *= 2
