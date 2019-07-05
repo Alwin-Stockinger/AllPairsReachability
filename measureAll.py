@@ -32,6 +32,10 @@ if len(sys.argv) == 1:
     multiArcsNumber = 0
     exponentialKNumber = 0
 
+    queriesNumber = 70
+    insertsNumber = 15
+    removalNumber = 15
+
     for i in range(1, 5):
         k = "-k 10"
         kMin = "--kMin 2"
@@ -44,10 +48,14 @@ if len(sys.argv) == 1:
         withoutPartition = "--withoutPartition " + str(withoutPartitionNumber)
         multiArcs = "--multiArcs " + str(multiArcsNumber)
         exponentialK = "--exponentialK " + str(exponentialKNumber)
+        queries = "-q " + str(queriesNumber)
+        inserts = "-a " + str(insertsNumber)
+        removes = "-r " + str(removalNumber)
 
         callString = "./AllPairReach"
         callString += " " + k + " " + algorithms + " " + vertices + " " + arcs + " " + operations + " " + timeOut \
-                      + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs
+                      + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs \
+                      + " " + exponentialK + " " + queries + " " + inserts + " " + removes
         subprocess.call([callString], shell=True)
 
         arcsNumber *= 2
