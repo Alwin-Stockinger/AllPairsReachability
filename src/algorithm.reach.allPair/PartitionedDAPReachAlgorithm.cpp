@@ -68,7 +68,7 @@ bool PartitionedDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Ve
         DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[endGraph];
 
         std::set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
-        std::set<Algora::Vertex *> endEdgeVertices = edgeVertices[endGraph];    //must be copy, otherwise can't erase vertices from set
+        std::set<Algora::Vertex *>& endEdgeVertices = edgeVertices[endGraph];
 
         //find outgoing vertices
         for (Algora::Vertex *outVertex : startEdgeVertices) {
@@ -80,20 +80,14 @@ bool PartitionedDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Ve
 
             if (startGraphAlgorithm->query(start, mainToSubMap[outVertex])) {
 
-                for(auto it = endEdgeVertices.begin(); it != endEdgeVertices.end();){
-
-                    Algora::Vertex* inVertex = *it;
+                for(Algora::Vertex* inVertex: endEdgeVertices){
 
                     if( overlayAlgorithm->query(mainToOverlayMap[outVertex], mainToOverlayMap[inVertex])){
 
                         if( endGraphAlgorithm->query(mainToSubMap[inVertex], end)){
                             return true;
                         }
-                        else{
-                            it = endEdgeVertices.erase(it);    //exclude for future queries, because dead-end
-                        }
                     }
-                    else it++;
                 }
             }
         }
