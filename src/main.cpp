@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     app.add_option(" --kMin", kMin, "Minimum partitions for tests");
 
     bool exponentialK = false;
-    app.add_option(" --exponentialK", exponentialK, "K is increased exponentially for tests");
+    app.add_option("--exponentialK", exponentialK, "K is increased exponentially for tests");
 
     unsigned minDepth = 0U;
     app.add_option("--minDepth", minDepth, "Minimum depth for partitions");
