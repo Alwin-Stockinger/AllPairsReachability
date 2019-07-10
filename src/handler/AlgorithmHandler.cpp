@@ -494,7 +494,7 @@ template<typename T>
 PartitionedDAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm(const unsigned depth) {
 
     //false to not propagate partition function
-    return new PartitionedDAPReachAlgorithmImplementation<T, false>(depth);
+    return new PartitionedDAPReachAlgorithmImplementation<T, T, false>(depth);
 }
 
 void AlgorithmHandler::writeDetailedResults(const AlgorithmHandler::TimeCollector& collector) {

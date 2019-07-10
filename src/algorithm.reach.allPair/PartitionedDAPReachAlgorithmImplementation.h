@@ -13,11 +13,11 @@
 #include "DynamicSSBasedDAPReachAlgorithm.h"
 #include "PartitionedDAPReachAlgorithm.h"
 
-template <typename T, bool propagatePartitionFunction = true>
+template <typename SubAlgorithm, typename OverlayAlgorithm = SubAlgorithm, bool propagatePartitionFunction = true>
 class PartitionedDAPReachAlgorithmImplementation : public PartitionedDAPReachAlgorithm{
 
 public:
-    static_assert(std::is_base_of<DynamicAPReachAlgorithm,T>::value, "Template Parameter has to inherit from DynamicApAlgorithm");
+    static_assert(std::is_base_of<DynamicAPReachAlgorithm,SubAlgorithm>::value, "Template Parameter has to inherit from DynamicApAlgorithm");
 
     explicit PartitionedDAPReachAlgorithmImplementation(const unsigned depth = 0U) : PartitionedDAPReachAlgorithm(), depth(depth){};
 
@@ -28,15 +28,19 @@ private:
 
     const unsigned depth = 0U;
 
+    DynamicAPReachAlgorithm *createOverlayAlgorithm() override {
+        return new OverlayAlgorithm;
+    }
+
     DynamicAPReachAlgorithm *createSubAlgorithm() override {
         if( depth > 0U){
-            auto* newAlgo = new PartitionedDAPReachAlgorithmImplementation<T>(depth - 1);
+            auto* newAlgo = new PartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm>(depth - 1);
             if(propagatePartitionFunction){
                 newAlgo->setPartitionFunction(partitionFunction, k);
             }
             return newAlgo;
         } else{
-            return new T;
+            return new SubAlgorithm;
         }
     }
 };

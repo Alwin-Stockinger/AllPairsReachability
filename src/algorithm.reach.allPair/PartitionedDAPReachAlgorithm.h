@@ -85,6 +85,7 @@ private:
 
 protected:
     virtual DynamicAPReachAlgorithm* createSubAlgorithm() = 0;
+    virtual DynamicAPReachAlgorithm* createOverlayAlgorithm() = 0;
 
     PartFunc partitionFunction = Partitioner::handlePartitioning;
 

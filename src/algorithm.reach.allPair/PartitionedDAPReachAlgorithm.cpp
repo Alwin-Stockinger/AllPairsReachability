@@ -131,7 +131,7 @@ void
 PartitionedDAPReachAlgorithm::initAlgorithms(std::vector<Algora::DiGraph *> &graphs) {
 
     //create new Algorithms
-    overlayAlgorithm = createSubAlgorithm();
+    overlayAlgorithm = createOverlayAlgorithm();
     overlayAlgorithm->setGraph(overlayGraph);
     for (Algora::DiGraph *graph : graphs) {
         DynamicAPReachAlgorithm* algorithm = createSubAlgorithm();
@@ -150,8 +150,7 @@ void PartitionedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
     Algora::DiGraph* subGraph = nullptr;
 
     //TODO chose smart or random graph
-    for(auto it = mainToSubMap.begin(); it != mainToSubMap.end(); it++){
-        auto* anyVertex = (*it);
+    for(auto anyVertex : mainToSubMap){
         if(anyVertex){
             subGraph = dynamic_cast<Algora::DiGraph*>(anyVertex->getParent());
             break;
