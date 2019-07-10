@@ -304,7 +304,7 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
                            const unsigned long long int kMax = 2ULL, const unsigned long long int kMin = 2ULL,
                            const unsigned long long int timeOut = 0ULL, const bool detailedResults = false,
                            const unsigned int minLevel = 0U, const unsigned int maxLevel = 0U,
-                           const bool withoutPartition = false) {
+                           const bool withoutPartition = false, const std::vector<std::string>* const overlayNames= nullptr) {
 
 
 
@@ -353,6 +353,11 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
         for(unsigned depth = minLevel; depth <= maxLevel; depth++){
 
             auto* algorithms = createPartitionedAlgorithms(algorithmNames, k, partition, depth);
+
+            if(overlayNames){
+                auto* overlayAlgorithms = createSpecialOverlayPartitionedAlgorithms(algorithmNames, *overlayNames, k, partition, depth);
+                algorithms->insert(algorithms->end(), overlayAlgorithms->begin(), overlayAlgorithms->end());
+            }
 
             for(auto* algorithm: (*algorithms)) {
 
@@ -493,7 +498,7 @@ std::vector<DynamicAPReachAlgorithm*> AlgorithmHandler::createPartitionedAlgorit
 }
 
 std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createSpecialOverlayPartitionedAlgorithms(
-        std::vector<std::string> &algorithmNames, std::vector<std::string> &overlayNames,
+        const std::vector<std::string> &algorithmNames, const std::vector<std::string> &overlayNames,
         unsigned long long int k,
         const Algora::FastPropertyMap<unsigned long long int>& partitions,
         unsigned depth = 0U){

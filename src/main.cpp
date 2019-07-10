@@ -52,6 +52,9 @@ int main(int argc, char *argv[]) {
     std::vector<std::string> algorithmNames;
     app.add_option("-A, --algorithms", algorithmNames, "Algorithms to use");
 
+    std::vector<std::string> overlayAlgorithms;
+    app.add_option("-O, --overlayAlgorithms", overlayAlgorithms, "Overlay algorithms to use");
+
     unsigned long long vertexSize = 100;
     app.add_option("-s, --vertexSize", vertexSize, "Amount of vertices for random graphs");
 
@@ -145,14 +148,16 @@ int main(int argc, char *argv[]) {
     dynGraph.resetToBigBang();
     dynGraph.applyNextDelta();
 
-
-
-
     AlgorithmHandler handler(provider);
+
+    std::vector<std::string> *overlayAlgorithmNames = nullptr;
+    if(overlayAlgorithms.begin()!=overlayAlgorithms.end()){
+        overlayAlgorithmNames = &overlayAlgorithms;
+    }
 
 
     if(runPerformanceTests){
-        handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth, withoutPartition);
+        handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth, withoutPartition, overlayAlgorithmNames);
     }
     else{
         handler.runInterface();

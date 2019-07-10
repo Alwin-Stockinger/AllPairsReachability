@@ -26,7 +26,8 @@ public:
     void runTests(const std::vector<std::string> &algorithmNames, bool exponentialK,
                   unsigned long long int kMax, unsigned long long int kMin,
                   unsigned long long int timeOut, bool detailedResults,
-                  unsigned int minLevel, unsigned int maxLevel, bool withoutPartition);
+                  unsigned int minLevel, unsigned int maxLevel, bool withoutPartition,
+                  const std::vector<std::string>* overlayNames);
 
 private:
     void addArc();
@@ -53,8 +54,8 @@ private:
     template<typename SubAlgorithm, typename OverlayAlgorithm = SubAlgorithm>
     PartitionedDAPReachAlgorithm *createPartitionAlgorithm(unsigned depth = 0U);
 
-    std::vector<DynamicAPReachAlgorithm *> * createSpecialOverlayPartitionedAlgorithms(std::vector<std::string> &algorithmNames,
-                                                                                       std::vector<std::string> &overlayNames,
+    std::vector<DynamicAPReachAlgorithm *> * createSpecialOverlayPartitionedAlgorithms(const std::vector<std::string> &algorithmNames,
+                                                                                       const std::vector<std::string> &overlayNames,
                                                                                         unsigned long long int k,
                                                                                         const Algora::FastPropertyMap<unsigned long long int>& partitions,
                                                                                         unsigned depth);
