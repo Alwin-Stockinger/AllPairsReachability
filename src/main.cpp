@@ -64,19 +64,19 @@ int main(int argc, char *argv[]) {
     double arcProb = 0.1;
     app.add_option("-p, --arcProbability", arcProb, "Probability of arcs for random graphs");
 
-    bool multiArcs = false;
+    bool multiArcs = true;
     app.add_option("-M, --multiArcs", multiArcs, "Multi Arcs are allowed");
 
     unsigned long long numOperations = 10000;
     app.add_option("-o, --numOperations", numOperations, "Number of Operations");
 
-    unsigned queryProp = 70;
+    unsigned queryProp = 10;
     app.add_option("-q, --queries", queryProp, "Proportion of queries");
 
-    unsigned removalProp = 15;
+    unsigned removalProp = 10;
     app.add_option("-r, --removalProp", removalProp, "Proportion of removals");
 
-    unsigned additionProp = 15;
+    unsigned additionProp = 10;
     app.add_option("-a, --additionProp", additionProp, "Proportion of additions");
 
     unsigned multiplier = 1;
@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
         konectProvider->addInputFile(inputFileName);
 
 
-        queriesPerDelta *=2;    //because two SS queries for one AP query
+        queriesPerDelta *= 2;    //because two SS queries for one AP query
         bool relative = queriesPerDelta < 0.0;
         konectProvider->generateQueriesAfterEachDelta( relative ? -queriesPerDelta : queriesPerDelta, relative);
 

@@ -14,6 +14,12 @@ algorithms = "-A " \
              "OldESTree " \
              "ESTreeQ "
 
+timeOutHours = 1
+timeOutSeconds = 60 * 60 * timeOutHours
+nanoConverter = 1000 * 1000 * 1000  # seconds to nanoseconds
+timeOutNumber = nanoConverter * timeOutSeconds
+timeOut = "-t " + str(timeOutNumber)
+
 if len(sys.argv) == 1:
 
     verticesNumber = 10000
@@ -25,16 +31,13 @@ if len(sys.argv) == 1:
 
     withoutPartitionNumber = 0
 
-    timeOutHours = 3
-    timeOutSeconds = 60 * 60 * timeOutHours
-    nanoConverter = 1000 * 1000 * 1000  # seconds to nanoseconds
-    timeOutNumber = nanoConverter * timeOutSeconds
+
     multiArcsNumber = 0
     exponentialKNumber = 0
 
-    queriesNumber = 70
-    insertsNumber = 15
-    removalNumber = 15
+    queriesNumber = 30
+    insertsNumber = 30
+    removalNumber = 30
 
     for i in range(1, 5):
         k = "-k 10"
@@ -42,7 +45,7 @@ if len(sys.argv) == 1:
         vertices = "-s " + str(verticesNumber)
         arcs = "--arcSize " + str(arcsNumber)
         operations = "-o " + str(operationsNumber)
-        timeOut = "-t " + str(timeOutNumber)
+
         minDepth = "--minDepth " + str(minDepthNumber)
         maxDepth = "--maxDepth " + str(maxDepthNumber)
         withoutPartition = "--withoutPartition " + str(withoutPartitionNumber)
@@ -62,12 +65,13 @@ if len(sys.argv) == 1:
 
 elif len(sys.argv) == 2:
     inputFile = "-i " + sys.argv[1]
-    subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms], shell=True)
+    subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms + " " + timeOut], shell=True)
 
 elif len(sys.argv) == 3:
     inputFile = "-i " + sys.argv[1]
     squashRatio = "-S " + sys.argv[2]
-    subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms + " " + squashRatio], shell=True)
+    subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms + " " + squashRatio + " " + timeOut],\
+                    shell=True)
 
 else:
     print("too many arguments")
