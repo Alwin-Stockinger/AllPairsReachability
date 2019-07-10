@@ -444,47 +444,47 @@ std::vector<DynamicAPReachAlgorithm*> AlgorithmHandler::createPartitionedAlgorit
 
         if(algorithmName == "StaticBFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if(algorithmName == "StaticDFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if( algorithmName == "LazyDFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm,true>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm,true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if( algorithmName == "LazyBFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm,true>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm,true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if( algorithmName == "CachingDFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm,true>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm,true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if( algorithmName == "CachingBFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm,true>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm,true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if( algorithmName == "SimpleInc") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm,true>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm,true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if( algorithmName == "ESTreeML") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML,true>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML,true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if( algorithmName == "OldESTree") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree,true>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree,true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if( algorithmName == "ESTreeQ") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ,true>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ,true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else if( algorithmName == "SimpleESTree") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree,true>, OverlayAlgorithm>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree,true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
         }
         else{
             std::cerr << algorithmName << " not a viable algorithm" << std::endl;
