@@ -31,7 +31,6 @@ if len(sys.argv) == 1:
 
     withoutPartitionNumber = 0
 
-
     multiArcsNumber = 0
     exponentialKNumber = 0
 
@@ -70,7 +69,7 @@ elif len(sys.argv) == 2:
 elif len(sys.argv) == 3:
     inputFile = "-i " + sys.argv[1]
     squashRatio = "-S " + sys.argv[2]
-    subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms + " " + squashRatio + " " + timeOut],\
+    subprocess.call(["./AllPairReach" + " " + inputFile + " " + algorithms + " " + squashRatio + " " + timeOut],
                     shell=True)
 
 else:
