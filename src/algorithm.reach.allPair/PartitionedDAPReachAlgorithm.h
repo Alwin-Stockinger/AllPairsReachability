@@ -31,7 +31,16 @@ public:
     bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
 
     std::string const getBaseName() override {
-        return overlayAlgorithm->getBaseName();
+        DynamicAPReachAlgorithm* subNameAlgorithm = createSubAlgorithm();
+        std::string subName = subNameAlgorithm->getBaseName();
+        delete subNameAlgorithm;
+
+        DynamicAPReachAlgorithm* overlayNameAlgorithm = createOverlayAlgorithm();
+        std::string overlayName = overlayNameAlgorithm->getBaseName();
+        delete overlayNameAlgorithm;
+
+
+        return subName + " (" + overlayName + ")";
     }
 
     void setK(unsigned long long newK){
