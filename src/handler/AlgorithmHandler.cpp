@@ -256,6 +256,9 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
     };
     diGraph->onVertexRemove(algorithm, onVertexRemoved);
 
+    int progress = 0;
+    unsigned long long currentStep = 0ULL;
+
     for (const auto &currentQueries : queries) {
 
         for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
@@ -268,6 +271,12 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
             algorithm->query(startVertex, endVertex);
             auto endQueryTime = std::chrono::high_resolution_clock::now();
             timer.addQueryTime(startQueryTime, endQueryTime);
+        }
+
+        int currentProg = (currentStep++*100) / queries.size();
+        if(progress < currentProg){
+            progress = currentProg;
+            std::cout << progress << "%" <<std::endl;
         }
 
         if(timeOut && timeOut < timer.getAllTime()){
