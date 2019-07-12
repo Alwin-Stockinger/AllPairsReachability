@@ -59,6 +59,9 @@ public:
         partitionFunction = std::move(newPartitionFunction);
     }
 
+    void setRepartitionThreshold(unsigned long long newThreshold){
+        this->repartitionThreshold = newThreshold;
+    }
 
 
 private:
@@ -95,6 +98,9 @@ protected:
 
     unsigned long long k = 2;
     bool initialized = false;
+
+    unsigned long long repartitionThreshold = 0;
+    unsigned long long operationsSinceRepartition = 0;
 };
 
 
