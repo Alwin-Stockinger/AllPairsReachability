@@ -62,6 +62,8 @@ callString += " " + k + " " + algorithms + " " + timeOut \
 if len(sys.argv) == 1:
 
     for i in range(1, 5):
+        arcs = "--arcSize " + str(arcsNumber)
+
         callString += " " + vertices + " " + arcs + " " + operations + " " + queries + " " + inserts + " " + removes
         subprocess.call([callString], shell=True)
 
