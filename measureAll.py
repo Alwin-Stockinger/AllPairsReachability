@@ -71,12 +71,12 @@ if len(sys.argv) == 1:
 
 elif len(sys.argv) == 2:
     inputFile = "-i " + sys.argv[1]
-    subprocess.call([callString + " " + inputFile + " " + timeOut], shell=True)
+    subprocess.call([callString + " " + inputFile], shell=True)
 
 elif len(sys.argv) == 3:
     inputFile = "-i " + sys.argv[1]
     squashRatio = "-S " + sys.argv[2]
-    subprocess.call([callString + inputFile + " " + squashRatio + " " + timeOut],
+    subprocess.call([callString + " " + inputFile + " " + squashRatio],
                     shell=True)
 
 else:
