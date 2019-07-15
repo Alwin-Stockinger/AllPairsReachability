@@ -1,18 +1,18 @@
 import subprocess
 import sys
 
-algorithms = "-A " \
-             "StaticBFS " \
-             "StaticDFS " \
-             "LazyDFS " \
-             "LazyBFS " \
-             "CachingDFS " \
-             "CachingBFS " \
-             "SimpleInc " \
-             "SimpleESTree " \
-             "ESTreeML " \
-             "OldESTree " \
-             "ESTreeQ "
+algorithms = "-A "
+algorithms += "StaticBFS "
+algorithms += "StaticDFS "
+algorithms += "LazyDFS "
+algorithms += "LazyBFS "
+algorithms += "CachingDFS "
+algorithms += "CachingBFS "
+algorithms += "SimpleInc "
+algorithms += "SimpleESTree "
+algorithms += "ESTreeML "
+algorithms += "OldESTree "
+algorithms += "ESTreeQ "
 
 timeOutHours = 0
 timeOutSeconds = 60 * 60 * timeOutHours
