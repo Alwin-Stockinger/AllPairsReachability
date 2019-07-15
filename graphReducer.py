@@ -1,7 +1,7 @@
 file_name = "origGraph"
 new_file_name = "reducedGraph"
 
-reduced_size = 10000
+reduced_size = 50000
 
 with open(file_name, "r") as origFile:
     with open(new_file_name, "w") as newFile:

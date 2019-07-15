@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 
     //for konect files
 
-    double queriesPerDelta = -0.5;
+    double queriesPerDelta = -1; //keep this one, so that always two vertices are there for queries
     app.add_option("-D, --queriesPerDelta", queriesPerDelta,
                    "Queries per delta to generate for konect graphs, negative numbers are relative to delta size");
 
