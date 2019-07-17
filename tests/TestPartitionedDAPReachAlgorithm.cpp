@@ -52,6 +52,7 @@ public:
         mainGraph->addVertex(5, 0);
         mainGraph->addVertex(6, 0);
         mainGraph->addVertex(7, 0);
+        mainGraph->addVertex(8, 0);
         mainGraph->addArc(2,0,0);
         mainGraph->addArc(1,2,0);
         mainGraph->addArc(2,3,0);
@@ -60,6 +61,7 @@ public:
         mainGraph->addArc(7,6,0);
         mainGraph->addArc(6,5,0);
         mainGraph->addArc(5,2,0);
+        mainGraph->addArc(4, 8, 0);
 
         mainGraph->applyNextDelta();
 
@@ -74,6 +76,7 @@ public:
         partitionMap[mainGraph->getCurrentVertexForId(5)]= 2;//graph3->getCurrentVertexForId(5);
         partitionMap[mainGraph->getCurrentVertexForId(6)]= 2;//graph3->getCurrentVertexForId(6);
         partitionMap[mainGraph->getCurrentVertexForId(7)]= 2;
+        partitionMap[mainGraph->getCurrentVertexForId(8)] = 3;
 
 
         algorithm = new PartitionedDAPReachAlgorithmImplementation<T>();
@@ -86,7 +89,7 @@ public:
 
         algorithm->setPartitionFunction([partitionMap] (unsigned long long k, Algora::DiGraph* diGraph){
             return partitionMap;
-        }, 3);
+        }, 4);
 
         algorithm->setGraph(mainGraph->getDiGraph());
 
@@ -348,4 +351,32 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testNewGraph){
     ASSERT_TRUE(this->algorithm -> query(vertex1, vertex2));
 
     this->algorithm->unsetGraph();
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testConnectionViaOtherSubGraph){
+
+    auto* vertex7 = this->mainGraph->getCurrentVertexForId(7);
+
+    auto* vertex8 = this->mainGraph->getCurrentVertexForId(8);
+
+    ASSERT_TRUE(this->algorithm -> query(vertex7, vertex8));
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testConnectionViaOtherSubGraphRemovedThenAdded){
+
+    auto* vertex7 = this->mainGraph->getCurrentVertexForId(7);
+
+    auto* vertex8 = this->mainGraph->getCurrentVertexForId(8);
+
+    ASSERT_TRUE(this->algorithm -> query(vertex7, vertex8));
+
+    this->mainGraph->removeArc(3, 4, 1);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_FALSE(this->algorithm->query(vertex7, vertex8));
+
+    this->mainGraph->addArc(3, 4, 2);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_TRUE(this->algorithm -> query(vertex7, vertex8));
 }

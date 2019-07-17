@@ -206,7 +206,10 @@ void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
     auto* tailGraph = subTail->getParent();
 
     if(headGraph == tailGraph){
-        static_cast<Algora::DiGraph*>(headGraph)->addArc(subTail, subHead);
+        auto* subGraph = dynamic_cast<Algora::DiGraph*>(headGraph);
+        subGraph->addArc(subTail, subHead);
+
+        insertOverlayEdgeArcs(subGraph);
     }
     else{
         auto * overlayHead = mainToOverlayMap[mainHead];
@@ -248,6 +251,8 @@ void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
         auto* subGraph = dynamic_cast<Algora::DiGraph*>(headGraph);
         Algora::Arc* subArc = subGraph->findArc(subTail, subHead);
         subGraph->removeArc(subArc);
+
+        removeOverlayEdgeArcs(subGraph);
     }
     else{
         auto * overlayHead = mainToOverlayMap[mainHead];
@@ -329,6 +334,13 @@ PartitionedDAPReachAlgorithm::partition() {
     });
 
     initAlgorithms(subGraphs);
+
+
+
+    //add arcs that go through subgraphs
+    for( Algora::DiGraph* diGraph : subGraphs){
+        insertOverlayEdgeArcs(diGraph);
+    }
 }
 
 
@@ -341,4 +353,59 @@ void PartitionedDAPReachAlgorithm::onDiGraphSet() {
 
 void PartitionedDAPReachAlgorithm::onDiGraphUnset() {
     DynamicDiGraphAlgorithm::onDiGraphUnset();
+}
+
+
+void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *subGraph){
+    std::set<Algora::Vertex*>& edges = edgeVertices[subGraph];
+
+    for(Algora::Vertex* source : edges){
+        for(Algora::Vertex* destination : edges){
+            if( source != destination){
+
+                DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
+
+                Algora::Vertex* subSource = mainToSubMap[source];
+                Algora::Vertex* subDestination = mainToSubMap[destination];
+
+                //vertices are already in overlay because they are edge vertices!
+                Algora::Vertex* overlaySource = mainToOverlayMap[source];
+                Algora::Vertex* overlayDestination = mainToOverlayMap[destination];
+
+                if(overlayGraph->findArc(overlaySource, overlayDestination)){
+                    continue;
+                }
+                else if(subAlgorithm->query(subSource, subDestination)){
+
+                    overlayGraph->addArc(overlaySource, overlayDestination);
+                }
+            }
+        }
+    }
+}
+
+void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGraph) {
+    std::set<Algora::Vertex*>& edges = edgeVertices[subGraph];
+
+    for(Algora::Vertex* source : edges){
+        for(Algora::Vertex* destination : edges){
+            if( source != destination){
+
+                DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
+
+                Algora::Vertex* subSource = mainToSubMap[source];
+                Algora::Vertex* subDestination = mainToSubMap[destination];
+
+                //vertices are already in overlay because they are edge vertices!
+                Algora::Vertex* overlaySource = mainToOverlayMap[source];
+                Algora::Vertex* overlayDestination = mainToOverlayMap[destination];
+
+                Algora::Arc* overlayArc = overlayGraph->findArc(overlaySource, overlayDestination);
+
+                if(overlayArc && !subAlgorithm->query(subSource, subDestination)){
+                    overlayGraph->removeArc(overlayArc);
+                }
+            }
+        }
+    }
 }
