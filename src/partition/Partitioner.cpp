@@ -21,13 +21,14 @@ Partitioner::handlePartitioning(unsigned long long int k, Algora::DiGraph *graph
     pid_t pid;
 
     std::string kahipName = "kaffpa";
-    std::string preconfig = "--preconfiguration=eco";   //TODO
+    std::string preconfig = "--preconfiguration=eco";
+    std::string seed = "--seed=877";
 
     std::string kahipInputFileName = "k";
     std::string kahipArgInputFileName = "--output_filename=" + kahipInputFileName;
     std::string kahipK = "--k=" + std::to_string(k);
 
-    char* kahipArgv[] = {kahipName.data(), kahipFileName.data(), kahipK.data(), preconfig.data(), kahipArgInputFileName.data(), nullptr};
+    char* kahipArgv[] = {kahipName.data(), kahipFileName.data(), kahipK.data(), seed.data(),preconfig.data(), kahipArgInputFileName.data(), nullptr};
     char* const envp[]={nullptr};
     std::cout << "\n\nStarting Kahip with k=" + std::to_string(k) <<"\n--------------KAHIP OUTPUT----------------"<< std::endl;
     int kahipStatus = posix_spawn(&pid, kahipName.data(), nullptr, nullptr, kahipArgv, envp);
