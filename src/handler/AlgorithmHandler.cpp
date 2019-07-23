@@ -258,8 +258,8 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
 
     int progress = 0;
     unsigned long long currentStep = 0ULL;
-    unsigned long long nextReport = 1000ULL;
-    unsigned long long reportStep = 1000ULL;
+    unsigned long long nextReport = 10ULL;
+    unsigned long long reportStep = 10ULL;
 
     for (const auto &currentQueries : queries) {
 
@@ -280,10 +280,10 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
         if( ++currentStep > nextReport){
             nextReport += reportStep;
 
-            int currentProg = (currentStep++*100) / queries.size();
+            int currentProg = (currentStep*100) / queries.size();
             if(progress < currentProg){
                 progress = currentProg;
-                std::cout << progress << "%" <<std::endl;
+                std::cout << progress << "% at " << timer.getAllTime() << std::endl;
             }
 
             if(timeOut && timeOut < timer.getAllTime()){
