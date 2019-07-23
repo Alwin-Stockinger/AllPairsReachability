@@ -27,7 +27,7 @@ link_libraries("libAlgoraCore.a")
 add_executable(AllPairReach src/main.cpp ${OBJS} ${CONVERT})
 
 
-if(NOT(CMAKE_BUILD_TYPE STREQUAL "Release"))
+#if(NOT(CMAKE_BUILD_TYPE STREQUAL "Release"))
     #gtest
 
     ADD_SUBDIRECTORY(tests/googletest)
@@ -41,7 +41,7 @@ if(NOT(CMAKE_BUILD_TYPE STREQUAL "Release"))
 
     add_executable(runTests ${OBJS} ${TESTS} ${CONVERT})
     target_link_libraries(runTests  gtest_main)
-endif()
+#endif()
 
 
 
