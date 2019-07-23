@@ -258,6 +258,8 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
 
     int progress = 0;
     unsigned long long currentStep = 0ULL;
+    unsigned long long nextReport = 1000ULL;
+    unsigned long long reportStep = 1000ULL;
 
     for (const auto &currentQueries : queries) {
 
@@ -273,16 +275,22 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
             timer.addQueryTime(startQueryTime, endQueryTime);
         }
 
-        int currentProg = (currentStep++*100) / queries.size();
-        if(progress < currentProg){
-            progress = currentProg;
-            std::cout << progress << "%" <<std::endl;
-        }
 
-        if(timeOut && timeOut < timer.getAllTime()){
-            std::cout << "TIMEOUT" << std::endl;
-            timer.timedOut = true;
-            break;
+
+        if( ++currentStep > nextReport){
+            nextReport += reportStep;
+
+            int currentProg = (currentStep++*100) / queries.size();
+            if(progress < currentProg){
+                progress = currentProg;
+                std::cout << progress << "%" <<std::endl;
+            }
+
+            if(timeOut && timeOut < timer.getAllTime()){
+                std::cout << "TIMEOUT" << std::endl;
+                timer.timedOut = true;
+                break;
+            }
         }
 
         dynGraph.applyNextDelta();
