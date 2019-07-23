@@ -4,6 +4,7 @@
 
 #include "../src/algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
 #include "../src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
+#include "../src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.h"
 
 #include <gtest/gtest.h>
 
@@ -26,7 +27,7 @@ template <typename T>
 class TestPartitionedDAPReachAlgorithm : public testing::Test{
 
 protected:
-    PartitionedDAPReachAlgorithmImplementation<T>* algorithm = nullptr;
+    PartitionedDAPReachAlgorithm* algorithm = nullptr;
 
     Algora::DynamicDiGraph* mainGraph = nullptr;
 
@@ -79,7 +80,7 @@ public:
         partitionMap[mainGraph->getCurrentVertexForId(8)] = 3;
 
 
-        algorithm = new PartitionedDAPReachAlgorithmImplementation<T>();
+        algorithm = new T();
 
 
         /*Algora::FastPropertyMap<unsigned long long> (*partitionFunction) (unsigned long long int, Algora::DiGraph*) = [partitionMap] (unsigned long long k, Algora::DiGraph* diGraph){
@@ -96,7 +97,8 @@ public:
     }
 };
 
-using TestTypes = ::testing::Types<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>, SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>, SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>, SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>;
+
+using TestTypes = ::testing::Types<PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>>;
 TYPED_TEST_SUITE(TestPartitionedDAPReachAlgorithm, TestTypes);
 
 TYPED_TEST(TestPartitionedDAPReachAlgorithm, testSameRegion){

@@ -72,14 +72,16 @@ protected:
     void onDiGraphUnset() override;
 
 
-private:
-    DynamicAPReachAlgorithm* overlayAlgorithm = nullptr;
-    Algora::DiGraph* overlayGraph = nullptr;
-
-    Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;//cannot use FastPropertyMap, because of different graphs???
     Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;
-    Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
-    Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;//cannot use FastPropertyMap, because of different graphs???
+    Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;
+    Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;
+//cannot use FastPropertyMap, because of different graphs???
+Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
+    Algora::DiGraph* overlayGraph = nullptr;
+    DynamicAPReachAlgorithm* overlayAlgorithm = nullptr;
+private:
+
+    //cannot use FastPropertyMap, because of different graphs???
 
 
 
