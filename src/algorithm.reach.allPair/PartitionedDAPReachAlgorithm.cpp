@@ -147,20 +147,26 @@ void PartitionedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
         return;
     }
 
-    Algora::DiGraph* subGraph = nullptr;
+    if(++operationsSinceRepartition > repartitionThreshold){
+        partition();
+    } else {
 
-    //TODO chose smart or random graph
-    for(auto anyVertex : mainToSubMap){
-        if(anyVertex){
-            subGraph = dynamic_cast<Algora::DiGraph*>(anyVertex->getParent());
-            break;
+        Algora::DiGraph *subGraph = nullptr;
+
+        //TODO chose smart or random graph
+        for(auto anyVertex : mainToSubMap){
+            if(anyVertex){
+                subGraph = dynamic_cast<Algora::DiGraph*>(anyVertex->getParent());
+                break;
+            }
         }
+        if(!subGraph){
+            throw std::logic_error("Could not find any non empty graph to insert new Vertex");  //TODO something better (can't use graphToAlgorithm map because graphs are const inside
+        }
+        auto* subVertex = subGraph->addVertex();
+        mainToSubMap[vertex] = subVertex;
+
     }
-    if(!subGraph){
-        throw std::logic_error("Could not find any non empty graph to insert new Vertex");  //TODO something better (can't use graphToAlgorithm map because graphs are const inside
-    }
-    auto* subVertex = subGraph->addVertex();
-    mainToSubMap[vertex] = subVertex;
 
     DynamicDiGraphAlgorithm::onVertexAdd(vertex);
 }
@@ -172,17 +178,22 @@ void PartitionedDAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
         return;
     }
 
-    Algora::Vertex* subVertex = mainToSubMap[vertex];
-    Algora::Vertex* overlayVertex = mainToOverlayMap[vertex];
+    if(++operationsSinceRepartition > repartitionThreshold){
+        partition();
+    } else {
 
-    auto * subGraph = dynamic_cast<Algora::DiGraph*>(subVertex->getParent());
-    subGraph->removeVertex(subVertex);
-    mainToSubMap.resetToDefault(vertex);
+        Algora::Vertex *subVertex = mainToSubMap[vertex];
+        Algora::Vertex *overlayVertex = mainToOverlayMap[vertex];
 
-    if(overlayVertex){
-        overlayGraph->removeVertex(overlayVertex);
-        mainToOverlayMap.resetToDefault(vertex);
-        edgeVertices[subGraph].erase(vertex);
+        auto * subGraph = dynamic_cast<Algora::DiGraph*>(subVertex->getParent());
+        subGraph->removeVertex(subVertex);
+        mainToSubMap.resetToDefault(vertex);
+
+        if(overlayVertex) {
+            overlayGraph->removeVertex(overlayVertex);
+            mainToOverlayMap.resetToDefault(vertex);
+            edgeVertices[subGraph].erase(vertex);
+        }
     }
     DynamicDiGraphAlgorithm::onVertexRemove(vertex);
 }
@@ -196,36 +207,39 @@ void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
 
     DynamicDiGraphAlgorithm::onArcAdd(arc);
 
-    auto* mainHead = arc->getHead();
-    auto* mainTail = arc->getTail();
+    if(++operationsSinceRepartition > repartitionThreshold){
+        partition();
+    } else {
+        auto *mainHead = arc->getHead();
+        auto *mainTail = arc->getTail();
 
-    auto * subHead = mainToSubMap[mainHead];
-    auto * subTail = mainToSubMap[mainTail];
+        auto *subHead = mainToSubMap[mainHead];
+        auto *subTail = mainToSubMap[mainTail];
 
-    auto* headGraph = subHead->getParent();
-    auto* tailGraph = subTail->getParent();
+        auto *headGraph = subHead->getParent();
+        auto *tailGraph = subTail->getParent();
 
-    if(headGraph == tailGraph){
-        auto* subGraph = dynamic_cast<Algora::DiGraph*>(headGraph);
-        subGraph->addArc(subTail, subHead);
+        if (headGraph == tailGraph) {
+            auto *subGraph = dynamic_cast<Algora::DiGraph *>(headGraph);
+            subGraph->addArc(subTail, subHead);
 
-        insertOverlayEdgeArcs(subGraph);
-    }
-    else{
-        auto * overlayHead = mainToOverlayMap[mainHead];
-        auto * overlayTail = mainToOverlayMap[mainTail];
+            insertOverlayEdgeArcs(subGraph);
+        } else {
+            auto *overlayHead = mainToOverlayMap[mainHead];
+            auto *overlayTail = mainToOverlayMap[mainTail];
 
-        if(!overlayHead){
-            overlayHead = overlayGraph->addVertex();
-            mainToOverlayMap[mainHead] = overlayHead;
-            edgeVertices[headGraph].insert(mainHead);
+            if (!overlayHead) {
+                overlayHead = overlayGraph->addVertex();
+                mainToOverlayMap[mainHead] = overlayHead;
+                edgeVertices[headGraph].insert(mainHead);
+            }
+            if (!overlayTail) {
+                overlayTail = overlayGraph->addVertex();
+                mainToOverlayMap[mainTail] = overlayTail;
+                edgeVertices[tailGraph].insert(mainTail);
+            }
+            overlayGraph->addArc(overlayTail, overlayHead);
         }
-        if(!overlayTail){
-            overlayTail = overlayGraph->addVertex();
-            mainToOverlayMap[mainTail] = overlayTail;
-            edgeVertices[tailGraph].insert(mainTail);
-        }
-        overlayGraph->addArc(overlayTail, overlayHead);
     }
 }
 
@@ -238,38 +252,43 @@ void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
 
     DynamicDiGraphAlgorithm::onArcRemove(arc);
 
-    auto * mainHead = arc->getHead();
-    auto * mainTail = arc->getTail();
 
-    auto * subHead = mainToSubMap[mainHead];
-    auto * subTail = mainToSubMap[mainTail];
+    if(++operationsSinceRepartition > repartitionThreshold){
+        partition();
+    } else {
 
-    auto* headGraph = subHead->getParent();
-    auto* tailGraph = subTail->getParent();
+        auto *mainHead = arc->getHead();
+        auto *mainTail = arc->getTail();
 
-    if(headGraph == tailGraph){
-        auto* subGraph = dynamic_cast<Algora::DiGraph*>(headGraph);
-        Algora::Arc* subArc = subGraph->findArc(subTail, subHead);
-        subGraph->removeArc(subArc);
+        auto *subHead = mainToSubMap[mainHead];
+        auto *subTail = mainToSubMap[mainTail];
 
-        removeOverlayEdgeArcs(subGraph);
-    }
-    else{
-        auto * overlayHead = mainToOverlayMap[mainHead];
-        auto * overlayTail = mainToOverlayMap[mainTail];
+        auto *headGraph = subHead->getParent();
+        auto *tailGraph = subTail->getParent();
 
-        Algora::Arc* overlayArc = overlayGraph->findArc(overlayTail, overlayHead);
-        overlayGraph->removeArc(overlayArc);
+        if (headGraph == tailGraph) {
+            auto *subGraph = dynamic_cast<Algora::DiGraph *>(headGraph);
+            Algora::Arc *subArc = subGraph->findArc(subTail, subHead);
+            subGraph->removeArc(subArc);
 
-        if(overlayGraph->isIsolated(overlayHead)){
-            mainToOverlayMap.resetToDefault(mainHead);
-            edgeVertices[headGraph].erase(mainHead);
-            overlayGraph->removeVertex(overlayHead);
-        }
-        if(overlayGraph->isIsolated(overlayTail)){
-            mainToOverlayMap.resetToDefault(mainTail);
-            edgeVertices[tailGraph].erase(mainTail);
-            overlayGraph->removeVertex(overlayTail);
+            removeOverlayEdgeArcs(subGraph);
+        } else {
+            auto *overlayHead = mainToOverlayMap[mainHead];
+            auto *overlayTail = mainToOverlayMap[mainTail];
+
+            Algora::Arc *overlayArc = overlayGraph->findArc(overlayTail, overlayHead);
+            overlayGraph->removeArc(overlayArc);
+
+            if (overlayGraph->isIsolated(overlayHead)) {
+                mainToOverlayMap.resetToDefault(mainHead);
+                edgeVertices[headGraph].erase(mainHead);
+                overlayGraph->removeVertex(overlayHead);
+            }
+            if (overlayGraph->isIsolated(overlayTail)) {
+                mainToOverlayMap.resetToDefault(mainTail);
+                edgeVertices[tailGraph].erase(mainTail);
+                overlayGraph->removeVertex(overlayTail);
+            }
         }
     }
 }
@@ -336,11 +355,12 @@ PartitionedDAPReachAlgorithm::partition() {
     initAlgorithms(subGraphs);
 
 
-
     //add arcs that go through subgraphs
     for( Algora::DiGraph* diGraph : subGraphs){
         insertOverlayEdgeArcs(diGraph);
     }
+
+    operationsSinceRepartition = 0;
 }
 
 

@@ -59,6 +59,12 @@ public:
         partitionFunction = std::move(newPartitionFunction);
     }
 
+    void setRepartitionThreshold(unsigned long long newThreshold){
+        this->repartitionThreshold = newThreshold;
+    }
+
+    void insertOverlayEdgeArcs(Algora::DiGraph *subGraph);
+    void removeOverlayEdgeArcs(Algora::DiGraph *subGraph);
 
 
 private:
@@ -81,8 +87,6 @@ Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
     DynamicAPReachAlgorithm* overlayAlgorithm = nullptr;
 private:
 
-    //cannot use FastPropertyMap, because of different graphs???
-
 
 
     void deleteOldPartition();
@@ -98,8 +102,8 @@ protected:
     unsigned long long k = 2;
     bool initialized = false;
 
-    void insertOverlayEdgeArcs(Algora::DiGraph *subGraph);
-    void removeOverlayEdgeArcs(Algora::DiGraph *subGraph);
+    unsigned long long repartitionThreshold = 0;
+    unsigned long long operationsSinceRepartition = 0;
 };
 
 
