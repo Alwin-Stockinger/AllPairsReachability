@@ -256,13 +256,14 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
     };
     diGraph->onVertexRemove(algorithm, onVertexRemoved);
 
-    int progress = 0;
+    short progress = 0;
     unsigned long long currentStep = 0ULL;
     unsigned long long nextReport = 0ULL;
-    unsigned long long reportStep = 5ULL;
+    unsigned long long reportStep = 1ULL;
 
     for (const auto &currentQueries : queries) {
 
+        auto queriesStart = std::chrono::high_resolution_clock::now();
         for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
 
             auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
@@ -274,10 +275,14 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
             auto endQueryTime = std::chrono::high_resolution_clock::now();
             timer.addQueryTime(startQueryTime, endQueryTime);
         }
+        auto queriesEnd = std::chrono::high_resolution_clock::now();
+
+        std::cout   << "Queries: "
+                    << std::chrono::duration_cast<std::chrono::nanoseconds>(queriesEnd - queriesStart).count()
+                    << std::endl;
 
 
-
-        if( currentStep++ > nextReport){
+        if( ++currentStep > nextReport){
             nextReport += reportStep;
 
             int currentProg = (currentStep*100) / queries.size();
@@ -293,7 +298,13 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
             }
         }
 
+        auto deltaStart = std::chrono::high_resolution_clock::now();
         dynGraph.applyNextDelta();
+        auto deltaEnd = std::chrono::high_resolution_clock::now();
+
+        std::cout   << "Delta: "
+                    << std::chrono::duration_cast<std::chrono::nanoseconds>(deltaEnd - deltaStart).count()
+                    << std::endl;
     }
 
     algorithm->unsetGraph();
@@ -308,7 +319,8 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
     //reset to initial graph
     dynGraph.resetToBigBang();
     dynGraph.applyNextDelta();
-    //Fix for very strange Algora Bug that doesn't always happen
+
+    //Fix for very strange bug that doesn't always happen
     dynGraph.resetToBigBang();
     dynGraph.applyNextDelta();
 

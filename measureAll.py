@@ -53,7 +53,7 @@ queries = "-q " + str(queriesNumber)
 inserts = "-a " + str(insertsNumber)
 removes = "-r " + str(removalNumber)
 
-callString = "./AllPairReach"
+callString = "nice -n -20 ./AllPairReach"
 
 callString += " " + k + " " + algorithms + " " + timeOut \
               + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs \
