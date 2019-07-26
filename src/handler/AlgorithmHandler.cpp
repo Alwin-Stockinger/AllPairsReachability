@@ -68,31 +68,31 @@ struct AlgorithmHandler::TimeCollector {
         removeArcTimes.push_back(duration);
     }
 
-    const double getAvgQueryTime(){
+    double getAvgQueryTime(){
         return getAvg(queryTimes);
     }
 
-    const double getAvgAddArcTime(){
+    double getAvgAddArcTime(){
         return getAvg(addArcTimes);
     }
 
-    const double getAvgRemoveArcTime(){
+    double getAvgRemoveArcTime(){
         return getAvg(removeArcTimes);
     }
 
-    const unsigned long long getQueryTime(){
+    unsigned long long getQueryTime(){
         return std::accumulate(queryTimes.begin(), queryTimes.end(), 0ULL);
     }
 
-    const unsigned long long getAddArcTime(){
+    unsigned long long getAddArcTime(){
         return std::accumulate(addArcTimes.begin(), addArcTimes.end(), 0ULL);
     }
 
-    const unsigned long long getRemoveArcTime(){
+    unsigned long long getRemoveArcTime(){
         return std::accumulate(removeArcTimes.begin(), removeArcTimes.end(), 0ULL);
     }
 
-    const unsigned long long getAllTime(){
+    unsigned long long getAllTime(){
         return getQueryTime() + getAddArcTime() + getRemoveArcTime() + initTime;
     }
 
@@ -223,7 +223,7 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
     algorithm->run();
     auto endTime = HRC::now();
     timer.addInitTime(startTime, endTime);
-
+    std::cout << "Initialized in " << timer.initTime << "ns" << std::endl;
     std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
 
     timer.algorithmName = algorithm->getBaseName();

@@ -44,6 +44,10 @@ public:
         return name;
     }
 
+    void onArcAdd(Algora::Arc *arc) override;
+
+    void onArcRemove(Algora::Arc *arc) override;
+
 protected:
 
     // DynamicDiGraphAlgorithm interface
@@ -54,7 +58,7 @@ protected:
     // DiGraphAlgorithm interface
     void onDiGraphSet() override {
         DynamicAPReachAlgorithm::onDiGraphSet();
-        init();
+        initialized = false;
     };
 
     void onDiGraphUnset() override {
@@ -75,6 +79,8 @@ private:
     virtual void addVertexToMap(Algora::Vertex *vertex);
 
     virtual void deleteAllAlgorithms();
+
+    bool initialized = false;
 
 };
 

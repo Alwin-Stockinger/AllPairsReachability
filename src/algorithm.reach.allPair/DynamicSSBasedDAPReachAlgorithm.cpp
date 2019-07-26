@@ -20,33 +20,81 @@
 
 template<bool immediateInit>
 bool DynamicSSBasedDAPReachAlgorithm<immediateInit>::query(Algora::Vertex *start, const Algora::Vertex *end) {
+    if(!initialized){
+        run();
+    }
     return vertexMap[start]->query(end);
 }
 
 template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::run() {
+    if(!initialized){
+        init();
+    }
     for (auto &&algorithm : vertexMap) {
         algorithm->run();
     }
+
+    initialized = true;
 }
 
 template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onVertexAdd(Algora::Vertex *vertex) {
-    DynamicDiGraphAlgorithm::onVertexAdd(vertex);
+    if(initialized){
+        DynamicDiGraphAlgorithm::onVertexAdd(vertex);
 
-    addVertexToMap(vertex);
+        for(auto* algorithm: vertexMap){
+            if(algorithm){
+                algorithm->onVertexAdd(vertex);
+            }
+        }
 
-    if(immediateInit){
-        vertexMap[vertex]->run();
+        addVertexToMap(vertex);
+        if(immediateInit){
+            vertexMap[vertex]->run();
+        }
+
     }
 }
 
 template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onVertexRemove(Algora::Vertex *vertex) {
-    DynamicDiGraphAlgorithm::onVertexRemove(vertex);
 
-    delete vertexMap[vertex];
-    vertexMap.resetToDefault(vertex);
+    if(initialized){
+        DynamicDiGraphAlgorithm::onVertexRemove(vertex);
+        delete vertexMap[vertex];
+        vertexMap.resetToDefault(vertex);
+
+        for(auto* algorithm: vertexMap){
+            if(algorithm){
+                algorithm->onVertexRemove(vertex);
+            }
+        }
+    }
+}
+
+template<bool immediateInit>
+void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onArcAdd(Algora::Arc *arc) {
+
+    if(initialized) {
+        DynamicDiGraphAlgorithm::onArcAdd(arc);
+        for(auto* algorithm: vertexMap){
+            if(algorithm){
+                algorithm->onArcAdd(arc);
+            }
+        }
+    }
+}
+
+template<bool immediateInit>
+void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onArcRemove(Algora::Arc *arc) {
+    if(initialized){
+        for(auto* algorithm: vertexMap){
+            if(algorithm){
+                algorithm->onArcRemove(arc);
+            }
+        }
+    }
 }
 
 template<bool immediateInit>
@@ -60,6 +108,9 @@ template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::addVertexToMap(Algora::Vertex *vertex) {
 
     Algora::DynamicSSReachAlgorithm *algorithm = createSSAlgorithm();
+
+    //important for testing, otherwise major work happens outside meassurement
+    algorithm->setAutoUpdate(false);
 
     algorithm->setGraph(diGraph);
     algorithm->setSource(vertex);
@@ -81,6 +132,7 @@ template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::reset() {
     deleteAllAlgorithms();
     vertexMap.resetAll();
+    initialized = false;
 }
 
 template<bool immediateInit>
