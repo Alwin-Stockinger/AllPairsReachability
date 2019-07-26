@@ -223,7 +223,7 @@ void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
             auto *subGraph = dynamic_cast<Algora::DiGraph *>(headGraph);
             subGraph->addArc(subTail, subHead);
 
-            insertOverlayEdgeArcs(subGraph);
+            if ( k > 2) insertOverlayEdgeArcs(subGraph);
         } else {
             auto *overlayHead = mainToOverlayMap[mainHead];
             auto *overlayTail = mainToOverlayMap[mainTail];
@@ -271,7 +271,9 @@ void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
             Algora::Arc *subArc = subGraph->findArc(subTail, subHead);
             subGraph->removeArc(subArc);
 
-            removeOverlayEdgeArcs(subGraph);
+            if( k > 2) {
+                removeOverlayEdgeArcs(subGraph);
+            }
         } else {
             auto *overlayHead = mainToOverlayMap[mainHead];
             auto *overlayTail = mainToOverlayMap[mainTail];
@@ -357,7 +359,7 @@ PartitionedDAPReachAlgorithm::partition() {
 
     //add arcs that go through subgraphs
     for( Algora::DiGraph* diGraph : subGraphs){
-        insertOverlayEdgeArcs(diGraph);
+        if( k > 2) insertOverlayEdgeArcs(diGraph);
     }
 
     operationsSinceRepartition = 0;
