@@ -13,7 +13,7 @@
 #include "property/fastpropertymap.h"
 
 #include "DynamicAPReachAlgorithm.h"
-#include "../partition/Partitioner.h"
+#include "../partition/OldPartitioner.h"
 
 using PartFunc = std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>;
 
