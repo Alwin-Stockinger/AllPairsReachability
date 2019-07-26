@@ -285,7 +285,7 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
         if( ++currentStep > nextReport){
             nextReport += reportStep;
 
-            int currentProg = (currentStep*100) / queries.size();
+            int currentProg = (currentStep*100ULL) / queries.size();
             if(progress < currentProg){
                 progress = currentProg;
                 std::cout << progress << "% at " << timer.getAllTime() << std::endl;
@@ -381,11 +381,14 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
 
         for(unsigned depth = minLevel; depth <= maxLevel; depth++){
 
-            auto* algorithms = createPartitionedAlgorithms(algorithmNames, k, partition, depth);
+            std::vector<DynamicAPReachAlgorithm*>* algorithms;
+
 
             if(overlayNames){
-                auto* overlayAlgorithms = createSpecialOverlayPartitionedAlgorithms(algorithmNames, *overlayNames, k, partition, depth);
-                algorithms->insert(algorithms->end(), overlayAlgorithms->begin(), overlayAlgorithms->end());
+                algorithms = createSpecialOverlayPartitionedAlgorithms(algorithmNames, *overlayNames, k, partition, depth);
+            }
+            else{
+                algorithms = createPartitionedAlgorithms(algorithmNames, k, partition, depth);
             }
 
             for(auto* algorithm: (*algorithms)) {
