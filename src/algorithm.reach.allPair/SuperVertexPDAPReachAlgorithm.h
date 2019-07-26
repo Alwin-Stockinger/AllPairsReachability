@@ -10,8 +10,9 @@
 #include "PartitionedDAPReachAlgorithmImplementation.h"
 
 // PartitionedDAPReachAlgorithmImplementation<SubAlgorithm,OverlayAlgorithm, propagatePartitionFunction >
-template <typename SubAlgorithm, typename OverlayAlgorithm = SubAlgorithm, bool propagatePartitionFunction = true>
-class SuperVertexPDAPReachAlgorithm : public PartitionedDAPReachAlgorithmImplementation<SubAlgorithm,OverlayAlgorithm, propagatePartitionFunction >{
+template<typename SubAlgorithm, typename OverlayAlgorithm = SubAlgorithm, bool propagatePartitionFunction = true>
+class SuperVertexPDAPReachAlgorithm
+        : public PartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm, propagatePartitionFunction> {
 
 public:
 
@@ -43,24 +44,31 @@ public:
 
             //build outgoing super vertex
             for (Algora::Vertex *outVertex : startEdgeVertices) {
+
                 if (startGraphAlgorithm->query(start, this->mainToSubMap[outVertex])) {
+
                     this->overlayGraph->mapOutgoingArcs(this->mainToOverlayMap[outVertex],
-                                                  [this, sourceSuperVertex](Algora::Arc *arc) {
-                                                      this->overlayGraph->addArc(sourceSuperVertex, arc->getHead());
-                                                  });
+                                                        [this, sourceSuperVertex](Algora::Arc *arc) {
+                                                            this->overlayGraph->addArc(sourceSuperVertex,
+                                                                                       arc->getHead());
+                                                        });
                 }
             }
 
             //build incoming super vertex
             for (Algora::Vertex *inVertex : endEdgeVertices) {
+
                 if (endGraphAlgorithm->query(this->mainToSubMap[inVertex], end)) {
+
                     this->overlayGraph->mapIncomingArcs(this->mainToOverlayMap[inVertex],
-                                                  [this, destinationSuperVertex](Algora::Arc *arc) {
-                                                      this->overlayGraph->addArc(arc->getTail(),
-                                                                                 destinationSuperVertex);
-                                                  });
+                                                        [this, destinationSuperVertex](Algora::Arc *arc) {
+                                                            this->overlayGraph->addArc(arc->getTail(),
+                                                                                       destinationSuperVertex);
+                                                        });
                 }
             }
+
+
 
             bool result = this->overlayAlgorithm->query(sourceSuperVertex, destinationSuperVertex);
 

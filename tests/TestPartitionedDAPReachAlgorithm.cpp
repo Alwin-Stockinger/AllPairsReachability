@@ -98,7 +98,7 @@ public:
 };
 
 
-using TestTypes = ::testing::Types<PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>>;
+using TestTypes = ::testing::Types<PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>>;
 TYPED_TEST_SUITE(TestPartitionedDAPReachAlgorithm, TestTypes);
 
 TYPED_TEST(TestPartitionedDAPReachAlgorithm, testSameRegion){
@@ -381,4 +381,31 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testConnectionViaOtherSubGraphRemov
     this->mainGraph->applyNextDelta();
 
     ASSERT_TRUE(this->algorithm -> query(vertex7, vertex8));
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testConnectionViaOtherSubGraphRemovedThenDoubleAddedAndRemoved){
+
+    auto* vertex7 = this->mainGraph->getCurrentVertexForId(7);
+
+    auto* vertex8 = this->mainGraph->getCurrentVertexForId(8);
+
+    ASSERT_TRUE(this->algorithm -> query(vertex7, vertex8));
+
+    this->mainGraph->removeArc(3, 4, 1);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_FALSE(this->algorithm->query(vertex7, vertex8));
+
+    this->mainGraph->addArc(3, 4, 2);
+    this->mainGraph->addArc(3, 4, 2);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_TRUE(this->algorithm -> query(vertex7, vertex8));
+
+
+    this->mainGraph->removeArc(3, 4, 3);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_TRUE(this->algorithm -> query(vertex7, vertex8));
+
 }
