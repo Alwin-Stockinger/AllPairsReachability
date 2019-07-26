@@ -147,7 +147,7 @@ void PartitionedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
         return;
     }
 
-    if(++operationsSinceRepartition > repartitionThreshold){
+    if(repartitionThreshold && ++operationsSinceRepartition > repartitionThreshold){
         partition();
     } else {
 
@@ -178,7 +178,7 @@ void PartitionedDAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
         return;
     }
 
-    if(++operationsSinceRepartition > repartitionThreshold){
+    if(repartitionThreshold && ++operationsSinceRepartition > repartitionThreshold){
         partition();
     } else {
 
@@ -207,7 +207,7 @@ void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
 
     DynamicDiGraphAlgorithm::onArcAdd(arc);
 
-    if(++operationsSinceRepartition > repartitionThreshold){
+    if(repartitionThreshold && ++operationsSinceRepartition > repartitionThreshold){
         partition();
     } else {
         auto *mainHead = arc->getHead();
@@ -253,7 +253,7 @@ void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
     DynamicDiGraphAlgorithm::onArcRemove(arc);
 
 
-    if(++operationsSinceRepartition > repartitionThreshold){
+    if(repartitionThreshold && ++operationsSinceRepartition > repartitionThreshold){
         partition();
     } else {
 
