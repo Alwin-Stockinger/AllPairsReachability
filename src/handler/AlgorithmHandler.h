@@ -23,11 +23,12 @@ public:
 
     void runInterface();
 
-    void runTests(const std::vector<std::string> &algorithmNames, bool exponentialK,
-                  unsigned long long int kMax, unsigned long long int kMin,
-                  unsigned long long int timeOut, bool detailedResults,
-                  unsigned int minLevel, unsigned int maxLevel, bool withoutPartition,
-                  const std::vector<std::string>* overlayNames);
+    void runTests(const std::vector<std::string> &algorithmNames, const bool exponentialK,
+                  const unsigned long long int kMax, const unsigned long long int kMin,
+                  const unsigned long long int timeOut, const bool detailedResults,
+                  const unsigned int minLevel, const unsigned int maxLevel, const bool withoutPartition,
+                  const std::vector<std::string> *const overlayNames,
+                  const unsigned long long repartitionThreshold);
 
 private:
     void addArc();
@@ -48,8 +49,9 @@ private:
     std::vector<DynamicAPReachAlgorithm *> *
     createPartitionedAlgorithms(const std::vector<std::string> &algorithmNames,
                                 unsigned long long int k,
-                                const Algora::FastPropertyMap<unsigned long long int>& partitions,
-                                unsigned depth);
+                                const Algora::FastPropertyMap<unsigned long long int> &partitions,
+                                unsigned int depth,
+                                unsigned long long repartitionThreshold = 0);
 
     template<typename SubAlgorithm, typename OverlayAlgorithm = SubAlgorithm>
     PartitionedDAPReachAlgorithm *createPartitionAlgorithm(unsigned depth = 0U);
@@ -58,14 +60,15 @@ private:
                                                                                        const std::vector<std::string> &overlayNames,
                                                                                         unsigned long long int k,
                                                                                         const Algora::FastPropertyMap<unsigned long long int>& partitions,
-                                                                                        unsigned depth);
+                                                                                        unsigned depth, unsigned long long repartitionThreshold);
 
     template<typename OverlayAlgorithm>
-    std::vector<DynamicAPReachAlgorithm*> createPartitionedAlgorithmForOverlay(
-            const std::vector<std::string> &algorithmNames,
-            unsigned long long int k,
-            const Algora::FastPropertyMap<unsigned long long int>& partitions,
-            unsigned depth = 0U);
+    std::vector<DynamicAPReachAlgorithm *>
+    createPartitionedAlgorithmForOverlay(const std::vector<std::string> &algorithmNames,
+                                         const unsigned long long int k,
+                                         const Algora::FastPropertyMap<unsigned long long int> &partitions,
+                                         const unsigned depth,
+                                         const unsigned long long repartitionThreshold);
 
     static void writeDetailedResults(const TimeCollector& collector);
 

@@ -88,9 +88,11 @@ int main(int argc, char *argv[]) {
     bool detailedResults = false;
     app.add_option("--detailed", detailedResults, "Also write detailed Results");
 
-    unsigned long long timeOut = 0;
+    unsigned long long timeOut = 0ULL;
     app.add_option("-t, --timeOut", timeOut, "Time out time for algorithms");
 
+    unsigned long long repartitionThreshold = 0ULL;
+    app.add_option("--repartition", repartitionThreshold, "Amount of operations until algorithms are repartitioned");
 
     //for konect files
 
@@ -157,7 +159,8 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth, withoutPartition, overlayAlgorithmNames);
+        handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth,
+                         withoutPartition, overlayAlgorithmNames, repartitionThreshold);
     }
     else{
         handler.runInterface();

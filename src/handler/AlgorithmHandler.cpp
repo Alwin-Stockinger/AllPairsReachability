@@ -333,7 +333,9 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
                            const unsigned long long int kMax = 2ULL, const unsigned long long int kMin = 2ULL,
                            const unsigned long long int timeOut = 0ULL, const bool detailedResults = false,
                            const unsigned int minLevel = 0U, const unsigned int maxLevel = 0U,
-                           const bool withoutPartition = false, const std::vector<std::string>* const overlayNames= nullptr) {
+                           const bool withoutPartition = false,
+                           const std::vector<std::string> *const overlayNames = nullptr,
+                           const unsigned long long repartitionThreshold = 0ULL) {
 
 
 
@@ -385,10 +387,10 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
 
 
             if(overlayNames){
-                algorithms = createSpecialOverlayPartitionedAlgorithms(algorithmNames, *overlayNames, k, NULL, depth);
+                algorithms = createSpecialOverlayPartitionedAlgorithms(algorithmNames, *overlayNames, k, NULL, depth, repartitionThreshold);
             }
             else{
-                algorithms = createPartitionedAlgorithms(algorithmNames, k, NULL, depth);
+                algorithms = createPartitionedAlgorithms(algorithmNames, k, NULL, depth, repartitionThreshold);
             }
 
             for(auto* algorithm: (*algorithms)) {
@@ -455,11 +457,12 @@ void AlgorithmHandler::writeResults(TimeCollector& timer) {
 }
 
 template<typename OverlayAlgorithm>
-std::vector<DynamicAPReachAlgorithm*> AlgorithmHandler::createPartitionedAlgorithmForOverlay(
-        const std::vector<std::string> &algorithmNames,
-        const unsigned long long int k,
-        const Algora::FastPropertyMap<unsigned long long int>& partitions,
-        const unsigned depth) {
+std::vector<DynamicAPReachAlgorithm *>
+AlgorithmHandler::createPartitionedAlgorithmForOverlay(const std::vector<std::string> &algorithmNames,
+                                                       const unsigned long long int k,
+                                                       const Algora::FastPropertyMap<unsigned long long int> &partitions,
+                                                       const unsigned depth,
+                                                       const unsigned long long repartitionThreshold) {
 
     std::vector<DynamicAPReachAlgorithm*> algorithms;
 
@@ -525,6 +528,7 @@ std::vector<DynamicAPReachAlgorithm*> AlgorithmHandler::createPartitionedAlgorit
         }
         //algorithm->setPartitionFunction(partitionFunction, k);
         algorithm->setK(k);
+        algorithm->setRepartitionThreshold(repartitionThreshold);
         algorithms.push_back(algorithm);
     }
     return algorithms;
@@ -534,7 +538,7 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createSpecialOverlayP
         const std::vector<std::string> &algorithmNames, const std::vector<std::string> &overlayNames,
         unsigned long long int k,
         const Algora::FastPropertyMap<unsigned long long int>& partitions,
-        unsigned depth = 0U){
+        unsigned depth = 0U, const unsigned long long repartitionThreshold = 0ULL){
 
     auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
 
@@ -544,47 +548,54 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createSpecialOverlayP
 
         if(overlayName == "StaticBFS") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::StaticBFSSSReachAlgorithm>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::StaticBFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                            partitions, depth, repartitionThreshold);
         }
         else if(overlayName == "StaticDFS") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::StaticDFSSSReachAlgorithm>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::StaticDFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                            partitions, depth, repartitionThreshold);
         }
         else if( overlayName == "LazyDFS") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::LazyDFSSSReachAlgorithm>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::LazyDFSSSReachAlgorithm>(algorithmNames, k, partitions,
+                                                                                          depth, repartitionThreshold);
         }
         else if( overlayName == "LazyBFS") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::LazyBFSSSReachAlgorithm>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::LazyBFSSSReachAlgorithm>(algorithmNames, k, partitions,
+                                                                                          depth, repartitionThreshold);
         }
         else if( overlayName == "CachingDFS") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::CachingDFSSSReachAlgorithm>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::CachingDFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                             partitions, depth, repartitionThreshold);
         }
         else if( overlayName == "CachingBFS") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::CachingBFSSSReachAlgorithm>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::CachingBFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                             partitions, depth, repartitionThreshold);
         }
         else if( overlayName == "SimpleInc") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::SimpleIncSSReachAlgorithm>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::SimpleIncSSReachAlgorithm>(algorithmNames, k,
+                                                                                            partitions, depth, repartitionThreshold);
         }
         else if( overlayName == "ESTreeML") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::ESTreeML>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::ESTreeML>(algorithmNames, k, partitions, depth, repartitionThreshold);
         }
         else if( overlayName == "OldESTree") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::OldESTree>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::OldESTree>(algorithmNames, k, partitions, depth, repartitionThreshold);
         }
         else if( overlayName == "ESTreeQ") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::ESTreeQ>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::ESTreeQ>(algorithmNames, k, partitions, depth, repartitionThreshold);
         }
         else if( overlayName == "SimpleESTree") {
             overlayAlgorithms =
-                    createPartitionedAlgorithmForOverlay<Algora::SimpleESTree>(algorithmNames, k, partitions, depth);
+                    createPartitionedAlgorithmForOverlay<Algora::SimpleESTree>(algorithmNames, k, partitions, depth, repartitionThreshold);
         }
         else{
             std::cerr << overlayName << " not a viable algorithm" << std::endl;
@@ -601,8 +612,9 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createSpecialOverlayP
 std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgorithms(
         const std::vector<std::string> &algorithmNames,
         const unsigned long long int k,
-        const Algora::FastPropertyMap<unsigned long long int>& partitions,
-        const unsigned depth = 0U) {
+        const Algora::FastPropertyMap<unsigned long long int> &partitions,
+        const unsigned int depth = 0U,
+        const unsigned long long repartitionThreshold) {
 
     auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
 
@@ -667,6 +679,7 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgo
         }
         //algorithm->setPartitionFunction(partitionFunction, k);
         algorithm->setK(k);
+        algorithm->setRepartitionThreshold(repartitionThreshold);
         algorithms->push_back(algorithm);
     }
     return algorithms;
