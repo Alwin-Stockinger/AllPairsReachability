@@ -21,7 +21,7 @@ Partitioner::handlePartitioning(unsigned long long int k, Algora::DiGraph *graph
     pid_t pid;
 
     std::string kahipName = "kaffpa";
-    std::string preconfig = "--preconfiguration=eco";
+    std::string preconfig = "--preconfiguration=ecosocial";
     std::string seed = "--seed=877";
 
     std::string kahipInputFileName = "k";
