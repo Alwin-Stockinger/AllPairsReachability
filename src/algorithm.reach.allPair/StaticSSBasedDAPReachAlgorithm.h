@@ -14,9 +14,9 @@ class StaticSSBasedDAPReachAlgorithm : public SSBasedDAPReachAlgorithm{
 public:
     void run() override;
 
-    std::string getName() const noexcept override;
+    [[nodiscard]] std::string getName() const noexcept override;
 
-    std::string getShortName() const noexcept override;
+    [[nodiscard]] std::string getShortName() const noexcept override;
 
     void onDiGraphSet() override;
 

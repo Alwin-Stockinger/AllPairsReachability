@@ -54,11 +54,13 @@ public:
 
     void setPartitionFunction(PartFunc newPartitionFunction,
                               unsigned long long newK){
-        k = newK;
-        partitionFunction = std::move(newPartitionFunction);
+        setK(newK);
+        setPartitionFunction(std::move(newPartitionFunction));
     }
     void setPartitionFunction(PartFunc newPartitionFunction){
         partitionFunction = std::move(newPartitionFunction);
+
+        initialized = false;
     }
 
     void setRepartitionThreshold(unsigned long long newThreshold){
