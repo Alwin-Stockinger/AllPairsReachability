@@ -40,6 +40,8 @@ public:
 
     void setK(unsigned long long newK){
         this->k = newK;
+
+        initialized = false;
     }
 
     void onArcAdd(Algora::Arc *arc) override;
