@@ -17,7 +17,7 @@ public:
 
     virtual bool query(Algora::Vertex *start, const Algora::Vertex *end) = 0;
 
-    virtual std::string const getBaseName() = 0;
+    virtual const std::string getBaseName() = 0;
 
 };
 

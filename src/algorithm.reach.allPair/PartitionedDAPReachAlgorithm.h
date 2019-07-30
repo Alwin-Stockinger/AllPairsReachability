@@ -24,20 +24,6 @@ public:
 
     void run() override;
 
-    std::string getName() const noexcept override;
-
-    std::string getShortName() const noexcept override;
-
-    bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
-
-    std::string const getBaseName() override {
-
-        std::string subName = graphToAlgorithmMap.begin()->second->getBaseName();
-        std::string overlayName = overlayAlgorithm->getBaseName();
-
-        return subName + " (" + overlayName + ")";
-    }
-
     void setK(unsigned long long newK){
         this->k = newK;
 
@@ -82,24 +68,26 @@ protected:
     void onDiGraphUnset() override;
 
 
-    Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;
+
     Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;
     Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;
-//cannot use FastPropertyMap, because of different graphs???
-Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
+    //cannot use FastPropertyMap, because of different graphs???
+    Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;
+    Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
     Algora::DiGraph* overlayGraph = nullptr;
-    DynamicAPReachAlgorithm* overlayAlgorithm = nullptr;
+
 private:
 
 
 
     void deleteOldPartition();
 
-    void partition ();
+
 
 protected:
+    void partition ();
+
     virtual DynamicAPReachAlgorithm* createSubAlgorithm() = 0;
-    virtual DynamicAPReachAlgorithm* createOverlayAlgorithm() = 0;
 
     PartFunc partitionFunction = Partitioner::handlePartitioning;
 

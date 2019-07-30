@@ -7,77 +7,67 @@
 
 
 #include "PartitionedDAPReachAlgorithm.h"
-#include "PartitionedDAPReachAlgorithmImplementation.h"
+#include "SimplePartitionedDAPReachAlgorithmImplementation.h"
 
-// PartitionedDAPReachAlgorithmImplementation<SubAlgorithm,OverlayAlgorithm, propagatePartitionFunction >
-template<typename SubAlgorithm, typename OverlayAlgorithm = SubAlgorithm, bool propagatePartitionFunction = true>
+
 class SuperVertexPDAPReachAlgorithm
-        : public PartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm, propagatePartitionFunction> {
+        : public PartitionedDAPReachAlgorithm {
 
 public:
-
-    bool query(Algora::Vertex *start, const Algora::Vertex *end) override {
-
-        if (!this->initialized) {
-            this->run();
+    void run() override {
+        if(initialized){
+            return;
         }
 
-        start = this->mainToSubMap[start];
-        end = this->mainToSubMap[end];
+        resetSuperStructure();
 
-        //select subgraphs
-        auto *startGraph = start->getParent();
-        auto *endGraph = end->getParent();
+        partition();
 
-        //same subgraph? then normal Algorithm
-        if (startGraph == endGraph) {
-            return this->graphToAlgorithmMap[startGraph]->query(start, end);
-        } else {
-            DynamicAPReachAlgorithm *startGraphAlgorithm = this->graphToAlgorithmMap[startGraph];
-            DynamicAPReachAlgorithm *endGraphAlgorithm = this->graphToAlgorithmMap[endGraph];
+        for(const auto &[_,algorithm] : graphToAlgorithmMap){
+            algorithm -> run();
 
-            std::set<Algora::Vertex *> &startEdgeVertices = this->edgeVertices[startGraph];
-            std::set<Algora::Vertex *> &endEdgeVertices = this->edgeVertices[endGraph];
-
-            Algora::Vertex *sourceSuperVertex = this->overlayGraph->addVertex();
-            Algora::Vertex *destinationSuperVertex = this->overlayGraph->addVertex();
-
-            //build outgoing super vertex
-            for (Algora::Vertex *outVertex : startEdgeVertices) {
-
-                if (startGraphAlgorithm->query(start, this->mainToSubMap[outVertex])) {
-
-                    this->overlayGraph->mapOutgoingArcs(this->mainToOverlayMap[outVertex],
-                                                        [this, sourceSuperVertex](Algora::Arc *arc) {
-                                                            this->overlayGraph->addArc(sourceSuperVertex,
-                                                                                       arc->getHead());
-                                                        });
-                }
-            }
-
-            //build incoming super vertex
-            for (Algora::Vertex *inVertex : endEdgeVertices) {
-
-                if (endGraphAlgorithm->query(this->mainToSubMap[inVertex], end)) {
-
-                    this->overlayGraph->mapIncomingArcs(this->mainToOverlayMap[inVertex],
-                                                        [this, destinationSuperVertex](Algora::Arc *arc) {
-                                                            this->overlayGraph->addArc(arc->getTail(),
-                                                                                       destinationSuperVertex);
-                                                        });
-                }
-            }
-
-
-
-            bool result = this->overlayAlgorithm->query(sourceSuperVertex, destinationSuperVertex);
-
-            this->overlayGraph->removeVertex(sourceSuperVertex);
-            this->overlayGraph->removeVertex(destinationSuperVertex);
-
-            return result;
+            (void)(_);  //unused warning
         }
+
+        generateSuperVertices();
+        generateOverlayAlgorithms();
+
+        registerOnOverlay();
+
+        initialized = true;
     }
+
+    bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
+
+
+    ~SuperVertexPDAPReachAlgorithm() override;
+
+    Algora::PropertyMap<Algora::Vertex*> sourceSuperVertices;
+    Algora::PropertyMap<Algora::Vertex*> destinationSuperVertices;
+    Algora::PropertyMap<Algora::DynamicSSReachAlgorithm*> overlayAlgorithms;
+
+    void onArcAdd(Algora::Arc *arc) override;
+
+    const std::string getBaseName() override;
+
+    std::string getName() const noexcept override;
+
+    std::string getShortName() const noexcept override;
+
+protected:
+    virtual Algora::DynamicSSReachAlgorithm* createOverlayAlgorithm() = 0;
+
+private:
+
+    void registerOnOverlay();
+    void deregisterOnOverlay();
+
+    void generateSuperVertices();
+    void generateOverlayAlgorithms();
+    void resetSuperStructure();
+
+    std::vector<Algora::Vertex*> delayedVertices;
+
 };
 
 

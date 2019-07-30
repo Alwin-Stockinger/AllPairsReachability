@@ -157,7 +157,7 @@ void AlgorithmHandler::reachabilityCheck() {
     std::cout << "End Vertex: ";
     std::cin >> endId;
 
-    Algora::DynamicDiGraph& graph = instanceProvider->getGraph();
+    Algora::DynamicDiGraph* graph = instanceProvider->getGraph();
 
     throw std::runtime_error("not implemented");
     /*for( DynamicAPReachAlgorithm* algorithm : algorithms){
@@ -183,10 +183,10 @@ void AlgorithmHandler::addArc() {
     std::cout << "End Vertex: ";
     std::cin >> endId;
 
-    Algora::DynamicDiGraph& graph = instanceProvider->getGraph();
+    Algora::DynamicDiGraph* graph = instanceProvider->getGraph();
 
-    graph.addArc(startId, endId, graph.getCurrentTime()+1);
-    graph.applyNextDelta();
+    graph->addArc(startId, endId, graph->getCurrentTime()+1);
+    graph->applyNextDelta();
 }
 
 void AlgorithmHandler::removeArc(){
@@ -199,18 +199,18 @@ void AlgorithmHandler::removeArc(){
     std::cout << "End Vertex: ";
     std::cin >> endId;
 
-    Algora::DynamicDiGraph& graph = instanceProvider->getGraph();
+    Algora::DynamicDiGraph* graph = instanceProvider->getGraph();
 
-    graph.removeArc(startId, endId, graph.getCurrentTime()+1);
-    graph.applyNextDelta();
+    graph->removeArc(startId, endId, graph->getCurrentTime()+1);
+    graph->applyNextDelta();
 }
 
 void
 AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &timer, const unsigned long long &timeOut) {
 
-    auto &queries = instanceProvider->getQueries();
-    auto &dynGraph = instanceProvider->getGraph();
-    auto* diGraph = dynGraph.getDiGraph();
+    auto* queries = instanceProvider->getQueries();
+    auto* dynGraph = instanceProvider->getGraph();
+    auto* diGraph = dynGraph->getDiGraph();
 
     //measurement specific
     algorithm->setAutoUpdate(false);
@@ -261,13 +261,13 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
     unsigned long long nextReport = 0ULL;
     unsigned long long reportStep = 1ULL;
 
-    for (const auto &currentQueries : queries) {
+    for (const auto &currentQueries : *queries) {
 
         auto queriesStart = std::chrono::high_resolution_clock::now();
         for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
 
-            auto startVertex = dynGraph.getCurrentVertexForId(currentQueries[j]);
-            auto endVertex = dynGraph.getCurrentVertexForId(currentQueries[j + 1]);
+            auto startVertex = dynGraph->getCurrentVertexForId(currentQueries[j]);
+            auto endVertex = dynGraph->getCurrentVertexForId(currentQueries[j + 1]);
 
 
             auto startQueryTime = std::chrono::high_resolution_clock::now();
@@ -285,7 +285,7 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
         if( ++currentStep > nextReport){
             nextReport += reportStep;
 
-            int currentProg = (currentStep*100ULL) / queries.size();
+            int currentProg = (currentStep*100ULL) / queries->size();
             if(progress < currentProg){
                 progress = currentProg;
                 std::cout << progress << "% at " << timer.getAllTime() << std::endl;
@@ -299,7 +299,7 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
         }
 
         auto deltaStart = std::chrono::high_resolution_clock::now();
-        dynGraph.applyNextDelta();
+        dynGraph->applyNextDelta();
         auto deltaEnd = std::chrono::high_resolution_clock::now();
 
         std::cout   << "Delta: "
@@ -317,12 +317,12 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
 
 
     //reset to initial graph
-    dynGraph.resetToBigBang();
-    dynGraph.applyNextDelta();
+    dynGraph->resetToBigBang();
+    dynGraph->applyNextDelta();
 
     //Fix for very strange bug that doesn't always happen
-    dynGraph.resetToBigBang();
-    dynGraph.applyNextDelta();
+    dynGraph->resetToBigBang();
+    dynGraph->applyNextDelta();
 
     std::cout << "Finished\n";
 
@@ -346,7 +346,7 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
         writeDetailedHeader();
     }
 
-    Algora::DiGraph* diGraph = instanceProvider->getGraph().getDiGraph();
+    Algora::DiGraph* diGraph = instanceProvider->getGraph()->getDiGraph();
 
     //SSBased Algorithm tests
     if(withoutPartition){
@@ -689,7 +689,7 @@ template<typename SubAlgorithm, typename OverlayAlgorithm>
 PartitionedDAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm(const unsigned depth) {
 
     //false to not propagate partition function
-    return new PartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm, false>(depth);
+    return new SimplePartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm, false>(depth);
 }
 
 void AlgorithmHandler::writeDetailedResults(const AlgorithmHandler::TimeCollector& collector) {

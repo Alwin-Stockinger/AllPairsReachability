@@ -5,7 +5,7 @@
 
 #include "converter/GraphFileConverter.h"
 
-#include "algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
+#include "algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h"
 #include "algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
 #include "handler/AlgorithmHandler.h"
 
@@ -146,9 +146,9 @@ int main(int argc, char *argv[]) {
     std::cout << "Generating Algora Graph" << std::endl;
     provider->nextInstance();
 
-    auto& dynGraph = provider->getGraph();
-    dynGraph.resetToBigBang();
-    dynGraph.applyNextDelta();
+    auto* dynGraph = provider->getGraph();
+    dynGraph->resetToBigBang();
+    dynGraph->applyNextDelta();
 
     AlgorithmHandler handler(provider);
 

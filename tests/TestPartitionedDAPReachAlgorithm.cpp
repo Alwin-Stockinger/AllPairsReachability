@@ -2,9 +2,9 @@
 // Created by Alwin Stockinger.
 //
 
-#include "../src/algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
+#include "../src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h"
 #include "../src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
-#include "../src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.h"
+#include "../src/algorithm.reach.allPair/SuperVertexAlgorithmImplementation.h"
 
 #include <gtest/gtest.h>
 
@@ -98,7 +98,7 @@ public:
 };
 
 
-using TestTypes = ::testing::Types<PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>, PartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>, SuperVertexPDAPReachAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>>;
+using TestTypes = ::testing::Types<SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>>, SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>>, SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>>, SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>>, SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>>, SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>>, SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>>, SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>>, SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>>, SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>,Algora::StaticDFSSSReachAlgorithm>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>,Algora::StaticBFSSSReachAlgorithm>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm>,Algora::CachingBFSSSReachAlgorithm>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm>,Algora::CachingDFSSSReachAlgorithm>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm>,Algora::LazyDFSSSReachAlgorithm>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm>,Algora::LazyBFSSSReachAlgorithm>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm>,Algora::SimpleIncSSReachAlgorithm>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ>,Algora::ESTreeQ>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML>,Algora::ESTreeML>, SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree>,Algora::SimpleESTree>>;
 TYPED_TEST_SUITE(TestPartitionedDAPReachAlgorithm, TestTypes);
 
 TYPED_TEST(TestPartitionedDAPReachAlgorithm, testSameRegion){
@@ -408,4 +408,22 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testConnectionViaOtherSubGraphRemov
 
     ASSERT_TRUE(this->algorithm -> query(vertex7, vertex8));
 
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testSuperVertexESProblem){
+
+    auto* vertex7 = this->mainGraph->getCurrentVertexForId(7);
+    auto* vertex1 = this->mainGraph->getCurrentVertexForId(1);
+
+    this->mainGraph->addArc(3,0,1);
+    this->mainGraph->addArc(7,0,1);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_FALSE(this->algorithm->query(vertex7, vertex1));
+
+    auto* vertex2 = this->mainGraph->getCurrentVertexForId(2);
+    auto* vertex3 = this->mainGraph->getCurrentVertexForId(3);
+
+
+    ASSERT_FALSE(this->algorithm->query(vertex3, vertex2));
 }

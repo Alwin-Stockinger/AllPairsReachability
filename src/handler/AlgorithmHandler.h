@@ -13,7 +13,7 @@
 #include "graph.dyn/dynamicdigraph.h"
 
 #include "../algorithm.reach.allPair/DynamicAPReachAlgorithm.h"
-#include "../algorithm.reach.allPair/PartitionedDAPReachAlgorithmImplementation.h"
+#include "../algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h"
 
 
 class AlgorithmHandler {
@@ -65,10 +65,10 @@ private:
     template<typename OverlayAlgorithm>
     std::vector<DynamicAPReachAlgorithm *>
     createPartitionedAlgorithmForOverlay(const std::vector<std::string> &algorithmNames,
-                                         const unsigned long long int k,
+                                         unsigned long long int k,
                                          const Algora::FastPropertyMap<unsigned long long int> &partitions,
-                                         const unsigned depth,
-                                         const unsigned long long repartitionThreshold);
+                                         unsigned depth,
+                                         unsigned long long repartitionThreshold);
 
     static void writeDetailedResults(const TimeCollector& collector);
 
@@ -77,6 +77,16 @@ private:
     void runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &timer, const unsigned long long &timeOut);
 
     static std::vector<DynamicAPReachAlgorithm *>* createAPAlgorithms(const std::vector<std::string> &algorithmNames);
+
+
+private:
+    unsigned long long timeout = 0ULL;
+    unsigned long long repartitionThreshold = 0ULL;
+
+    bool withoutpartition = false;
+
+
+
 };
 
 
