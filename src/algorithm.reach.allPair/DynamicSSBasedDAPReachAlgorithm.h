@@ -37,7 +37,7 @@ public:
     // DynamicAPReachAlgorithm interface
     bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
 
-    std::string const getBaseName() override{
+    std::string getBaseName() override{
         auto* algorithm = createSSAlgorithm();
         std::string name = algorithm->getShortName();
         delete algorithm;

@@ -19,7 +19,7 @@ public:
 
     std::string getShortName() const noexcept override;
 
-    const std::string getBaseName() override  {
+    std::string getBaseName() override  {
 
         std::string subName = graphToAlgorithmMap.begin()->second->getBaseName();
         std::string overlayName = overlayAlgorithm->getBaseName();

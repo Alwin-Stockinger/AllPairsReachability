@@ -28,7 +28,7 @@ public:
 
     bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
 
-    const std::string getBaseName() override;
+    std::string getBaseName() override;
 
 
 private:

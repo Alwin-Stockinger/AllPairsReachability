@@ -40,6 +40,6 @@ bool StaticSSBasedDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::
     return algorithm->query(end);
 }
 
-const std::string StaticSSBasedDAPReachAlgorithm::getBaseName() {
+std::string StaticSSBasedDAPReachAlgorithm::getBaseName() {
     return algorithm->getShortName();
 }

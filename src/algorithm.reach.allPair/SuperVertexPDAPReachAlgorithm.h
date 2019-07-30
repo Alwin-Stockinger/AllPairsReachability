@@ -48,7 +48,7 @@ public:
 
     void onArcAdd(Algora::Arc *arc) override;
 
-    const std::string getBaseName() override;
+    std::string getBaseName() override;
 
     std::string getName() const noexcept override;
 

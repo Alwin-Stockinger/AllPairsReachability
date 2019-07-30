@@ -5,7 +5,9 @@
 #include "SuperVertexPDAPReachAlgorithm.h"
 
 void SuperVertexPDAPReachAlgorithm::generateSuperVertices() {
-    for(auto& [graph,algorithm] : graphToAlgorithmMap){
+    for(auto& [graph,_] : graphToAlgorithmMap){
+        (void)(_);// unused warning
+
         Algora::Vertex* sourceSuperVertex = overlayGraph->addVertex();
         Algora::Vertex* destinationSuperVertex = overlayGraph->addVertex();
 
@@ -37,8 +39,9 @@ void SuperVertexPDAPReachAlgorithm::generateOverlayAlgorithms() {
 
 void SuperVertexPDAPReachAlgorithm::resetSuperStructure() {
 
-    for(auto& [graph, superVertex]: sourceSuperVertices){
+    for(auto& [graph, _]: sourceSuperVertices){
         delete overlayAlgorithms[graph];
+        (void)(_);// unused warning
     }
 
     if(overlayGraph){
@@ -68,8 +71,9 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
     }
     else {
 
-        for(auto& [graph,algorithm] : overlayAlgorithms){
+        for(auto& [_,algorithm] : overlayAlgorithms){
             algorithm->setAutoUpdate(false);
+            (void)(_);// unused warning
         }
 
         DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[startGraph];
@@ -121,8 +125,10 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
         }
 
 
-        for(auto& [graph,algorithm] : overlayAlgorithms){
+        for(auto& [_,algorithm] : overlayAlgorithms){
             algorithm->setAutoUpdate(true);
+
+            (void)(_); //unused warning
         }
 
         return result;
@@ -153,7 +159,7 @@ void SuperVertexPDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
     delayedVertices.clear();
 }
 
-const std::string SuperVertexPDAPReachAlgorithm::getBaseName() {
+std::string SuperVertexPDAPReachAlgorithm::getBaseName() {
 
     std::string subName = graphToAlgorithmMap.begin()->second->getBaseName();
     std::string overlayName = overlayAlgorithms.begin()->second->getShortName();
