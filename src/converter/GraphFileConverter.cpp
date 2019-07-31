@@ -114,34 +114,6 @@ GraphFileConverter::addSubVertices(const std::map<unsigned long long, unsigned l
     }
 }
 
-std::map<const Algora::Vertex *, Algora::Vertex *> *
-GraphFileConverter::makeMainToOverlayMap(const Algora::DynamicDiGraph& mainGraph,const Algora::DynamicDiGraph *overlayGraph) {
-
-    auto* vertexMap = new std::map<const Algora::Vertex*, Algora::Vertex*>;
-
-    for(unsigned i = 0; i < mainGraph.getCurrentGraphSize(); i++){
-        Algora::Vertex* keyVertex = mainGraph.getCurrentVertexForId(i);
-        vertexMap->insert({keyVertex, overlayGraph->getCurrentVertexForId(i)});
-    }
-    return vertexMap;
-}
-
-std::map<const Algora::Vertex *, Algora::Vertex *> *
-GraphFileConverter::makeInMap(Algora::DynamicDiGraph *overlayGraph, std::vector<Algora::DynamicDiGraph *> *subGraphs,
-                              std::map<unsigned long long int, unsigned long long int> partitionMap) {
-    auto* vertexMap = new std::map<const Algora::Vertex*, Algora::Vertex*>();
-
-    for(unsigned i = 0; i < overlayGraph->getCurrentGraphSize(); i++){
-        Algora::DynamicDiGraph* subGraph = subGraphs->at(partitionMap[i]);
-        Algora::Vertex* subVertex = subGraph->getCurrentVertexForId(i);
-        vertexMap->insert({overlayGraph->getCurrentVertexForId(i),subVertex});
-    }
-    return vertexMap;
-}
-
-
-
-
 
 
 

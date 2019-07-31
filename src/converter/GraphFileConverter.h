@@ -33,17 +33,6 @@ public:
 
     static void addSubVertices(const std::map<unsigned long long, unsigned long long> &partitionMap,
                                std::vector<Algora::DynamicDiGraph*> *graphs);
-
-    static std::map<const Algora::Vertex *, Algora::Vertex *> *
-    makeMainToOverlayMap(const Algora::DynamicDiGraph& mainGraph,const Algora::DynamicDiGraph *overlayGraph);
-
-    static std::map<const Algora::Vertex *, Algora::Vertex *> *
-    makeInMap(Algora::DynamicDiGraph *overlayGraph, std::vector<Algora::DynamicDiGraph *> *subGraphs,
-              std::map<unsigned long long int, unsigned long long int> partitionMap);
-
-
-
-
 };
 
 
