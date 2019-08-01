@@ -26,6 +26,8 @@
 #include <algorithm.reach.es/simpleestree.h>
 
 #include "../algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
+#include "../algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.h"
+#include "../algorithm.reach.allPair/SuperVertexAlgorithmImplementation.h"
 
 typedef std::chrono::high_resolution_clock HRC;
 typedef HRC::time_point TimePoint;
@@ -335,7 +337,8 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
                            const unsigned int minLevel = 0U, const unsigned int maxLevel = 0U,
                            const bool withoutPartition = false,
                            const std::vector<std::string> *const overlayNames = nullptr,
-                           const unsigned long long repartitionThreshold = 0ULL) {
+                           const unsigned long long repartitionThreshold = 0ULL, bool normalAlgorithmTests = true,
+                           bool superVertexAlgorithmTests = false) {
 
 
 
@@ -371,48 +374,94 @@ AlgorithmHandler::runTests(const std::vector<std::string> &algorithmNames, const
     }
 
 
+    if(normalAlgorithmTests) {
+        for (unsigned long long k = kMin; k <= kMax; [exponentialK, &k]() {
+            exponentialK ? (k *= 2ULL) : (k++);
+        }()) {
 
-    for(unsigned long long k = kMin; k <= kMax ; [exponentialK, &k](){
-        exponentialK ? (k *= 2ULL) : (k++);
-    }()){
+            //auto parStartTime = HRC::now();
+            /*Algora::FastPropertyMap<unsigned long long> partition
+                = Partitioner::handlePartitioning(k, diGraph);*/
+            //auto parEndTime = HRC::now();
 
-        //auto parStartTime = HRC::now();
-        /*Algora::FastPropertyMap<unsigned long long> partition
-            = Partitioner::handlePartitioning(k, diGraph);*/
-        //auto parEndTime = HRC::now();
+            for (unsigned depth = minLevel; depth <= maxLevel; depth++) {
 
-        for(unsigned depth = minLevel; depth <= maxLevel; depth++){
-
-            std::vector<DynamicAPReachAlgorithm*>* algorithms;
-
-
-            if(overlayNames){
-                algorithms = createSpecialOverlayPartitionedAlgorithms(algorithmNames, *overlayNames, k, NULL, depth, repartitionThreshold);
-            }
-            else{
-                algorithms = createPartitionedAlgorithms(algorithmNames, k, NULL, depth, repartitionThreshold);
-            }
-
-            for(auto* algorithm: (*algorithms)) {
-
-                TimeCollector timer(k, depth);
-
-                runTest(algorithm, timer, timeOut);
-
-                delete algorithm;
+                std::vector<DynamicAPReachAlgorithm *> *algorithms;
 
 
-                writeResults(timer);
-
-                if(detailedResults){
-                    writeDetailedResults(timer);
+                if (overlayNames) {
+                    algorithms = createSpecialOverlayPartitionedAlgorithms(algorithmNames, *overlayNames, k, NULL,
+                                                                           depth, repartitionThreshold);
+                } else {
+                    algorithms = createPartitionedAlgorithms(algorithmNames, k, NULL, depth, repartitionThreshold);
                 }
 
-            }
+                for (auto *algorithm: (*algorithms)) {
 
-            delete algorithms;
+                    TimeCollector timer(k, depth);
+
+                    runTest(algorithm, timer, timeOut);
+
+                    delete algorithm;
+
+
+                    writeResults(timer);
+
+                    if (detailedResults) {
+                        writeDetailedResults(timer);
+                    }
+
+                }
+
+                delete algorithms;
+            }
         }
     }
+
+    if(superVertexAlgorithmTests){
+        for (unsigned long long k = kMin; k <= kMax; [exponentialK, &k]() {
+            exponentialK ? (k *= 2ULL) : (k++);
+        }()) {
+
+            //auto parStartTime = HRC::now();
+            /*Algora::FastPropertyMap<unsigned long long> partition
+                = Partitioner::handlePartitioning(k, diGraph);*/
+            //auto parEndTime = HRC::now();
+
+            for (unsigned depth = minLevel; depth <= maxLevel; depth++) {
+
+                std::vector<DynamicAPReachAlgorithm *> *algorithms;
+
+
+                if (overlayNames) {
+                    algorithms = createSpecialOverlaySuperVertexAlgorithms(algorithmNames, *overlayNames, k,
+                                                                           depth, repartitionThreshold);
+                } else {
+                    algorithms = createSuperVertexAlgorithms(algorithmNames, k, depth, repartitionThreshold);
+                }
+
+                for (auto *algorithm: (*algorithms)) {
+
+                    TimeCollector timer(k, depth);
+
+                    runTest(algorithm, timer, timeOut);
+
+                    delete algorithm;
+
+
+                    writeResults(timer);
+
+                    if (detailedResults) {
+                        writeDetailedResults(timer);
+                    }
+
+                }
+
+                delete algorithms;
+            }
+        }
+    }
+
 }
 
 void AlgorithmHandler::writeHeader(){
@@ -687,9 +736,7 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgo
 
 template<typename SubAlgorithm, typename OverlayAlgorithm>
 PartitionedDAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm(const unsigned depth) {
-
-    //false to not propagate partition function
-    return new SimplePartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm, false>(depth);
+    return new SimplePartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm>(depth);
 }
 
 void AlgorithmHandler::writeDetailedResults(const AlgorithmHandler::TimeCollector& collector) {
@@ -787,6 +834,232 @@ std::vector<DynamicAPReachAlgorithm*>* AlgorithmHandler::createAPAlgorithms(cons
             //TODO throw error
         }
 
+        algorithms->push_back(algorithm);
+    }
+    return algorithms;
+}
+
+std::vector<DynamicAPReachAlgorithm *> *
+AlgorithmHandler::createSpecialOverlaySuperVertexAlgorithms(const std::vector<std::string> &algorithmNames,
+                                                            const std::vector<std::string> overlayNames,
+                                                            unsigned long long int k, unsigned int depth,
+                                                            const unsigned long long int repartitionThreshold) {
+    auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
+
+    for(const std::string& overlayName: overlayNames){
+
+        std::vector<DynamicAPReachAlgorithm*> overlayAlgorithms;
+
+        if(overlayName == "StaticBFS") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::StaticBFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                            depth, repartitionThreshold);
+        }
+        else if(overlayName == "StaticDFS") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::StaticDFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                             depth, repartitionThreshold);
+        }
+        else if( overlayName == "LazyDFS") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::LazyDFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                          depth, repartitionThreshold);
+        }
+        else if( overlayName == "LazyBFS") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::LazyBFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                          depth, repartitionThreshold);
+        }
+        else if( overlayName == "CachingDFS") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::CachingDFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                              depth, repartitionThreshold);
+        }
+        else if( overlayName == "CachingBFS") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::CachingBFSSSReachAlgorithm>(algorithmNames, k,
+                                                                                              depth, repartitionThreshold);
+        }
+        else if( overlayName == "SimpleInc") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::SimpleIncSSReachAlgorithm>(algorithmNames, k,
+                                                                                             depth, repartitionThreshold);
+        }
+        else if( overlayName == "ESTreeML") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::ESTreeML>(algorithmNames, k,  depth, repartitionThreshold);
+        }
+        else if( overlayName == "OldESTree") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::OldESTree>(algorithmNames, k,  depth, repartitionThreshold);
+        }
+        else if( overlayName == "ESTreeQ") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::ESTreeQ>(algorithmNames, k,  depth, repartitionThreshold);
+        }
+        else if( overlayName == "SimpleESTree") {
+            overlayAlgorithms =
+                    createSuperVertexAlgorithmForOverlay<Algora::SimpleESTree>(algorithmNames, k,  depth, repartitionThreshold);
+        }
+        else{
+            std::cerr << overlayName << " not a viable algorithm" << std::endl;
+            //TODO throw error
+        }
+
+        algorithms->insert(algorithms->end(), overlayAlgorithms.begin(), overlayAlgorithms.end());
+    }
+    return algorithms;
+}
+
+template<typename OverlayAlgorithm>
+std::vector<DynamicAPReachAlgorithm *>
+AlgorithmHandler::createSuperVertexAlgorithmForOverlay(const std::vector<std::string> &algorithmNames,
+                                                       const unsigned long long int k,
+                                                       const unsigned depth,
+                                                       const unsigned long long repartitionThreshold) {
+
+    std::vector<DynamicAPReachAlgorithm*> algorithms;
+
+    /*std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>
+            partitionFunction = [partitions] (unsigned long long k, Algora::DiGraph* diGraph){
+
+        return partitions;
+    };*/
+
+
+    for(const std::string& algorithmName: algorithmNames){
+
+        PartitionedDAPReachAlgorithm *algorithm = nullptr;
+
+        if(algorithmName == "StaticBFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>, OverlayAlgorithm>(depth);
+        }
+        else if(algorithmName == "StaticDFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>, OverlayAlgorithm>(depth);
+        }
+        else if( algorithmName == "LazyDFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm,false>, OverlayAlgorithm>(depth);
+        }
+        else if( algorithmName == "LazyBFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm,false>, OverlayAlgorithm>(depth);
+        }
+        else if( algorithmName == "CachingDFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm,false>, OverlayAlgorithm>(depth);
+        }
+        else if( algorithmName == "CachingBFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm,false>, OverlayAlgorithm>(depth);
+        }
+        else if( algorithmName == "SimpleInc") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm,false>, OverlayAlgorithm>(depth);
+        }
+        else if( algorithmName == "ESTreeML") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML,false>, OverlayAlgorithm>(depth);
+        }
+        else if( algorithmName == "OldESTree") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree,false>, OverlayAlgorithm>(depth);
+        }
+        else if( algorithmName == "ESTreeQ") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ,false>, OverlayAlgorithm>(depth);
+        }
+        else if( algorithmName == "SimpleESTree") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree,false>, OverlayAlgorithm>(depth);
+        }
+        else{
+            std::cerr << algorithmName << " not a viable algorithm" << std::endl;
+            continue;
+            //TODO throw error
+        }
+        //algorithm->setPartitionFunction(partitionFunction, k);
+        algorithm->setK(k);
+        algorithm->setRepartitionThreshold(repartitionThreshold);
+        algorithms.push_back(algorithm);
+    }
+    return algorithms;
+}
+
+template<typename SubAlgorithm, typename OverlayAlgorithm>
+PartitionedDAPReachAlgorithm *AlgorithmHandler::createSuperVertexAlgorithm(const unsigned int depth) {
+    return new SuperVertexAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm>(depth);
+}
+
+std::vector<DynamicAPReachAlgorithm *> *
+AlgorithmHandler::createSuperVertexAlgorithms(const std::vector<std::string> &algorithmNames, unsigned long long int k,
+                                              unsigned int depth, const unsigned long long int repartitionThreshold) {
+    auto *algorithms = new std::vector<DynamicAPReachAlgorithm*>;
+
+    /*std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>
+            partitionFunction = [partitions] (unsigned long long k, Algora::DiGraph* diGraph){
+
+                            return partitions;
+            };*/
+
+
+    for(const std::string& algorithmName: algorithmNames){
+
+        PartitionedDAPReachAlgorithm *algorithm = nullptr;
+
+        if(algorithmName == "StaticBFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>,Algora::StaticBFSSSReachAlgorithm>(depth);
+        }
+        else if(algorithmName == "StaticDFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>,Algora::StaticDFSSSReachAlgorithm>(depth);
+        }
+        else if( algorithmName == "LazyDFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyDFSSSReachAlgorithm,true>, Algora::LazyDFSSSReachAlgorithm>(depth);
+        }
+        else if( algorithmName == "LazyBFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::LazyBFSSSReachAlgorithm,true>, Algora::LazyBFSSSReachAlgorithm>(depth);
+        }
+        else if( algorithmName == "CachingDFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingDFSSSReachAlgorithm,true>, Algora::CachingDFSSSReachAlgorithm>(depth);
+        }
+        else if( algorithmName == "CachingBFS") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::CachingBFSSSReachAlgorithm,true>, Algora::CachingBFSSSReachAlgorithm>(depth);
+        }
+        else if( algorithmName == "SimpleInc") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleIncSSReachAlgorithm,true>, Algora::SimpleIncSSReachAlgorithm>(depth);
+        }
+        else if( algorithmName == "ESTreeML") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeML,true>, Algora::ESTreeML>(depth);
+        }
+        else if( algorithmName == "OldESTree") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::OldESTree,true>, Algora::OldESTree>(depth);
+        }
+        else if( algorithmName == "ESTreeQ") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::ESTreeQ,true>, Algora::ESTreeQ>(depth);
+        }
+        else if( algorithmName == "SimpleESTree") {
+            algorithm =
+                    createSuperVertexAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::SimpleESTree,true>, Algora::SimpleESTree>(depth);
+        }
+        else{
+            std::cerr << algorithmName << " not a viable algorithm" << std::endl;
+            //TODO throw error
+        }
+        //algorithm->setPartitionFunction(partitionFunction, k);
+        algorithm->setK(k);
+        algorithm->setRepartitionThreshold(repartitionThreshold);
         algorithms->push_back(algorithm);
     }
     return algorithms;

@@ -329,8 +329,8 @@ void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *subGra
 }
 
 
-//It can't be that there is an Arc between two vertices of the same subgraph in the overlaygraph, but not in the subgraph
-//, since tail and head are in the subgraph, their arc must also be in the subgraph!!!
+//It can't be that there is an Arc between two vertices of the same subgraph in the overlaygraph, but not connection in the subgraph
+//, since tail and head are in the subgraph, their connection must also be in the subgraph!!!
 void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGraph) {
     std::set<Algora::Vertex*>& edges = edgeVertices[subGraph];
 

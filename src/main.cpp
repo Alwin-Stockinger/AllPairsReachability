@@ -45,9 +45,15 @@ int main(int argc, char *argv[]) {
     unsigned maxDepth = 0U;
     app.add_option("--maxDepth", maxDepth, "Maximum depth for partitions");
 
-    bool withoutPartition = false;
-    app.add_option("--withoutPartition", withoutPartition, "Also test not partitioned algorithms");
 
+    bool testWithoutPartition = false;
+    app.add_option("--testWithoutPartition", testWithoutPartition, "Also test not partitioned algorithms");
+
+    bool testPartition = true;
+    app.add_option("--testPartition", testPartition, "Test Normal Partition Algorithms");
+
+    bool testSuperVertex = false;
+    app.add_option("--testSuperVertex", testSuperVertex, "Test Super Vertex Algorithms")
 
     std::vector<std::string> algorithmNames;
     app.add_option("-A, --algorithms", algorithmNames, "Algorithms to use");
@@ -124,6 +130,8 @@ int main(int argc, char *argv[]) {
         randomProvider->setArcAdditionProportion(additionProp);
         randomProvider->setMultiplier(multiplier);
 
+        randomProvider->setSeed(7969758442);    //make sure tests are reproducible
+
         provider = randomProvider;
     }
     else{
@@ -135,11 +143,12 @@ int main(int argc, char *argv[]) {
         bool relative = queriesPerDelta < 0.0;
         konectProvider->generateQueriesAfterEachDelta( relative ? -queriesPerDelta : queriesPerDelta, relative);
 
+        konectProvider->setSeed(183788608);     //make sure tests are reproducible
+
         if(squashOption){
             konectProvider->squash(true);
             konectProvider->squashRatio(squashRatio);
         }
-
         provider = konectProvider;
     }
 
@@ -160,7 +169,7 @@ int main(int argc, char *argv[]) {
 
     if(runPerformanceTests){
         handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth,
-                         withoutPartition, overlayAlgorithmNames, repartitionThreshold);
+                         testWithoutPartition, overlayAlgorithmNames, repartitionThreshold, testPartition, testSuperVertex);
     }
     else{
         handler.runInterface();

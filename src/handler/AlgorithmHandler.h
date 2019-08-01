@@ -28,7 +28,7 @@ public:
                   const unsigned long long int timeOut, const bool detailedResults,
                   const unsigned int minLevel, const unsigned int maxLevel, const bool withoutPartition,
                   const std::vector<std::string> *const overlayNames,
-                  const unsigned long long repartitionThreshold);
+                  const unsigned long long repartitionThreshold, bool normalAlgorithmTests, bool superVertexAlgorithmTests);
 
 private:
     void addArc();
@@ -70,6 +70,14 @@ private:
                                          unsigned depth,
                                          unsigned long long repartitionThreshold);
 
+    template<typename OverlayAlgorithm>
+    std::vector<DynamicAPReachAlgorithm *>
+    createSuperVertexAlgorithmForOverlay(const std::vector<std::string> &algorithmNames,
+                                         unsigned long long int k,
+                                         unsigned depth,
+                                         unsigned long long repartitionThreshold);
+
+
     static void writeDetailedResults(const TimeCollector& collector);
 
     void writeDetailedHeader();
@@ -80,13 +88,18 @@ private:
 
 
 private:
-    unsigned long long timeout = 0ULL;
-    unsigned long long repartitionThreshold = 0ULL;
 
-    bool withoutpartition = false;
+    std::vector<DynamicAPReachAlgorithm *> *
+    createSpecialOverlaySuperVertexAlgorithms(const std::vector<std::string> &algorithmNames,
+                                              const std::vector<std::string> overlayNames, unsigned long long int k,
+                                              unsigned int depth, const unsigned long long int repartitionThreshold);
 
+    template<typename SubAlgorithm, typename OverlayAlgorithm>
+    PartitionedDAPReachAlgorithm *createSuperVertexAlgorithm(const unsigned int depth);
 
-
+    std::vector<DynamicAPReachAlgorithm *> *
+    createSuperVertexAlgorithms(const std::vector<std::string> &algorithmNames, unsigned long long int k, unsigned int depth,
+                                const unsigned long long int repartitionThreshold);
 };
 
 
