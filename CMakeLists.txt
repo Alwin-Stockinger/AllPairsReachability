@@ -20,11 +20,14 @@ set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -mtun
 SET(CONVERT src/converter/GraphFileConverter.cpp src/converter/GraphFileConverter.h )
 
 #src
-SET(OBJS "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/konectnetworkinstanceprovider.o" "../DyReach/build/Release/instanceprovider.o" src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/DynamicSSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicSSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h src/handler/AlgorithmHandler.cpp src/handler/AlgorithmHandler.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h src/generator/RandomDoubleQueryGenerator.cpp src/generator/RandomDoubleQueryGenerator.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.cpp src/algorithm.reach.allPair/StaticSSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/StaticSSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h src/partition/Partitioner.cpp src/partition/Partitioner.h src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.h src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithm.h src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SuperVertexAlgorithmImplementation.h)
+SET(DyReach "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/konectnetworkinstanceprovider.o" "../DyReach/build/Release/instanceprovider.o")
+SET(ALGORITHMS src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/DynamicSSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicSSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h src/partition/Partitioner.h src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.h src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithm.h src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SuperVertexAlgorithmImplementation.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.cpp src/algorithm.reach.allPair/StaticSSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/StaticSSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h)
+SET(HANDLER src/handler/AlgorithmHandler.cpp src/handler/AlgorithmHandler.h)
+SET(PARTITIONER src/partition/Partitioner.h src/partition/Partitioner.cpp)
 
 link_libraries("libAlgoraDyn.a")
 link_libraries("libAlgoraCore.a")
-add_executable(AllPairReach src/main.cpp ${OBJS} ${CONVERT})
+add_executable(AllPairReach src/main.cpp ${HANDLER} ${ALGORITHMS} ${DyReach} ${PARTITIONER})
 
 
 #if(NOT(CMAKE_BUILD_TYPE STREQUAL "Release"))
@@ -39,7 +42,7 @@ add_executable(AllPairReach src/main.cpp ${OBJS} ${CONVERT})
     #unit tests
     SET(TESTS tests/TestDynamicAPReachAlgorithm.cc tests/TestDynamicAPReachAlgorithm.h tests/TestSSBasedDAPReachAlgorithm.cpp tests/TestPartitionedDAPReachAlgorithm.cpp)
 
-    add_executable(runTests ${OBJS} ${TESTS} ${CONVERT})
+    add_executable(runTests ${TESTS} ${ALGORITHMS} ${PARTITIONER})
     target_link_libraries(runTests  gtest_main)
 #endif()
 

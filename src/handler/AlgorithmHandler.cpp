@@ -104,7 +104,7 @@ struct AlgorithmHandler::TimeCollector {
     }
 
 private:
-    static const double getAvg(const std::vector<unsigned long long >& times){
+    static double getAvg(const std::vector<unsigned long long >& times){
         unsigned long long sum = 0ULL;
         for(unsigned long long time : times){
             sum += time;
