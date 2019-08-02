@@ -316,10 +316,8 @@ void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *subGra
                 Algora::Vertex* overlaySource = mainToOverlayMap[source];
                 Algora::Vertex* overlayDestination = mainToOverlayMap[destination];
 
-                if(overlayGraph->findArc(overlaySource, overlayDestination)){
-                    continue;
-                }
-                else if(subAlgorithm->query(subSource, subDestination)){
+
+                if(subAlgorithm->query(subSource, subDestination) && !overlayGraph->findArc(overlaySource, overlayDestination)){
 
                     overlayGraph->addArc(overlaySource, overlayDestination);
                 }
