@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     app.add_option("--testPartition", testPartition, "Test Normal Partition Algorithms");
 
     bool testSuperVertex = false;
-    app.add_option("--testSuperVertex", testSuperVertex, "Test Super Vertex Algorithms")
+    app.add_option("--testSuperVertex", testSuperVertex, "Test Super Vertex Algorithms");
 
     std::vector<std::string> algorithmNames;
     app.add_option("-A, --algorithms", algorithmNames, "Algorithms to use");
