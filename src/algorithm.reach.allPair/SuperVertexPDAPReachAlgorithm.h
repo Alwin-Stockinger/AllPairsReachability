@@ -21,13 +21,7 @@ public:
 
         resetSuperStructure();
 
-        partition();
-
-        for(const auto &[_,algorithm] : graphToAlgorithmMap){
-            algorithm -> run();
-
-            (void)(_);  //unused warning
-        }
+        PartitionedDAPReachAlgorithm::run();
 
         generateSuperVertices();
         generateOverlayAlgorithms();

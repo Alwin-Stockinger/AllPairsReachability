@@ -345,10 +345,14 @@ void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGra
                 Algora::Vertex* overlaySource = mainToOverlayMap[source];
                 Algora::Vertex* overlayDestination = mainToOverlayMap[destination];
 
-                Algora::Arc* overlayArc = overlayGraph->findArc(overlaySource, overlayDestination);
+                ;
 
-                if(overlayArc && !subAlgorithm->query(subSource, subDestination)){
-                    overlayGraph->removeArc(overlayArc);
+                if(!subAlgorithm->query(subSource, subDestination)){
+                    Algora::Arc* overlayArc = overlayGraph->findArc(overlaySource, overlayDestination);
+
+                    if(overlayArc){
+                        overlayGraph->removeArc(overlayArc);
+                    }
                 }
             }
         }
