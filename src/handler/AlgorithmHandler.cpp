@@ -265,7 +265,6 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
 
     for (const auto &currentQueries : *queries) {
 
-        auto queriesStart = std::chrono::high_resolution_clock::now();
         for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
 
             auto startVertex = dynGraph->getCurrentVertexForId(currentQueries[j]);
@@ -277,12 +276,6 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
             auto endQueryTime = std::chrono::high_resolution_clock::now();
             timer.addQueryTime(startQueryTime, endQueryTime);
         }
-        auto queriesEnd = std::chrono::high_resolution_clock::now();
-
-        std::cout   << "Queries: "
-                    << std::chrono::duration_cast<std::chrono::nanoseconds>(queriesEnd - queriesStart).count()
-                    << std::endl;
-
 
         if( ++currentStep > nextReport){
             nextReport += reportStep;
@@ -300,13 +293,7 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
             }
         }
 
-        auto deltaStart = std::chrono::high_resolution_clock::now();
         dynGraph->applyNextDelta();
-        auto deltaEnd = std::chrono::high_resolution_clock::now();
-
-        std::cout   << "Delta: "
-                    << std::chrono::duration_cast<std::chrono::nanoseconds>(deltaEnd - deltaStart).count()
-                    << std::endl;
     }
 
     algorithm->unsetGraph();
