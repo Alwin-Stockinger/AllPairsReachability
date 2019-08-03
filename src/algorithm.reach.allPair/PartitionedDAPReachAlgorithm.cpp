@@ -330,7 +330,7 @@ void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *subGra
 //It can't be that there is an Arc between two vertices of the same subgraph in the overlaygraph, but not connection in the subgraph
 //, since tail and head are in the subgraph, their connection must also be in the subgraph!!!
 void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGraph) {
-    std::set<Algora::Vertex*>& edges = edgeVertices[subGraph];
+    std::set<Algora::Vertex*> edges = edgeVertices.getValue(subGraph);
 
     for(Algora::Vertex* source : edges){
         for(Algora::Vertex* destination : edges){
@@ -349,15 +349,17 @@ void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGra
                     Algora::Arc* overlayArc = overlayGraph->findArc(overlaySource, overlayDestination);
 
                     if(overlayArc){
-                        auto* head = overlayArc->getHead();
-                        auto* tail = overlayArc->getTail();
                         overlayGraph->removeArc(overlayArc);
 
-                        if(overlayGraph->isIsolated(head)){
-                            overlayGraph->removeVertex(head);
+                        if(overlayGraph->isIsolated(overlaySource)){
+                            mainToOverlayMap.resetToDefault(source);
+                            edgeVertices[subGraph].erase(source);
+                            overlayGraph->removeVertex(overlaySource);
                         }
-                        if(overlayGraph->isIsolated(tail)){
-                            overlayGraph->removeVertex(tail);
+                        if(overlayGraph->isIsolated(overlayDestination)){
+                            mainToOverlayMap.resetToDefault(destination);
+                            edgeVertices[subGraph].erase(destination);
+                            overlayGraph->removeVertex(overlayDestination);
                         }
 
                     }

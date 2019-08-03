@@ -44,15 +44,11 @@ bool SimplePartitionedDAPReachAlgorithm::query(Algora::Vertex *start, const Algo
         DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[endGraph];
 
         std::set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
-        std::set<Algora::Vertex *> endEdgeVertices = edgeVertices[endGraph];    //must be copy, otherwise can't erase vertices from set
+        std::set<Algora::Vertex *> endEdgeVertices = edgeVertices.getValue(endGraph);    //must be copy, otherwise can't erase vertices from set
 
-        //find outgoing vertices
+
         for (Algora::Vertex *outVertex : startEdgeVertices) {
 
-            /*if(endEdgeVertices.empty()){ very unlikely to improve algorithm, because there would have to be a connection between every startEdgeVertex and endEdgeVertex, but the connections should be minimized by partitioning
-                //there is not a single endEdgeVertex that has a connection to the end vertex
-                return false;
-            }*/
 
             if (startGraphAlgorithm->query(start, mainToSubMap[outVertex])) {
 
