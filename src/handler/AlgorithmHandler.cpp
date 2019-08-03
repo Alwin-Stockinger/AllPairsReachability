@@ -515,11 +515,11 @@ AlgorithmHandler::createPartitionedAlgorithmForOverlay(const std::vector<std::st
 
         if(algorithmName == "StaticBFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticBFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm, true>>(depth);
         }
         else if(algorithmName == "StaticDFS") {
             algorithm =
-                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm>>(depth);
+                    createPartitionAlgorithm<SSBasedDAPReachAlgorithmImplementation<Algora::StaticDFSSSReachAlgorithm>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm, true>>(depth);
         }
         else if( algorithmName == "LazyDFS") {
             algorithm =
