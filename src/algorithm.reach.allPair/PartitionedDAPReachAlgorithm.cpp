@@ -203,15 +203,14 @@ void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
             Algora::Arc *overlayArc = overlayGraph->findArc(overlayTail, overlayHead);
             overlayGraph->removeArc(overlayArc);
 
-            if (overlayGraph->isIsolated(overlayHead)) {
-                mainToOverlayMap.resetToDefault(mainHead);
-                edgeVertices[headGraph].erase(mainHead);
-                overlayGraph->removeVertex(overlayHead);
+            //check if head can be removed from overlay
+            if(checkIfOverlayIsolated(mainHead)){
+                removeOverlayVertex(mainHead);
             }
-            if (overlayGraph->isIsolated(overlayTail)) {
-                mainToOverlayMap.resetToDefault(mainTail);
-                edgeVertices[tailGraph].erase(mainTail);
-                overlayGraph->removeVertex(overlayTail);
+
+            //check if tail can be removed from overlay
+            if(checkIfOverlayIsolated(mainTail)){
+                removeOverlayVertex(mainTail);
             }
         }
     }
@@ -351,15 +350,15 @@ void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGra
                     if(overlayArc){
                         overlayGraph->removeArc(overlayArc);
 
-                        if(overlayGraph->isIsolated(overlaySource)){
-                            mainToOverlayMap.resetToDefault(source);
-                            edgeVertices[subGraph].erase(source);
-                            overlayGraph->removeVertex(overlaySource);
+
+                        //check if source can be removed from overlay
+                        if(checkIfOverlayIsolated(source)){
+                            removeOverlayVertex(source);
                         }
-                        if(overlayGraph->isIsolated(overlayDestination)){
-                            mainToOverlayMap.resetToDefault(destination);
-                            edgeVertices[subGraph].erase(destination);
-                            overlayGraph->removeVertex(overlayDestination);
+
+                        //check if destination can be removed from overlay
+                        if(checkIfOverlayIsolated(destination)){
+                            removeOverlayVertex(destination);
                         }
 
                     }
@@ -367,4 +366,33 @@ void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGra
             }
         }
     }
+}
+
+bool PartitionedDAPReachAlgorithm::checkIfOverlayIsolated(Algora::Vertex *vertex) {
+
+    bool overlayIsolated = true;
+
+    auto* subGraph = mainToSubMap[vertex]->getParent();
+
+    diGraph->mapOutgoingArcsUntil(vertex, [this, &overlayIsolated, &subGraph] (Algora::Arc* arc){
+        overlayIsolated = edgeVertices[subGraph].count(arc->getHead()) != 0;
+    }, [&overlayIsolated](const Algora::Arc* arc){
+        return !overlayIsolated;
+    });
+    diGraph->mapIncomingArcsUntil(vertex, [this, &overlayIsolated, &subGraph] (Algora::Arc* arc){
+        overlayIsolated = edgeVertices[subGraph].count(arc->getTail()) != 0;
+    }, [&overlayIsolated](const Algora::Arc* arc){
+        return !overlayIsolated;
+    });
+
+    return overlayIsolated;
+}
+
+void PartitionedDAPReachAlgorithm::removeOverlayVertex(Algora::Vertex *vertex) {
+
+    auto* subGraph = mainToSubMap[vertex]->getParent();
+
+    edgeVertices[subGraph].erase(vertex);
+    overlayGraph->removeVertex(mainToOverlayMap[vertex]);
+    mainToOverlayMap.resetToDefault(vertex);
 }

@@ -94,6 +94,7 @@ public:
 
         algorithm->setGraph(mainGraph->getDiGraph());
 
+        algorithm->run();
     }
 };
 
@@ -426,4 +427,24 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testSuperVertexESProblem){
 
 
     ASSERT_FALSE(this->algorithm->query(vertex3, vertex2));
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testOverlayVertexOnSecondRemoved){
+
+    auto* vertex2 = this->mainGraph->getCurrentVertexForId(2);
+    auto* vertex3 = this->mainGraph->getCurrentVertexForId(3);
+    auto* vertex7 = this->mainGraph->getCurrentVertexForId(7);
+
+    this->mainGraph->removeArc(2,3,1);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_FALSE(this->algorithm->query(vertex2, vertex3));
+    ASSERT_TRUE(this->algorithm->query(vertex7, vertex3));
+
+    this->mainGraph->removeArc(7,3,2);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_FALSE(this->algorithm->query(vertex2, vertex3));
+    ASSERT_FALSE(this->algorithm->query(vertex7, vertex3));
+
 }

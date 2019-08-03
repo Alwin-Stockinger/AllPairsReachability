@@ -96,6 +96,12 @@ protected:
 
     unsigned long long repartitionThreshold = 0;
     unsigned long long operationsSinceRepartition = 0;
+
+
+private:
+    bool checkIfOverlayIsolated(Algora::Vertex* vertex);
+
+    void removeOverlayVertex(Algora::Vertex* vertex);
 };
 
 
