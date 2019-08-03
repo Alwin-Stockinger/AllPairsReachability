@@ -43,8 +43,8 @@ bool SimplePartitionedDAPReachAlgorithm::query(Algora::Vertex *start, const Algo
         DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[startGraph];
         DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[endGraph];
 
-        std::set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
-        std::set<Algora::Vertex *> endEdgeVertices = edgeVertices.getValue(endGraph);    //must be copy, otherwise can't erase vertices from set
+        std::unordered_set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
+        std::unordered_set<Algora::Vertex *> endEdgeVertices = edgeVertices.getValue(endGraph);    //must be copy, otherwise can't erase vertices from set
 
 
         for (Algora::Vertex *outVertex : startEdgeVertices) {

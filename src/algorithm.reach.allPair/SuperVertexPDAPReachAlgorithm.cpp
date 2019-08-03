@@ -11,7 +11,7 @@ void SuperVertexPDAPReachAlgorithm::generateSuperVertices() {
         Algora::Vertex* sourceSuperVertex = overlayGraph->addVertex();
         Algora::Vertex* destinationSuperVertex = overlayGraph->addVertex();
 
-        std::set<Algora::Vertex*>& edgeVerticesSet = edgeVertices[graph];
+        std::unordered_set<Algora::Vertex*>& edgeVerticesSet = edgeVertices[graph];
 
         for(Algora::Vertex* edgeVertex : edgeVerticesSet){
             overlayGraph->addArc(sourceSuperVertex, mainToOverlayMap[edgeVertex]);
@@ -85,20 +85,20 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
         Algora::Vertex* sourceSuperVertex = sourceSuperVertices[startGraph];
         Algora::Vertex* destinationSuperVertex = destinationSuperVertices[endGraph];
 
-        std::set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
-        std::set<Algora::Vertex *>& endEdgeVertices = edgeVertices[endGraph];
+        std::unordered_set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
+        std::unordered_set<Algora::Vertex *>& endEdgeVertices = edgeVertices[endGraph];
 
-        std::set<Algora::Vertex*> sourceNotReachable;
-        std::set<Algora::Vertex*> destinationNotReachable;
+        std::vector<Algora::Vertex*> sourceNotReachable;
+        std::vector<Algora::Vertex*> destinationNotReachable;
 
         for (Algora::Vertex *outVertex : startEdgeVertices) {
             if (!startGraphAlgorithm->query(start, mainToSubMap[outVertex])) {
-                sourceNotReachable.insert(mainToOverlayMap[outVertex]);
+                sourceNotReachable.push_back(mainToOverlayMap[outVertex]);
             }
         }
         for(Algora::Vertex* inVertex : endEdgeVertices) {
             if (!endGraphAlgorithm->query(mainToSubMap[inVertex], end)) {
-                destinationNotReachable.insert(mainToOverlayMap[inVertex]);
+                destinationNotReachable.push_back(mainToOverlayMap[inVertex]);
             }
         }
 

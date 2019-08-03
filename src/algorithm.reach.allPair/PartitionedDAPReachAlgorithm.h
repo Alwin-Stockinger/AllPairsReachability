@@ -10,6 +10,7 @@
 #define ALLPAIRREACH_PARTITIONEDDAPREACHALGORITHM_H
 
 #include <property/propertymap.h>
+#include <unordered_set>
 #include "property/fastpropertymap.h"
 
 #include "DynamicAPReachAlgorithm.h"
@@ -70,7 +71,7 @@ protected:
 
 
     Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;
-    Algora::PropertyMap<std::set<Algora::Vertex*>> edgeVertices;
+    Algora::PropertyMap<std::unordered_set<Algora::Vertex*>> edgeVertices;
     //cannot use FastPropertyMap, because of different graphs???
     Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;
     Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
@@ -102,6 +103,8 @@ private:
     bool checkIfOverlayIsolated(Algora::Vertex* vertex);
 
     void removeOverlayVertex(Algora::Vertex* vertex);
+
+    void insertOverlayEdgeArcsOfVertex(Algora::Vertex* vertex);
 };
 
 

@@ -312,6 +312,9 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testAlternativeNewOverlayVertex){
     Algora::Vertex* vertex7 = this->mainGraph -> getCurrentVertexForId(7);
     Algora::Vertex* vertex0 = this->mainGraph -> getCurrentVertexForId(0);
 
+    Algora::Vertex* vertex5 = this->mainGraph->getCurrentVertexForId(5);
+    ASSERT_FALSE(!vertex5);
+
 
     this->mainGraph->removeVertex(5,1);
     this->mainGraph->addVertex(10, 1);
