@@ -102,14 +102,30 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
             }
         }
 
-        for(Algora::Vertex* notReachableVertex : sourceNotReachable){
-            Algora::Arc* arcToRemove = overlayGraph->findArc(sourceSuperVertex, notReachableVertex);
-            overlayGraph->removeArc(arcToRemove);
-        }
+        //cant use always set because have to remove and reinserted arcs have to keep order
+        std::unordered_set<Algora::Vertex*> sourceNotReachableSet( sourceNotReachable.begin(), sourceNotReachable.end());
+        std::unordered_set<Algora::Vertex*> destinationNotReachableSet( destinationNotReachable.begin(), destinationNotReachable.end());
 
-        for(Algora::Vertex* notReachableVertex : destinationNotReachable){
-            Algora::Arc* arcToRemove = overlayGraph->findArc(notReachableVertex, destinationSuperVertex);
-            overlayGraph->removeArc(arcToRemove);
+        std::vector<Algora::Arc*> arcsToRemove;
+
+        overlayGraph->mapOutgoingArcsUntil(sourceSuperVertex,[&sourceNotReachableSet, &arcsToRemove](Algora::Arc* arc){
+            if(sourceNotReachableSet.count(arc->getHead())){
+                arcsToRemove.push_back(arc);
+            }
+        },[&arcsToRemove, &sourceNotReachable](const Algora::Arc* arc){
+            return arcsToRemove.size() == sourceNotReachable.size();
+        });
+
+        overlayGraph->mapIncomingArcsUntil(destinationSuperVertex, [&destinationNotReachableSet, &arcsToRemove](Algora::Arc* arc){
+            if(destinationNotReachableSet.count(arc->getTail())){
+                arcsToRemove.push_back(arc);
+            }
+        }, [&arcsToRemove, &sourceNotReachable, &destinationNotReachable](const Algora::Arc* arc){
+            return arcsToRemove.size() == (destinationNotReachable.size() + sourceNotReachable.size());
+        });
+
+        for(Algora::Arc* arc : arcsToRemove){
+            overlayGraph->removeArc(arc);
         }
 
         bool result = overlayAlgorithm->query(destinationSuperVertex);
