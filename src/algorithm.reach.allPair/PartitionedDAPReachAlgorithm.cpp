@@ -391,12 +391,12 @@ bool PartitionedDAPReachAlgorithm::checkIfOverlayIsolated(Algora::Vertex *vertex
     auto* subGraph = mainToSubMap[vertex]->getParent();
 
     diGraph->mapOutgoingArcsUntil(vertex, [this, &overlayIsolated, &subGraph] (Algora::Arc* arc){
-        overlayIsolated = mainToSubMap[arc->getHead()] == subGraph;
+        overlayIsolated = mainToSubMap[arc->getHead()]->getParent() == subGraph;
     }, [&overlayIsolated](const Algora::Arc* arc){
         return !overlayIsolated;
     });
     diGraph->mapIncomingArcsUntil(vertex, [this, &overlayIsolated, &subGraph] (Algora::Arc* arc){
-        overlayIsolated = mainToSubMap[arc->getTail()] == subGraph;
+        overlayIsolated = mainToSubMap[arc->getTail()]->getParent() == subGraph;
     }, [&overlayIsolated](const Algora::Arc* arc){
         return !overlayIsolated;
     });
