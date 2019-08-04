@@ -309,20 +309,37 @@ void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *subGra
     DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
 
     for(Algora::Vertex* source : edges){
+
+        Algora::Vertex* subSource = mainToSubMap[source];
+        Algora::Vertex* overlaySource = mainToOverlayMap[source];
+
+        std::unordered_set<Algora::Vertex*> newReachableEdges{};
+
         for(Algora::Vertex* destination : edges){
             if( source != destination){
 
-                Algora::Vertex* subSource = mainToSubMap[source];
                 Algora::Vertex* subDestination = mainToSubMap[destination];
 
                 //vertices are already in overlay because they are edge vertices!
-                Algora::Vertex* overlaySource = mainToOverlayMap[source];
+
                 Algora::Vertex* overlayDestination = mainToOverlayMap[destination];
 
-                if(subAlgorithm->query(subSource, subDestination) && !overlayGraph->findArc(overlaySource, overlayDestination)){
-                    overlayGraph->addArc(overlaySource, overlayDestination);
+                if(subAlgorithm->query(subSource, subDestination)){
+                    newReachableEdges.insert(overlayDestination);
                 }
             }
+        }
+
+        overlayGraph->mapOutgoingArcsUntil(overlaySource,[&newReachableEdges](Algora::Arc* arc){
+            if(newReachableEdges.count(arc->getHead())){
+                newReachableEdges.erase(arc->getHead());
+            }
+        }, [&newReachableEdges](const Algora::Arc* arc){
+            return newReachableEdges.empty();
+        });
+
+        for(Algora::Vertex* vertex: newReachableEdges){
+            overlayGraph->addArc(overlaySource, vertex);
         }
     }
 }
@@ -335,40 +352,43 @@ void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGra
     DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
 
     for(Algora::Vertex* source : edges){
-        for(Algora::Vertex* destination : edges){
-            if( source != destination){
+        Algora::Vertex* subSource = mainToSubMap[source];
+        Algora::Vertex* overlaySource = mainToOverlayMap[source];
 
-                Algora::Vertex* subSource = mainToSubMap[source];
-                Algora::Vertex* subDestination = mainToSubMap[destination];
+        //overlay vertices could have been removed from the overlay during the loop, since they could have been removed previously due to being isolated
+        if(!overlaySource) {
+            continue;
+        }
 
+        std::unordered_set<Algora::Vertex*> unreachableVertices;
 
-                Algora::Vertex* overlaySource = mainToOverlayMap[source];
-                Algora::Vertex* overlayDestination = mainToOverlayMap[destination];
+        for(Algora::Vertex* destination : edges) {
+            if (source != destination) {
+
+                Algora::Vertex *subDestination = mainToSubMap[destination];
+                Algora::Vertex *overlayDestination = mainToOverlayMap[destination];
 
                 //overlay vertices could have been removed from the overlay during the loop, since they could have been removed previously due to being isolated
-                if(!overlaySource || !overlayDestination){
+                if (!overlayDestination) {
                     continue;
                 }
-                if(!subAlgorithm->query(subSource, subDestination)){
-                    Algora::Arc* overlayArc = overlayGraph->findArc(overlaySource, overlayDestination);
-
-                    if(overlayArc){
-                        overlayGraph->removeArc(overlayArc);
-
-
-                        //check if source can be removed from overlay
-                        if(checkIfOverlayIsolated(source)){
-                            removeOverlayVertex(source);
-                        }
-
-                        //check if destination can be removed from overlay
-                        if(checkIfOverlayIsolated(destination)){
-                            removeOverlayVertex(destination);
-                        }
-
-                    }
+                if (!subAlgorithm->query(subSource, subDestination)) {
+                    unreachableVertices.insert(overlayDestination);
                 }
             }
+        }
+
+        std::unordered_set<Algora::Arc*> arcsToRemove{};
+        overlayGraph->mapOutgoingArcsUntil(overlaySource, [&unreachableVertices, &arcsToRemove](Algora::Arc* arc){
+            if(unreachableVertices.count(arc->getHead())){
+                arcsToRemove.insert(arc);
+            }
+        },[&unreachableVertices, &arcsToRemove](const Algora::Arc* arc){
+            return unreachableVertices.size() == arcsToRemove.size();
+        });
+
+        for(Algora::Arc* arc : arcsToRemove){
+            overlayGraph->removeArc(arc);
         }
     }
 }
