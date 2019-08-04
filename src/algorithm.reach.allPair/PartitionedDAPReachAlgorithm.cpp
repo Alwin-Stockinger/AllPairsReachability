@@ -304,12 +304,11 @@ void PartitionedDAPReachAlgorithm::onDiGraphUnset() {
 
 void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *subGraph){
     std::unordered_set<Algora::Vertex*>& edges = edgeVertices[subGraph];
+    DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
 
     for(Algora::Vertex* source : edges){
         for(Algora::Vertex* destination : edges){
             if( source != destination){
-
-                DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
 
                 Algora::Vertex* subSource = mainToSubMap[source];
                 Algora::Vertex* subDestination = mainToSubMap[destination];
@@ -318,9 +317,7 @@ void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *subGra
                 Algora::Vertex* overlaySource = mainToOverlayMap[source];
                 Algora::Vertex* overlayDestination = mainToOverlayMap[destination];
 
-
                 if(subAlgorithm->query(subSource, subDestination) && !overlayGraph->findArc(overlaySource, overlayDestination)){
-
                     overlayGraph->addArc(overlaySource, overlayDestination);
                 }
             }
@@ -333,12 +330,11 @@ void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *subGra
 //, since tail and head are in the subgraph, their connection must also be in the subgraph!!!
 void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGraph) {
     std::unordered_set<Algora::Vertex*> edges = edgeVertices.getValue(subGraph);
+    DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
 
     for(Algora::Vertex* source : edges){
         for(Algora::Vertex* destination : edges){
             if( source != destination){
-
-                DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
 
                 Algora::Vertex* subSource = mainToSubMap[source];
                 Algora::Vertex* subDestination = mainToSubMap[destination];

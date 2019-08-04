@@ -31,8 +31,10 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::run() {
     if(!initialized){
         init();
     }
-    for (auto &&algorithm : vertexMap) {
-        algorithm->run();
+    if(immediateInit){
+        for (auto &&algorithm : vertexMap) {
+            algorithm->run();
+        }
     }
 
     initialized = true;
@@ -109,7 +111,7 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::addVertexToMap(Algora::Vert
 
     Algora::DynamicSSReachAlgorithm *algorithm = createSSAlgorithm();
 
-    //important for testing, otherwise major work happens outside meassurement
+    //important for testing, otherwise major work happens outside meassurement when only testing SSBased
     algorithm->setAutoUpdate(false);
 
     algorithm->setGraph(diGraph);
