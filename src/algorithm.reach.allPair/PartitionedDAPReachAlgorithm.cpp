@@ -282,8 +282,10 @@ PartitionedDAPReachAlgorithm::partition() {
 
 
     //add arcs that go through subgraphs
-    for( Algora::DiGraph* diGraph : subGraphs){
-        if( k > 2) insertOverlayEdgeArcs(diGraph);
+    if( k > 2) {
+        for( Algora::DiGraph* diGraph : subGraphs){
+            insertOverlayEdgeArcs(diGraph);
+        }
     }
 
     operationsSinceRepartition = 0;
