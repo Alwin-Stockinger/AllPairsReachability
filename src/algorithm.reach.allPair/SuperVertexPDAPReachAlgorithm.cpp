@@ -67,88 +67,88 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
 
     //same subgraph? then normal Algorithm
     if(startGraph == endGraph){
-        return graphToAlgorithmMap[startGraph] -> query(start, end);
+        if(graphToAlgorithmMap[startGraph] -> query(start, end)){
+            return true;
+        }
     }
-    else {
 
-        for(auto& [_,algorithm] : overlayAlgorithms){
-            algorithm->setAutoUpdate(false);
-            (void)(_);// unused warning
-        }
-
-        DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[startGraph];
-        DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[endGraph];
-
-        Algora::DynamicSSReachAlgorithm* overlayAlgorithm = overlayAlgorithms[startGraph];
-        overlayAlgorithm->setAutoUpdate(true);
-
-        Algora::Vertex* sourceSuperVertex = sourceSuperVertices[startGraph];
-        Algora::Vertex* destinationSuperVertex = destinationSuperVertices[endGraph];
-
-        std::unordered_set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
-        std::unordered_set<Algora::Vertex *>& endEdgeVertices = edgeVertices[endGraph];
-
-        std::vector<Algora::Vertex*> sourceNotReachable;
-        std::vector<Algora::Vertex*> destinationNotReachable;
-
-        for (Algora::Vertex *outVertex : startEdgeVertices) {
-            if (!startGraphAlgorithm->query(start, mainToSubMap[outVertex])) {
-                sourceNotReachable.push_back(mainToOverlayMap[outVertex]);
-            }
-        }
-        for(Algora::Vertex* inVertex : endEdgeVertices) {
-            if (!endGraphAlgorithm->query(mainToSubMap[inVertex], end)) {
-                destinationNotReachable.push_back(mainToOverlayMap[inVertex]);
-            }
-        }
-
-        //cant use always set because have to remove and reinserted arcs have to keep order
-        std::unordered_set<Algora::Vertex*> sourceNotReachableSet( sourceNotReachable.begin(), sourceNotReachable.end());
-        std::unordered_set<Algora::Vertex*> destinationNotReachableSet( destinationNotReachable.begin(), destinationNotReachable.end());
-
-        std::vector<Algora::Arc*> arcsToRemove;
-
-        overlayGraph->mapOutgoingArcsUntil(sourceSuperVertex,[&sourceNotReachableSet, &arcsToRemove](Algora::Arc* arc){
-            if(sourceNotReachableSet.count(arc->getHead())){
-                arcsToRemove.push_back(arc);
-            }
-        },[&arcsToRemove, &sourceNotReachable](const Algora::Arc* arc){
-            return arcsToRemove.size() == sourceNotReachable.size();
-        });
-
-        overlayGraph->mapIncomingArcsUntil(destinationSuperVertex, [&destinationNotReachableSet, &arcsToRemove](Algora::Arc* arc){
-            if(destinationNotReachableSet.count(arc->getTail())){
-                arcsToRemove.push_back(arc);
-            }
-        }, [&arcsToRemove, &sourceNotReachable, &destinationNotReachable](const Algora::Arc* arc){
-            return arcsToRemove.size() == (destinationNotReachable.size() + sourceNotReachable.size());
-        });
-
-        for(Algora::Arc* arc : arcsToRemove){
-            overlayGraph->removeArc(arc);
-        }
-
-        bool result = overlayAlgorithm->query(destinationSuperVertex);
-
-        //restore Arcs, the order is important so that the correct arcs get reused.
-
-        for (auto rit=destinationNotReachable.rbegin(); rit != destinationNotReachable.rend(); ++rit){
-            overlayGraph->addArc(*(rit), destinationSuperVertex);
-        }
-
-        for (auto rit=sourceNotReachable.rbegin(); rit != sourceNotReachable.rend(); ++rit){
-            overlayGraph->addArc(sourceSuperVertex, *(rit));
-        }
-
-
-        for(auto& [_,algorithm] : overlayAlgorithms){
-            algorithm->setAutoUpdate(true);
-
-            (void)(_); //unused warning
-        }
-
-        return result;
+    for(auto& [_,algorithm] : overlayAlgorithms){
+        algorithm->setAutoUpdate(false);
+        (void)(_);// unused warning
     }
+
+    DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[startGraph];
+    DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[endGraph];
+
+    Algora::DynamicSSReachAlgorithm* overlayAlgorithm = overlayAlgorithms[startGraph];
+    overlayAlgorithm->setAutoUpdate(true);
+
+    Algora::Vertex* sourceSuperVertex = sourceSuperVertices[startGraph];
+    Algora::Vertex* destinationSuperVertex = destinationSuperVertices[endGraph];
+
+    std::unordered_set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
+    std::unordered_set<Algora::Vertex *>& endEdgeVertices = edgeVertices[endGraph];
+
+    std::vector<Algora::Vertex*> sourceNotReachable;
+    std::vector<Algora::Vertex*> destinationNotReachable;
+
+    for (Algora::Vertex *outVertex : startEdgeVertices) {
+        if (!startGraphAlgorithm->query(start, mainToSubMap[outVertex])) {
+            sourceNotReachable.push_back(mainToOverlayMap[outVertex]);
+        }
+    }
+    for(Algora::Vertex* inVertex : endEdgeVertices) {
+        if (!endGraphAlgorithm->query(mainToSubMap[inVertex], end)) {
+            destinationNotReachable.push_back(mainToOverlayMap[inVertex]);
+        }
+    }
+
+    //cant use always set because have to remove and reinserted arcs have to keep order
+    std::unordered_set<Algora::Vertex*> sourceNotReachableSet( sourceNotReachable.begin(), sourceNotReachable.end());
+    std::unordered_set<Algora::Vertex*> destinationNotReachableSet( destinationNotReachable.begin(), destinationNotReachable.end());
+
+    std::vector<Algora::Arc*> arcsToRemove;
+
+    overlayGraph->mapOutgoingArcsUntil(sourceSuperVertex,[&sourceNotReachableSet, &arcsToRemove](Algora::Arc* arc){
+        if(sourceNotReachableSet.count(arc->getHead())){
+            arcsToRemove.push_back(arc);
+        }
+    },[&arcsToRemove, &sourceNotReachable](const Algora::Arc* arc){
+        return arcsToRemove.size() == sourceNotReachable.size();
+    });
+
+    overlayGraph->mapIncomingArcsUntil(destinationSuperVertex, [&destinationNotReachableSet, &arcsToRemove](Algora::Arc* arc){
+        if(destinationNotReachableSet.count(arc->getTail())){
+            arcsToRemove.push_back(arc);
+        }
+    }, [&arcsToRemove, &sourceNotReachable, &destinationNotReachable](const Algora::Arc* arc){
+        return arcsToRemove.size() == (destinationNotReachable.size() + sourceNotReachable.size());
+    });
+
+    for(Algora::Arc* arc : arcsToRemove){
+        overlayGraph->removeArc(arc);
+    }
+
+    bool result = overlayAlgorithm->query(destinationSuperVertex);
+
+    //restore Arcs, the order is important so that the correct arcs get reused.
+
+    for (auto rit=destinationNotReachable.rbegin(); rit != destinationNotReachable.rend(); ++rit){
+        overlayGraph->addArc(*(rit), destinationSuperVertex);
+    }
+
+    for (auto rit=sourceNotReachable.rbegin(); rit != sourceNotReachable.rend(); ++rit){
+        overlayGraph->addArc(sourceSuperVertex, *(rit));
+    }
+
+
+    for(auto& [_,algorithm] : overlayAlgorithms){
+        algorithm->setAutoUpdate(true);
+
+        (void)(_); //unused warning
+    }
+
+    return result;
 }
 
 

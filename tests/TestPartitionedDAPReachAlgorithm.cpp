@@ -450,5 +450,18 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testOverlayVertexOnSecondRemoved){
 
     ASSERT_FALSE(this->algorithm->query(vertex2, vertex3));
     ASSERT_FALSE(this->algorithm->query(vertex7, vertex3));
+}
 
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testOverlayConnectionOfSameSubgraph){
+    auto* vertex1 = this->mainGraph->getCurrentVertexForId(1);
+    auto* vertex2 = this->mainGraph->getCurrentVertexForId(2);
+    auto* vertex3 = this->mainGraph->getCurrentVertexForId(3);
+    auto* vertex4 = this->mainGraph->getCurrentVertexForId(4);
+
+    ASSERT_FALSE(this->algorithm->query(vertex2, vertex1));
+
+    this->mainGraph->addArc(4,1,1);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_TRUE(this->algorithm->query(vertex2, vertex1));
 }

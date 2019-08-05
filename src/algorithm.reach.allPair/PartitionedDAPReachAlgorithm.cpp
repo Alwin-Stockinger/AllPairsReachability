@@ -145,7 +145,7 @@ void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
             auto *subGraph = dynamic_cast<Algora::DiGraph *>(headGraph);
             subGraph->addArc(subTail, subHead);
 
-            if ( k > 2) insertOverlayEdgeArcs(subGraph);
+            insertOverlayEdgeArcs(subGraph);
         } else {
             auto *overlayHead = mainToOverlayMap[mainHead];
             auto *overlayTail = mainToOverlayMap[mainTail];
@@ -154,13 +154,13 @@ void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
                 overlayHead = overlayGraph->addVertex();
                 mainToOverlayMap[mainHead] = overlayHead;
                 edgeVertices[headGraph].insert(mainHead);
-                if ( k > 2) insertOverlayEdgeArcsOfVertex(mainHead);
+                insertOverlayEdgeArcsOfVertex(mainHead);
             }
             if (!overlayTail) {
                 overlayTail = overlayGraph->addVertex();
                 mainToOverlayMap[mainTail] = overlayTail;
                 edgeVertices[tailGraph].insert(mainTail);
-                if ( k > 2) insertOverlayEdgeArcsOfVertex(mainTail);
+                insertOverlayEdgeArcsOfVertex(mainTail);
             }
 
             overlayGraph->addArc(overlayTail, overlayHead);
@@ -196,9 +196,8 @@ void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
             Algora::Arc *subArc = subGraph->findArc(subTail, subHead);
             subGraph->removeArc(subArc);
 
-            if( k > 2) {
-                removeOverlayEdgeArcs(subGraph);
-            }
+            removeOverlayEdgeArcs(subGraph);
+
         } else {
             auto *overlayHead = mainToOverlayMap[mainHead];
             auto *overlayTail = mainToOverlayMap[mainTail];
@@ -281,11 +280,9 @@ PartitionedDAPReachAlgorithm::partition() {
     initAlgorithms(subGraphs);
 
 
-    //add arcs that go through subgraphs
-    if( k > 2) {
-        for( Algora::DiGraph* diGraph : subGraphs){
-            insertOverlayEdgeArcs(diGraph);
-        }
+
+    for( Algora::DiGraph* diGraph : subGraphs){
+        insertOverlayEdgeArcs(diGraph);
     }
 
     operationsSinceRepartition = 0;

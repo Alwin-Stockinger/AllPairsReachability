@@ -35,45 +35,43 @@ bool SimplePartitionedDAPReachAlgorithm::query(Algora::Vertex *start, const Algo
     auto* startGraph = start->getParent();
     auto* endGraph = end->getParent();
 
-    //same subgraph? then normal Algorithm
     if(startGraph == endGraph){
-        return graphToAlgorithmMap[startGraph] -> query(start, end);
+        if(graphToAlgorithmMap[startGraph] -> query(start, end)){
+            return true;
+        }
     }
-    else {
-        DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[startGraph];
-        DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[endGraph];
+    DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[startGraph];
+    DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[endGraph];
 
-        std::unordered_set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
-        std::unordered_set<Algora::Vertex *> endEdgeVertices = edgeVertices.getValue(endGraph);    //must be copy, otherwise can't erase vertices from set
-
-
-        for (Algora::Vertex *outVertex : startEdgeVertices) {
+    std::unordered_set<Algora::Vertex *>& startEdgeVertices = edgeVertices[startGraph];
+    std::unordered_set<Algora::Vertex *> endEdgeVertices = edgeVertices.getValue(endGraph);    //must be copy, otherwise can't erase vertices from set
 
 
-            if (startGraphAlgorithm->query(start, mainToSubMap[outVertex])) {
+    for (Algora::Vertex *outVertex : startEdgeVertices) {
 
-                for(auto it = endEdgeVertices.begin(); it != endEdgeVertices.end();){
 
-                    Algora::Vertex* inVertex = *it;
+        if (startGraphAlgorithm->query(start, mainToSubMap[outVertex])) {
 
-                    if( overlayAlgorithm->query(mainToOverlayMap[outVertex], mainToOverlayMap[inVertex])){
+            for(auto it = endEdgeVertices.begin(); it != endEdgeVertices.end();){
 
-                        if( endGraphAlgorithm->query(mainToSubMap[inVertex], end)){
-                            return true;
-                        }
-                        else{
-                            it = endEdgeVertices.erase(it);    //exclude for future queries, because dead-end
-                        }
+                Algora::Vertex* inVertex = *it;
+
+                if( overlayAlgorithm->query(mainToOverlayMap[outVertex], mainToOverlayMap[inVertex])){
+
+                    if( endGraphAlgorithm->query(mainToSubMap[inVertex], end)){
+                        return true;
                     }
-                    else it++;
+                    else{
+                        it = endEdgeVertices.erase(it);    //exclude for future queries, because dead-end
+                    }
                 }
+                else it++;
             }
         }
-
-        //return that no connection was found
-        return false;
     }
 
+    //return that no connection was found
+    return false;
 }
 
 SimplePartitionedDAPReachAlgorithm::~SimplePartitionedDAPReachAlgorithm() {

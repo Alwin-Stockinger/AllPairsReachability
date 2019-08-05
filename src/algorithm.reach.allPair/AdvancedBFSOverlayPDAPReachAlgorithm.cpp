@@ -17,64 +17,65 @@ bool AdvancedBFSOverlayPDAPReachAlgorithm::query(Algora::Vertex *start, const Al
     auto* endGraph = end->getParent();
 
     //same subgraph? then normal Algorithm
+    //same subgraph? then normal Algorithm
     if(startGraph == endGraph){
-        return graphToAlgorithmMap[startGraph] -> query(start, end);
+        if(graphToAlgorithmMap[startGraph] -> query(start, end)){
+            return true;
+        }
     }
-    else{
-        std::unordered_set<const Algora::Vertex*> reachableSourceEdgeVertices{};
-        std::unordered_set<Algora::Vertex*> reachableDestinationEdgeVertices{};
-        auto& sourceEdgeVertices = edgeVertices[startGraph];
-        auto& destinationEdgeVertices = edgeVertices[endGraph];
 
-        auto* sourceAlgorithm = graphToAlgorithmMap[startGraph];
-        auto* destinationAlgorithm = graphToAlgorithmMap[endGraph];
+    std::unordered_set<const Algora::Vertex*> reachableSourceEdgeVertices{};
+    std::unordered_set<Algora::Vertex*> reachableDestinationEdgeVertices{};
+    auto& sourceEdgeVertices = edgeVertices[startGraph];
+    auto& destinationEdgeVertices = edgeVertices[endGraph];
 
-        for(Algora::Vertex* destinationEdge: destinationEdgeVertices){
-            if(destinationAlgorithm->query(mainToSubMap[destinationEdge], end)){
-                reachableDestinationEdgeVertices.insert(mainToOverlayMap[destinationEdge]);
-            }
+    auto* sourceAlgorithm = graphToAlgorithmMap[startGraph];
+    auto* destinationAlgorithm = graphToAlgorithmMap[endGraph];
+
+    for(Algora::Vertex* destinationEdge: destinationEdgeVertices){
+        if(destinationAlgorithm->query(mainToSubMap[destinationEdge], end)){
+            reachableDestinationEdgeVertices.insert(mainToOverlayMap[destinationEdge]);
         }
-        if(reachableDestinationEdgeVertices.empty()){    //no tree search necessary
-            return false;
-        }
-
-
-        for(Algora::Vertex* sourceEdge: sourceEdgeVertices){
-            if(sourceAlgorithm->query(start, mainToSubMap[sourceEdge])){
-                const Algora::Vertex* vertex = mainToOverlayMap[sourceEdge];
-                reachableSourceEdgeVertices.insert(vertex);
-            }
-        }
-
-        bool reachable = false;
-
-        for(const Algora::Vertex* sourceEdge : reachableSourceEdgeVertices){  //iterator is not invalidated, because only pointers to erased elements are invalidated
-
-            Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> bfs(false, false);
-            bfs.setStartVertex(sourceEdge);
-
-            bfs.setArcStopCondition([&reachableDestinationEdgeVertices, &reachable](const Algora::Arc* arc){
-                reachable = reachableDestinationEdgeVertices.count(arc->getHead());
-                return reachable;
-            });
-
-            bfs.onVertexDiscover([&reachableSourceEdgeVertices, &sourceEdge](const Algora::Vertex* vertex){
-                if(vertex != sourceEdge){
-                    reachableSourceEdgeVertices.erase(vertex);
-                }
-                return true;
-            });
-
-            runAlgorithm(bfs, overlayGraph);
-
-            if(reachable){
-                return true;
-            }
-        }
-
+    }
+    if(reachableDestinationEdgeVertices.empty()){    //no tree search necessary
         return false;
     }
 
+
+    for(Algora::Vertex* sourceEdge: sourceEdgeVertices){
+        if(sourceAlgorithm->query(start, mainToSubMap[sourceEdge])){
+            const Algora::Vertex* vertex = mainToOverlayMap[sourceEdge];
+            reachableSourceEdgeVertices.insert(vertex);
+        }
+    }
+
+    bool reachable = false;
+
+    for(const Algora::Vertex* sourceEdge : reachableSourceEdgeVertices){  //iterator is not invalidated, because only pointers to erased elements are invalidated
+
+        Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> bfs(false, false);
+        bfs.setStartVertex(sourceEdge);
+
+        bfs.setArcStopCondition([&reachableDestinationEdgeVertices, &reachable](const Algora::Arc* arc){
+            reachable = reachableDestinationEdgeVertices.count(arc->getHead());
+            return reachable;
+        });
+
+        bfs.onVertexDiscover([&reachableSourceEdgeVertices, &sourceEdge](const Algora::Vertex* vertex){
+            if(vertex != sourceEdge){
+                reachableSourceEdgeVertices.erase(vertex);
+            }
+            return true;
+        });
+
+        runAlgorithm(bfs, overlayGraph);
+
+        if(reachable){
+            return true;
+        }
+    }
+
+    return false;
 }
 
 std::string AdvancedBFSOverlayPDAPReachAlgorithm::getBaseName() {
