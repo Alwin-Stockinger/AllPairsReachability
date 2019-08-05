@@ -10,9 +10,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraCore/src/")
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
-link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraCore/build/Release")
-link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraDyn/build/Release")
-link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../DyReach/build/Release")
+link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraCore/build/Debug")
+link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../AlgoraDyn/build/Debug")
+link_directories("${CMAKE_CURRENT_SOURCE_DIR}/../DyReach/build/Debug")
 
 
 set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native -mtune=native")
@@ -21,7 +21,7 @@ SET(CONVERT src/converter/GraphFileConverter.cpp src/converter/GraphFileConverte
 
 #src
 SET(DyReach "../DyReach/build/Release/randominstanceprovider.o" "../DyReach/build/Release/konectnetworkinstanceprovider.o" "../DyReach/build/Release/instanceprovider.o")
-SET(ALGORITHMS src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/DynamicSSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicSSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h src/partition/Partitioner.h src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.h src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithm.h src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SuperVertexAlgorithmImplementation.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.cpp src/algorithm.reach.allPair/StaticSSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/StaticSSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h)
+SET(ALGORITHMS src/algorithm.reach.allPair/DynamicAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicAPReachAlgorithm.h src/algorithm.reach.allPair/DynamicSSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/DynamicSSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h src/algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h src/partition/Partitioner.h src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.h src/algorithm.reach.allPair/SuperVertexPDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithm.h src/algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SuperVertexAlgorithmImplementation.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.cpp src/algorithm.reach.allPair/StaticSSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/StaticSSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.cpp src/algorithm.reach.allPair/SSBasedDAPReachAlgorithm.h src/algorithm.reach.allPair/AdvancedBFSOverlayPDAPReachAlgorithm.cpp src/algorithm.reach.allPair/AdvancedBFSOverlayPDAPReachAlgorithm.h src/algorithm.reach.allPair/ABFSPDAPReachAlgorithmImplementation.h)
 SET(HANDLER src/handler/AlgorithmHandler.cpp src/handler/AlgorithmHandler.h)
 SET(PARTITIONER src/partition/Partitioner.h src/partition/Partitioner.cpp)
 
