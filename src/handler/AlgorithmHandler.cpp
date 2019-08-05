@@ -286,7 +286,7 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
                 std::cout << progress << "% at " << timer.getAllTime() << std::endl;
             }
 
-            if(timeOut && timeOut * (currentProg / 100.) < timer.getAllTime()){ // NOLINT(bugprone-narrowing-conversions)
+            if(timeOut && timeOut * (currentProg + 1 / 100.) < timer.getAllTime()){ // NOLINT(bugprone-narrowing-conversions)
                 std::cout << "TIMEOUT" << std::endl;
                 timer.timedOut = true;
                 break;
