@@ -29,7 +29,7 @@ class SuperVertexAlgorithmImplementation : public SuperVertexPDAPReachAlgorithm{
 
         DynamicAPReachAlgorithm *createSubAlgorithm() override {
                 if( depth > 0U){
-                    auto* newAlgo = new SuperVertexAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm>(depth - 1);
+                    auto* newAlgo = new SuperVertexAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm, propagatePartitionFunction>(depth - 1);
                     if(propagatePartitionFunction){
                         newAlgo->setPartitionFunction(partitionFunction, k);
                     }

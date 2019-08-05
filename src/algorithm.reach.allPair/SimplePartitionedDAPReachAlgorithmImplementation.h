@@ -36,7 +36,7 @@ private:
 
     DynamicAPReachAlgorithm *createSubAlgorithm() override {
         if( depth > 0U){
-            auto* newAlgo = new SimplePartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm>(depth - 1);
+            auto* newAlgo = new SimplePartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm, propagatePartitionFunction>(depth - 1);
             if(propagatePartitionFunction){
                 newAlgo->setPartitionFunction(partitionFunction, k);
             }

@@ -25,8 +25,6 @@ public:
         std::string overlayName = overlayAlgorithm->getBaseName();
 
         return subName + " (" + overlayName + ")";
-
-
     }
 
     ~SimplePartitionedDAPReachAlgorithm() override;
