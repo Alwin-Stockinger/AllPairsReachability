@@ -280,13 +280,13 @@ AlgorithmHandler::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector &tim
         if( ++currentStep > nextReport){
             nextReport += reportStep;
 
-            int currentProg = (currentStep*100ULL) / queries->size();
+            short currentProg = (currentStep*100ULL) / queries->size(); // NOLINT(bugprone-narrowing-conversions)
             if(progress < currentProg){
-                progress = currentProg;
+                progress = currentProg; // NOLINT(bugprone-narrowing-conversions)
                 std::cout << progress << "% at " << timer.getAllTime() << std::endl;
             }
 
-            if(timeOut && timeOut < timer.getAllTime()){
+            if(timeOut && timeOut * (currentProg / 100.) < timer.getAllTime()){ // NOLINT(bugprone-narrowing-conversions)
                 std::cout << "TIMEOUT" << std::endl;
                 timer.timedOut = true;
                 break;
