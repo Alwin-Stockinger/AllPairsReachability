@@ -11,7 +11,7 @@
 
 #include "DynamicAPReachAlgorithm.h"
 #include "DynamicSSBasedDAPReachAlgorithm.h"
-#include "PartitionedDAPReachAlgorithm.h"
+#include "PartitionedAPReachAlgorithm.h"
 #include "SimplePartitionedDAPReachAlgorithm.h"
 
 template <typename SubAlgorithm, typename OverlayAlgorithm = SubAlgorithm, bool propagatePartitionFunction = true>

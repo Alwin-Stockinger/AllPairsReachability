@@ -9,8 +9,7 @@
 #include "factories/SimplePartitionFactory.h"
 #include "factories/SuperVertexFactory.h"
 #include "factories/SSBasedFactory.h"
-#include "factories/ABFSOFactory.h"
-#include "factories/SBFSOFactory.h"
+#include "factories/BFSOFactory.h"
 
 
 using PartFunc = std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>;
@@ -19,7 +18,7 @@ class FactoryFacade {
 
 public:
 
-    FactoryFacade(bool ssBased, bool simplePartition, bool aBFSO, bool superVertex, bool simpleBFSO){
+    FactoryFacade(bool ssBased, bool simplePartition, bool bFSO, bool superVertex){
         if(ssBased){
             factories.push_back(&ssBasedFactory);
         }
@@ -27,18 +26,15 @@ public:
             factories.push_back(&simplePartitionFactory);
             partitionedFactories.push_back(&simplePartitionFactory);
         }
-        if(aBFSO){
-            factories.push_back(&abfsoFactory);
-            partitionedFactories.push_back(&abfsoFactory);
+        if(bFSO){
+            factories.push_back(&bfsoFactory);
+            partitionedFactories.push_back(&bfsoFactory);
         }
         if(superVertex){
             factories.push_back(&superVertexFactory);
             partitionedFactories.push_back(&superVertexFactory);
         }
-        if(simpleBFSO){
-            factories.push_back(&sbfsoFactory);
-            partitionedFactories.push_back(&sbfsoFactory);
-        }
+
     }
 
     void setExponentialK(bool expoK){
@@ -110,9 +106,16 @@ public:
 
     }
 
+    void setAdvancedBFSO(bool b) {
+        bfsoFactory.setAdvancedBFSO(b);
+    }
+
+    void setSimpleBFSO(bool b){
+        bfsoFactory.setSimpleBFSO(b);
+    }
+
 private:
-    ABFSOFactory abfsoFactory{};
-    SBFSOFactory sbfsoFactory{};
+    BFSOFactory bfsoFactory{};
     SimplePartitionFactory simplePartitionFactory{};
     SuperVertexFactory superVertexFactory{};
     SSBasedFactory ssBasedFactory{};

@@ -2,22 +2,26 @@
 // Created by Alwin Stockinger.
 //
 
-#include "PartitionedDAPReachAlgorithm.h"
+#include "PartitionedAPReachAlgorithm.h"
 
 #include <graph.incidencelist/incidencelistgraph.h>
 
-void PartitionedDAPReachAlgorithm::run() {
+void PartitionedAPReachAlgorithm::run() {
 
     if(initialized){
         return;
     }
 
+    resetChildStructures();
+
+    deleteOldPartition();
+
     partition();
 
-    for(const auto &[_,algorithm] : graphToAlgorithmMap){
-        algorithm -> run();
+    initializeChildStructures();
 
-        (void)(_);  //unused warning
+    for( Algora::DiGraph* diGraph : subGraphs){
+        insertOverlayEdgeArcs(diGraph);
     }
 
     initialized = true;
@@ -25,45 +29,30 @@ void PartitionedDAPReachAlgorithm::run() {
 
 
 
-
-
-
-
-
-
-PartitionedDAPReachAlgorithm::~PartitionedDAPReachAlgorithm() {
+PartitionedAPReachAlgorithm::~PartitionedAPReachAlgorithm() {
     deleteOldPartition();
 }
 
 
-void PartitionedDAPReachAlgorithm::deleteOldPartition() {
-    for(auto [graph,algorithm] : graphToAlgorithmMap){
-        delete algorithm;
+void PartitionedAPReachAlgorithm::deleteOldPartition() {
+    for(auto* graph: subGraphs){
         delete graph;
     }
+    subGraphs.clear();
 
     delete overlayGraph;
 
     mainToOverlayMap.resetAll();
     mainToSubMap.resetAll();
-    graphToAlgorithmMap.resetAll();
+
     edgeVertices.resetAll();
 }
 
 
-void
-PartitionedDAPReachAlgorithm::initAlgorithms(std::vector<Algora::DiGraph *> &graphs) {
-
-    //create new Algorithms
-    for (Algora::DiGraph *graph : graphs) {
-        DynamicAPReachAlgorithm* algorithm = createSubAlgorithm();
-        algorithm -> setGraph(graph);
-        graphToAlgorithmMap.setValue(graph, algorithm);
-    }
-}
 
 
-void PartitionedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
+
+void PartitionedAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
 
     if(!initialized){
         return;
@@ -94,7 +83,7 @@ void PartitionedDAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
 }
 
 
-void PartitionedDAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
+void PartitionedAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
 
     if(!initialized){
         return;
@@ -121,7 +110,7 @@ void PartitionedDAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
 }
 
 
-void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
+void PartitionedAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
 
     if(!initialized){
         return;
@@ -169,7 +158,7 @@ void PartitionedDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
 }
 
 
-void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
+void PartitionedAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
 
     if(!initialized){
         return;
@@ -219,13 +208,10 @@ void PartitionedDAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
 }
 
 
-void
-PartitionedDAPReachAlgorithm::partition() {
+std::vector<Algora::DiGraph*>
+PartitionedAPReachAlgorithm::partition() {
     const Algora::FastPropertyMap<unsigned long long> &partitionMap = partitionFunction(k,diGraph);
 
-    deleteOldPartition();
-
-    std::vector<Algora::DiGraph*> subGraphs;
 
     for(auto i = 0ULL; i < k; i++){
         auto* graph = new Algora::IncidenceListGraph;
@@ -239,12 +225,12 @@ PartitionedDAPReachAlgorithm::partition() {
 
 
 
-    diGraph->mapVertices([&subGraphs, this, partitionMap](Algora::Vertex* vertex){
+    diGraph->mapVertices([ this, partitionMap](Algora::Vertex* vertex){
         auto* subVertex = subGraphs.at(partitionMap.getValue(vertex))->addVertex();
         mainToSubMap[vertex] = subVertex;
     });
 
-    diGraph->mapArcs([&subGraphs, this, partitionMap](Algora::Arc* arc){
+    diGraph->mapArcs( [this, partitionMap](Algora::Arc* arc){
 
         auto* mainHead = arc->getHead();
         auto * mainTail = arc->getTail();
@@ -277,111 +263,29 @@ PartitionedDAPReachAlgorithm::partition() {
         }
     });
 
-    initAlgorithms(subGraphs);
-
-
-
-    for( Algora::DiGraph* diGraph : subGraphs){
-        insertOverlayEdgeArcs(diGraph);
-    }
 
     operationsSinceRepartition = 0;
+
+    return subGraphs;
 }
 
 
-void PartitionedDAPReachAlgorithm::onDiGraphSet() {
+void PartitionedAPReachAlgorithm::onDiGraphSet() {
     DynamicDiGraphAlgorithm::onDiGraphSet();
 
     initialized = false;
 }
 
 
-void PartitionedDAPReachAlgorithm::onDiGraphUnset() {
+void PartitionedAPReachAlgorithm::onDiGraphUnset() {
     DynamicDiGraphAlgorithm::onDiGraphUnset();
+
+    initialized = false;
 }
 
 
-void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *subGraph){
-    std::unordered_set<Algora::Vertex*>& edges = edgeVertices[subGraph];
-    DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
 
-    for(Algora::Vertex* source : edges){
-
-        Algora::Vertex* subSource = mainToSubMap[source];
-        Algora::Vertex* overlaySource = mainToOverlayMap[source];
-
-        std::unordered_set<Algora::Vertex*> newReachableEdges{};
-
-        for(Algora::Vertex* destination : edges){
-            if( source != destination){
-
-                Algora::Vertex* subDestination = mainToSubMap[destination];
-
-                //vertices are already in overlay because they are edge vertices!
-
-                Algora::Vertex* overlayDestination = mainToOverlayMap[destination];
-
-                if(subAlgorithm->query(subSource, subDestination)){
-                    newReachableEdges.insert(overlayDestination);
-                }
-            }
-        }
-
-        overlayGraph->mapOutgoingArcsUntil(overlaySource,[&newReachableEdges](Algora::Arc* arc){
-            if(newReachableEdges.count(arc->getHead())){
-                newReachableEdges.erase(arc->getHead());
-            }
-        }, [&newReachableEdges](const Algora::Arc* arc){
-            return newReachableEdges.empty();
-        });
-
-        for(Algora::Vertex* vertex: newReachableEdges){
-            overlayGraph->addArc(overlaySource, vertex);
-        }
-    }
-}
-
-
-//It can't be that there is an Arc between two vertices of the same subgraph in the overlaygraph, but not connection in the subgraph
-//, since tail and head are in the subgraph, their connection must also be in the subgraph!!!
-void PartitionedDAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *subGraph) {
-    std::unordered_set<Algora::Vertex*>& edges = edgeVertices[subGraph];
-    DynamicAPReachAlgorithm* subAlgorithm = graphToAlgorithmMap[subGraph];
-
-    for(Algora::Vertex* source : edges){
-        Algora::Vertex* subSource = mainToSubMap[source];
-        Algora::Vertex* overlaySource = mainToOverlayMap[source];
-
-        std::unordered_set<Algora::Vertex*> unreachableVertices;
-
-        for(Algora::Vertex* destination : edges) {
-            if (source != destination) {
-
-                Algora::Vertex *subDestination = mainToSubMap[destination];
-                Algora::Vertex *overlayDestination = mainToOverlayMap[destination];
-
-                if (!subAlgorithm->query(subSource, subDestination)) {
-                    unreachableVertices.insert(overlayDestination);
-                }
-            }
-        }
-
-        std::unordered_set<Algora::Arc*> arcsToRemove{};
-        overlayGraph->mapOutgoingArcsUntil(overlaySource, [&unreachableVertices, &arcsToRemove](Algora::Arc* arc){
-            if(unreachableVertices.count(arc->getHead())){
-                arcsToRemove.insert(arc);
-            }
-        },[&unreachableVertices, &arcsToRemove](const Algora::Arc* arc){
-            return unreachableVertices.size() == arcsToRemove.size();
-        });
-
-        for(Algora::Arc* arc : arcsToRemove){
-            overlayGraph->removeArc(arc);
-        }
-    }
-}
-
-bool PartitionedDAPReachAlgorithm::checkIfOverlayIsolated(Algora::Vertex *vertex) {
+bool PartitionedAPReachAlgorithm::checkIfOverlayIsolated(Algora::Vertex *vertex) {
 
     bool overlayIsolated = true;
 
@@ -401,31 +305,11 @@ bool PartitionedDAPReachAlgorithm::checkIfOverlayIsolated(Algora::Vertex *vertex
     return overlayIsolated;
 }
 
-void PartitionedDAPReachAlgorithm::removeOverlayVertex(Algora::Vertex *vertex) {
+void PartitionedAPReachAlgorithm::removeOverlayVertex(Algora::Vertex *vertex) {
 
     auto* subGraph = mainToSubMap[vertex]->getParent();
 
     edgeVertices[subGraph].erase(vertex);
     overlayGraph->removeVertex(mainToOverlayMap[vertex]);
     mainToOverlayMap.resetToDefault(vertex);
-}
-
-void PartitionedDAPReachAlgorithm::insertOverlayEdgeArcsOfVertex(Algora::Vertex *vertex) {
-
-    auto* overlayVertex = mainToOverlayMap[vertex];
-    auto* subVertex = mainToSubMap[vertex];
-    auto* subGraph = subVertex->getParent();
-    auto* subGraphAlgorithm = graphToAlgorithmMap[subGraph];
-    auto& edges = edgeVertices[subGraph];
-
-
-    for(Algora::Vertex* edge: edges){
-        if(subGraphAlgorithm->query(subVertex, mainToSubMap[edge])){
-            overlayGraph->addArc(overlayVertex, mainToOverlayMap[edge]);
-        }
-        if(subGraphAlgorithm->query(mainToSubMap[edge], subVertex)){
-            overlayGraph->addArc(mainToOverlayMap[edge], overlayVertex);
-        }
-    }
-
 }

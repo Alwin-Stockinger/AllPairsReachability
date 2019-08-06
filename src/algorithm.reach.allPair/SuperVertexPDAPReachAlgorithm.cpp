@@ -200,5 +200,21 @@ void SuperVertexPDAPReachAlgorithm::registerOnOverlay() {
 }
 
 void SuperVertexPDAPReachAlgorithm::deregisterOnOverlay() {
-    overlayGraph->removeOnVertexAdd(this);
+    if(overlayGraph){
+        overlayGraph->removeOnVertexAdd(this);
+    }
+}
+
+void SuperVertexPDAPReachAlgorithm::initializeChildStructures() {
+    PartitionedDynamicAPReachAlgorithm::initializeChildStructures();
+
+    generateSuperVertices();
+    generateOverlayAlgorithms();
+
+    registerOnOverlay(); //this needs to be last, so that super vertices don't notify
+}
+
+void SuperVertexPDAPReachAlgorithm::resetChildStructures() {
+    resetSuperStructure();
+    PartitionedDynamicAPReachAlgorithm::resetChildStructures();
 }

@@ -4,17 +4,6 @@
 
 #include "SimplePartitionedDAPReachAlgorithm.h"
 
-void SimplePartitionedDAPReachAlgorithm::run() {
-
-    delete overlayAlgorithm;
-
-    PartitionedDAPReachAlgorithm::run();
-
-    overlayAlgorithm = createOverlayAlgorithm();
-    overlayAlgorithm->setGraph(overlayGraph);
-    overlayAlgorithm->run();
-}
-
 std::string SimplePartitionedDAPReachAlgorithm::getName() const noexcept {
     return std::__cxx11::string("Partitioned Graph All Pair Reachability Algorithm based on " + overlayAlgorithm -> getName()+ " and " + graphToAlgorithmMap.begin()->second->getName());
 }
@@ -76,4 +65,16 @@ bool SimplePartitionedDAPReachAlgorithm::query(Algora::Vertex *start, const Algo
 
 SimplePartitionedDAPReachAlgorithm::~SimplePartitionedDAPReachAlgorithm() {
     delete overlayAlgorithm;
+}
+
+void SimplePartitionedDAPReachAlgorithm::initializeChildStructures() {
+    PartitionedDynamicAPReachAlgorithm::initializeChildStructures();
+    overlayAlgorithm = createOverlayAlgorithm();
+    overlayAlgorithm->setGraph(overlayGraph);
+    overlayAlgorithm->run();
+}
+
+void SimplePartitionedDAPReachAlgorithm::resetChildStructures() {
+    delete overlayAlgorithm;
+    PartitionedDynamicAPReachAlgorithm::resetChildStructures();
 }

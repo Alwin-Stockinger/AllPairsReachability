@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        FactoryFacade factory(testWithoutPartition, testPartition, testAdvancedBFSO, testSuperVertex, testSimpleBFSO);
+        FactoryFacade factory(testWithoutPartition, testPartition, testAdvancedBFSO || testSimpleBFSO, testSuperVertex);
 
         factory.setExponentialK(exponentialK);
         factory.setKMax(k);
@@ -180,6 +180,8 @@ int main(int argc, char *argv[]) {
         factory.setAlgorithmNames(algorithmNames);
         factory.setOverlayNames(overlayAlgorithms);
         factory.setRepartitionThreshold(repartitionThreshold);
+        factory.setAdvancedBFSO(testAdvancedBFSO);
+        factory.setSimpleBFSO(testSimpleBFSO);
 
 
         AlgorithmTester tester;
