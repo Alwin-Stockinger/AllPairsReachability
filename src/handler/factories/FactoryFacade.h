@@ -10,12 +10,13 @@
 #include "SuperVertexFactory.h"
 #include "SSBasedFactory.h"
 #include "ABFSOFactory.h"
+#include "SBFSOFactory.h"
 
 class FactoryFacade {
 
 public:
 
-    FactoryFacade(bool ssBased, bool simplePartition, bool aBFSO, bool superVertex){
+    FactoryFacade(bool ssBased, bool simplePartition, bool aBFSO, bool superVertex, bool simpleBFSO){
         if(ssBased){
             factories.push_back(&ssBasedFactory);
         }
@@ -30,6 +31,10 @@ public:
         if(superVertex){
             factories.push_back(&superVertexFactory);
             partitionedFactories.push_back(&superVertexFactory);
+        }
+        if(simpleBFSO){
+            factories.push_back(&sbfsoFactory);
+            partitionedFactories.push_back(&sbfsoFactory);
         }
     }
 
@@ -98,12 +103,13 @@ public:
 
 private:
     ABFSOFactory abfsoFactory{};
+    SBFSOFactory sbfsoFactory{};
     SimplePartitionFactory simplePartitionFactory{};
     SuperVertexFactory superVertexFactory{};
     SSBasedFactory ssBasedFactory{};
 
-    std::vector<AlgorithmFactory*> factories;
-    std::vector<PartitionedFactory*> partitionedFactories;
+    std::vector<AlgorithmFactory*> factories{};
+    std::vector<PartitionedFactory*> partitionedFactories{};
 };
 
 

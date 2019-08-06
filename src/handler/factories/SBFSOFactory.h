@@ -2,15 +2,13 @@
 // Created by Alwin Stockinger.
 //
 
-#ifndef ALLPAIRREACH_ABFSOFACTORY_H
-#define ALLPAIRREACH_ABFSOFACTORY_H
+#ifndef ALLPAIRREACH_SBFSOFACTORY_H
+#define ALLPAIRREACH_SBFSOFACTORY_H
 
 
-#include <vector>
-#include "../../algorithm.reach.allPair/DynamicAPReachAlgorithm.h"
 #include "PartitionedFactory.h"
 
-class ABFSOFactory : public PartitionedFactory{
+class SBFSOFactory : public PartitionedFactory{
     std::vector<DynamicAPReachAlgorithm *> getStaticBFSAlgorithms() override;
 
     std::vector<DynamicAPReachAlgorithm *> getStaticDFSAlgorithms() override;
@@ -40,4 +38,4 @@ private:
 };
 
 
-#endif //ALLPAIRREACH_ABFSOFACTORY_H
+#endif //ALLPAIRREACH_SBFSOFACTORY_H

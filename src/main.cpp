@@ -57,6 +57,12 @@ int main(int argc, char *argv[]) {
     bool testSuperVertex = false;
     app.add_option("--testSuperVertex", testSuperVertex, "Test Super Vertex Algorithms");
 
+    bool testSimpleBFSO = false;
+    app.add_option("--testSBFSO", testSimpleBFSO, "Test Simple BFSO Algorithms");
+
+    bool testAdvancedBFSO = false;
+    app.add_option("--testABFSO", testAdvancedBFSO, "Test Advanced BFSO Algorithms");
+
     std::vector<std::string> algorithmNames;
     app.add_option("-A, --algorithms", algorithmNames, "Algorithms to use");
 
@@ -164,7 +170,7 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        FactoryFacade factory(testWithoutPartition, testPartition, false, testSuperVertex);
+        FactoryFacade factory(testWithoutPartition, testPartition, testAdvancedBFSO, testSuperVertex, testSimpleBFSO);
 
         factory.setExponentialK(exponentialK);
         factory.setKMax(k);
@@ -184,6 +190,10 @@ int main(int argc, char *argv[]) {
         //TODO detailed results
 
         tester.runTests();
+
+        for(DynamicAPReachAlgorithm* algorithm: algorithms){
+            delete algorithm;
+        }
 
         /*handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth,
                          testWithoutPartition, overlayAlgorithmNames, repartitionThreshold, testPartition, testSuperVertex);*/
