@@ -8,6 +8,8 @@
 #include "algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h"
 #include "algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
 #include "handler/AlgorithmHandler.h"
+#include "handler/factories/FactoryFacade.h"
+#include "handler/AlgorithmTester.h"
 
 #include <CLI11.hpp>
 #include <instanceprovider.h>
@@ -159,20 +161,35 @@ int main(int argc, char *argv[]) {
     dynGraph->resetToBigBang();
     dynGraph->applyNextDelta();
 
-    AlgorithmHandler handler(provider);
-
-    std::vector<std::string> *overlayAlgorithmNames = nullptr;
-    if(overlayAlgorithms.begin()!=overlayAlgorithms.end()){
-        overlayAlgorithmNames = &overlayAlgorithms;
-    }
 
 
     if(runPerformanceTests){
-        handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth,
-                         testWithoutPartition, overlayAlgorithmNames, repartitionThreshold, testPartition, testSuperVertex);
+        FactoryFacade factory(testWithoutPartition, testPartition, false, testSuperVertex);
+
+        factory.setExponentialK(exponentialK);
+        factory.setKMax(k);
+        factory.setKMin(kMin);
+        factory.setMinDepth(minDepth);
+        factory.setMaxDepth(maxDepth);
+        factory.setAlgorithmNames(algorithmNames);
+        factory.setOverlayNames(overlayAlgorithms);
+        factory.setRepartitionThreshold(repartitionThreshold);
+
+        std::vector<DynamicAPReachAlgorithm*> algorithms = factory.getAlgorithms();
+
+        AlgorithmTester tester;
+        tester.setAlgorithms(algorithms);
+        tester.setInstanceProvider(provider);
+        tester.setTimeOut(timeOut);
+        //TODO detailed results
+
+        tester.runTests();
+
+        /*handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth,
+                         testWithoutPartition, overlayAlgorithmNames, repartitionThreshold, testPartition, testSuperVertex);*/
     }
     else{
-        handler.runInterface();
+        //handler.runInterface();
     }
 
     delete provider;

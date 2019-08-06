@@ -21,10 +21,14 @@ public:
 
     std::string getBaseName() override  {
 
-        std::string subName = graphToAlgorithmMap.begin()->second->getBaseName();
-        std::string overlayName = overlayAlgorithm->getBaseName();
+        std::string retName = "Simple";
+        retName += "(k=" + std::to_string(k);
+        retName += "/d=" + std::to_string(depth);
+        retName += "): " + graphToAlgorithmMap.begin()->second->getBaseName();
 
-        return subName + " (" + overlayName + ")";
+        retName += "(" + overlayAlgorithm->getBaseName() + ")";
+
+        return retName;
     }
 
     ~SimplePartitionedDAPReachAlgorithm() override;

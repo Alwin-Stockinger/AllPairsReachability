@@ -12,14 +12,14 @@ class ABFSPDAPReachAlgorithmImplementation : public AdvancedBFSOverlayPDAPReachA
 public:
     static_assert(std::is_base_of<DynamicAPReachAlgorithm,SubAlgorithm>::value, "Template Parameter has to inherit from DynamicAPAlgorithm");
 
-    explicit ABFSPDAPReachAlgorithmImplementation(const unsigned depth = 0U) : AdvancedBFSOverlayPDAPReachAlgorithm(), depth(depth){};
+    explicit ABFSPDAPReachAlgorithmImplementation(const unsigned depth = 0U) : AdvancedBFSOverlayPDAPReachAlgorithm(){
+        this->depth = depth;
+    };
 
 
     ~ABFSPDAPReachAlgorithmImplementation() override = default;
 
 private:
-
-    const unsigned depth = 0U;
 
     DynamicAPReachAlgorithm *createSubAlgorithm() override {
         if( depth > 0U){

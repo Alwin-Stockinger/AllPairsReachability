@@ -21,14 +21,14 @@ public:
     static_assert(std::is_base_of<DynamicAPReachAlgorithm,SubAlgorithm>::value, "Template Parameter has to inherit from DynamicAPAlgorithm");
     static_assert(std::is_base_of<DynamicAPReachAlgorithm,OverlayAlgorithm>::value, "Template Parameter has to inherit from DynamicAPAlgorithm");
 
-    explicit SimplePartitionedDAPReachAlgorithmImplementation(const unsigned depth = 0U) : SimplePartitionedDAPReachAlgorithm(), depth(depth){};
+    explicit SimplePartitionedDAPReachAlgorithmImplementation(const unsigned depth = 0U) : SimplePartitionedDAPReachAlgorithm(){
+        this->depth=depth;
+    };
 
 
     ~SimplePartitionedDAPReachAlgorithmImplementation() override = default;
 
 private:
-
-    const unsigned depth = 0U;
 
     DynamicAPReachAlgorithm *createOverlayAlgorithm() override {
         return new OverlayAlgorithm;

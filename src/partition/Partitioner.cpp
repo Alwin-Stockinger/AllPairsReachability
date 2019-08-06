@@ -30,7 +30,7 @@ Partitioner::handlePartitioning(unsigned long long int k, Algora::DiGraph *graph
 
     char* kahipArgv[] = {kahipName.data(), kahipFileName.data(), kahipK.data(), seed.data(),preconfig.data(), kahipArgInputFileName.data(), nullptr};
     char* const envp[]={nullptr};
-    std::cout << "\n\nStarting Kahip with k=" + std::to_string(k) <<"\n--------------KAHIP OUTPUT----------------"<< std::endl;
+    std::cout << "\nStarting Kahip with k=" + std::to_string(k) <<"\n--------------KAHIP OUTPUT----------------"<< std::endl;
     int kahipStatus = posix_spawn(&pid, kahipName.data(), nullptr, nullptr, kahipArgv, envp);
 
     if(kahipStatus != 0 || waitpid(pid, &kahipStatus, 0) == -1){

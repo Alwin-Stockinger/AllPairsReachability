@@ -176,12 +176,13 @@ void SuperVertexPDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
 }
 
 std::string SuperVertexPDAPReachAlgorithm::getBaseName() {
+    std::string retName = "Super Vertex ";
+    retName += "(k=" + std::to_string(k);
+    retName += "/d=" + std::to_string(depth);
+    retName += "): " + graphToAlgorithmMap.begin()->second->getBaseName();
+    retName += "(" + overlayAlgorithms.begin()->second->getShortName() + ")";
 
-    std::string subName = graphToAlgorithmMap.begin()->second->getBaseName();
-    std::string overlayName = overlayAlgorithms.begin()->second->getShortName();
-
-    return "Super Vertex: " + subName + " (" + overlayName + ")";
-
+    return retName;
 }
 
 std::string SuperVertexPDAPReachAlgorithm::getName()  const noexcept {

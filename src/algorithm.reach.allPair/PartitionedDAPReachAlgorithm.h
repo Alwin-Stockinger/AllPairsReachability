@@ -105,6 +105,9 @@ private:
     void removeOverlayVertex(Algora::Vertex* vertex);
 
     void insertOverlayEdgeArcsOfVertex(Algora::Vertex* vertex);
+
+protected:
+    unsigned depth = 0U;
 };
 
 

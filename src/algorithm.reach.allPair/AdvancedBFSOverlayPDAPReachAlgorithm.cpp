@@ -79,7 +79,12 @@ bool AdvancedBFSOverlayPDAPReachAlgorithm::query(Algora::Vertex *start, const Al
 }
 
 std::string AdvancedBFSOverlayPDAPReachAlgorithm::getBaseName() {
-    return "AdvancedBFS: " + graphToAlgorithmMap.begin()->second->getBaseName();
+    std::string retName = "ABFSO";
+    retName += "(k=" + std::to_string(k);
+    retName += "/d=" + std::to_string(depth);
+    retName += "): " + graphToAlgorithmMap.begin()->second->getBaseName();
+
+    return retName;
 }
 
 std::string AdvancedBFSOverlayPDAPReachAlgorithm::getName() const noexcept {
@@ -87,5 +92,5 @@ std::string AdvancedBFSOverlayPDAPReachAlgorithm::getName() const noexcept {
 }
 
 std::string AdvancedBFSOverlayPDAPReachAlgorithm::getShortName() const noexcept {
-    return std::__cxx11::string("ABFS Partitioned Algorithm");
+    return std::__cxx11::string("ABFSO Partitioned Algorithm");
 }
