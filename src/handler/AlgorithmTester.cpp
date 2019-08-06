@@ -208,6 +208,7 @@ void AlgorithmTester::runTests() {
         runTest(algorithm, &timer);
 
         writeResults(&timer);
+        delete algorithm;
     }
 
 }

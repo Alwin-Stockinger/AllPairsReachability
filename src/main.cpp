@@ -8,7 +8,7 @@
 #include "algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h"
 #include "algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
 #include "handler/AlgorithmHandler.h"
-#include "handler/factories/FactoryFacade.h"
+#include "handler/FactoryFacade.h"
 #include "handler/AlgorithmTester.h"
 
 #include <CLI11.hpp>
@@ -190,10 +190,6 @@ int main(int argc, char *argv[]) {
         //TODO detailed results
 
         tester.runTests();
-
-        for(DynamicAPReachAlgorithm* algorithm: algorithms){
-            delete algorithm;
-        }
 
         /*handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth,
                          testWithoutPartition, overlayAlgorithmNames, repartitionThreshold, testPartition, testSuperVertex);*/

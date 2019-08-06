@@ -6,11 +6,11 @@
 #define ALLPAIRREACH_FACTORYFACADE_H
 
 
-#include "SimplePartitionFactory.h"
-#include "SuperVertexFactory.h"
-#include "SSBasedFactory.h"
-#include "ABFSOFactory.h"
-#include "SBFSOFactory.h"
+#include "factories/SimplePartitionFactory.h"
+#include "factories/SuperVertexFactory.h"
+#include "factories/SSBasedFactory.h"
+#include "factories/ABFSOFactory.h"
+#include "factories/SBFSOFactory.h"
 
 class FactoryFacade {
 
