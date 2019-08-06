@@ -147,9 +147,11 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
     unsigned long long nextReport = 0ULL;
     unsigned long long reportStep = 1ULL;
 
+    bool first = true;
     for (const auto &currentQueries : *queries) {
 
-        for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
+        if(first) first=false;
+        else for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
 
             auto startVertex = dynGraph->getCurrentVertexForId(currentQueries[j]);
             auto endVertex = dynGraph->getCurrentVertexForId(currentQueries[j + 1]);
