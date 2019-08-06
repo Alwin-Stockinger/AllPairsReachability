@@ -18,10 +18,10 @@
 
 using PartFunc = std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>;
 
-class PartitionedDAPReachAlgorithm : public DynamicAPReachAlgorithm{
+class PartitionedAPReachAlgorithm : public DynamicAPReachAlgorithm{
 public:
 
-    ~PartitionedDAPReachAlgorithm() override;
+    ~PartitionedAPReachAlgorithm() override;
 
     void run() override;
 
@@ -54,12 +54,6 @@ public:
         this->repartitionThreshold = newThreshold;
     }
 
-    void insertOverlayEdgeArcs(Algora::DiGraph *subGraph);
-    void removeOverlayEdgeArcs(Algora::DiGraph *subGraph);
-
-
-private:
-    void initAlgorithms(std::vector<Algora::DiGraph *> &graphs);
 
 
 
@@ -68,14 +62,21 @@ protected:
 
     void onDiGraphUnset() override;
 
+    virtual void insertOverlayEdgeArcs(Algora::DiGraph *subGraph) = 0;
+    virtual void removeOverlayEdgeArcs(Algora::DiGraph *subGraph) = 0;
+
+    virtual void resetChildStructures() = 0;
+    virtual void initializeChildStructures() = 0;
 
 
-    Algora::PropertyMap<DynamicAPReachAlgorithm*> graphToAlgorithmMap;
+
+
     Algora::PropertyMap<std::unordered_set<Algora::Vertex*>> edgeVertices;
     //cannot use FastPropertyMap, because of different graphs???
     Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;
     Algora::FastPropertyMap<Algora::Vertex*> mainToOverlayMap;
     Algora::DiGraph* overlayGraph = nullptr;
+    std::vector<Algora::DiGraph*> subGraphs;
 
 private:
 
@@ -86,9 +87,7 @@ private:
 
 
 protected:
-    void partition ();
-
-    virtual DynamicAPReachAlgorithm* createSubAlgorithm() = 0;
+    std::vector<Algora::DiGraph*> partition ();
 
     PartFunc partitionFunction = Partitioner::handlePartitioning;
 
@@ -100,11 +99,13 @@ protected:
 
 
 private:
-    bool checkIfOverlayIsolated(Algora::Vertex* vertex);
 
     void removeOverlayVertex(Algora::Vertex* vertex);
 
-    void insertOverlayEdgeArcsOfVertex(Algora::Vertex* vertex);
+    bool checkIfOverlayIsolated(Algora::Vertex* vertex);
+
+    virtual void insertOverlayEdgeArcsOfVertex(Algora::Vertex* vertex) = 0;
+
 
 protected:
     unsigned depth = 0U;

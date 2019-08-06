@@ -6,12 +6,12 @@
 #define ALLPAIRREACH_SIMPLEPARTITIONEDDAPREACHALGORITHM_H
 
 
-#include "PartitionedDAPReachAlgorithm.h"
+#include "PartitionedAPReachAlgorithm.h"
+#include "PartitionedDynamicAPReachAlgorithm.h"
 
-class SimplePartitionedDAPReachAlgorithm : public PartitionedDAPReachAlgorithm{
+class SimplePartitionedDAPReachAlgorithm : public PartitionedDynamicAPReachAlgorithm{
 
 public:
-    void run() override;
 
     bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
 
@@ -35,6 +35,10 @@ public:
 
 protected:
     virtual DynamicAPReachAlgorithm* createOverlayAlgorithm() = 0;
+
+    void initializeChildStructures() override;
+
+    void resetChildStructures() override;
 
 private:
     DynamicAPReachAlgorithm* overlayAlgorithm = nullptr;

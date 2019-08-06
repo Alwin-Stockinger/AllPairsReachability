@@ -6,30 +6,15 @@
 #define ALLPAIRREACH_SUPERVERTEXPDAPREACHALGORITHM_H
 
 
-#include "PartitionedDAPReachAlgorithm.h"
+#include "PartitionedAPReachAlgorithm.h"
 #include "SimplePartitionedDAPReachAlgorithmImplementation.h"
 
 
 class SuperVertexPDAPReachAlgorithm
-        : public PartitionedDAPReachAlgorithm {
+        : public PartitionedDynamicAPReachAlgorithm {
 
 public:
-    void run() override {
-        if(initialized){
-            return;
-        }
 
-        resetSuperStructure();
-
-        PartitionedDAPReachAlgorithm::run();
-
-        generateSuperVertices();
-        generateOverlayAlgorithms();
-
-        registerOnOverlay();
-
-        initialized = true;
-    }
 
     bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
 
@@ -50,6 +35,10 @@ public:
 
 protected:
     virtual Algora::DynamicSSReachAlgorithm* createOverlayAlgorithm() = 0;
+
+    void initializeChildStructures() override;
+
+    void resetChildStructures() override;
 
 private:
 

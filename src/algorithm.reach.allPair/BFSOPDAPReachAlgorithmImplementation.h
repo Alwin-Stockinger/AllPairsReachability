@@ -2,29 +2,28 @@
 // Created by Alwin Stockinger.
 //
 
-#ifndef ALLPAIRREACH_SBFSPDAPREACHALGORITHMIMPLEMENTATION_H
-#define ALLPAIRREACH_SBFSPDAPREACHALGORITHMIMPLEMENTATION_H
+#ifndef ALLPAIRREACH_BFSOPDAPREACHALGORITHMIMPLEMENTATION_H
+#define ALLPAIRREACH_BFSOPDAPREACHALGORITHMIMPLEMENTATION_H
 
-#include "SimpleBFSOverlayPDAPReachAlgorithm.h"
+#include "BFSOverlayPDAPReachAlgorithm.h"
 
 template <typename SubAlgorithm, bool propagatePartitionFunction = true>
-class SBFSPDAPReachAlgorithmImplementation : public SimpleBFSOverlayPDAPReachAlgorithm{
-
+class BFSOPDAPReachAlgorithmImplementation : public BFSOverlayPDAPReachAlgorithm{
 public:
     static_assert(std::is_base_of<DynamicAPReachAlgorithm,SubAlgorithm>::value, "Template Parameter has to inherit from DynamicAPAlgorithm");
 
-    explicit SBFSPDAPReachAlgorithmImplementation(const unsigned depth = 0U) : SimpleBFSOverlayPDAPReachAlgorithm(){
+    explicit BFSOPDAPReachAlgorithmImplementation(const unsigned depth = 0U) : BFSOverlayPDAPReachAlgorithm(){
         this->depth = depth;
     };
 
 
-    ~SBFSPDAPReachAlgorithmImplementation() override = default;
+    ~BFSOPDAPReachAlgorithmImplementation() override = default;
 
 private:
 
     DynamicAPReachAlgorithm *createSubAlgorithm() override {
         if( depth > 0U){
-            auto* newAlgo = new SBFSPDAPReachAlgorithmImplementation<SubAlgorithm, propagatePartitionFunction>(depth - 1);
+            auto* newAlgo = new BFSOPDAPReachAlgorithmImplementation<SubAlgorithm, propagatePartitionFunction>(depth - 1);
             if(propagatePartitionFunction){
                 newAlgo->setPartitionFunction(partitionFunction, k);
             }
@@ -33,8 +32,6 @@ private:
             return new SubAlgorithm;
         }
     }
-
 };
 
-
-#endif //ALLPAIRREACH_SBFSPDAPREACHALGORITHMIMPLEMENTATION_H
+#endif //ALLPAIRREACH_BFSOPDAPREACHALGORITHMIMPLEMENTATION_H

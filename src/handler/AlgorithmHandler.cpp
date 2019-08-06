@@ -513,7 +513,7 @@ AlgorithmHandler::createPartitionedAlgorithmForOverlay(const std::vector<std::st
 
     for(const std::string& algorithmName: algorithmNames){
 
-        PartitionedDAPReachAlgorithm *algorithm = nullptr;
+        PartitionedAPReachAlgorithm *algorithm = nullptr;
 
         if(algorithmName == "StaticBFS") {
             algorithm =
@@ -665,7 +665,7 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgo
 
     for(const std::string& algorithmName: algorithmNames){
 
-        PartitionedDAPReachAlgorithm *algorithm = nullptr;
+        PartitionedAPReachAlgorithm *algorithm = nullptr;
 
         if(algorithmName == "StaticBFS") {
             algorithm =
@@ -724,7 +724,7 @@ std::vector<DynamicAPReachAlgorithm *> * AlgorithmHandler::createPartitionedAlgo
 }
 
 template<typename SubAlgorithm, typename OverlayAlgorithm>
-PartitionedDAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm(const unsigned depth) {
+PartitionedAPReachAlgorithm * AlgorithmHandler::createPartitionAlgorithm(const unsigned depth) {
     return new SimplePartitionedDAPReachAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm>(depth);
 }
 
@@ -918,7 +918,7 @@ AlgorithmHandler::createSuperVertexAlgorithmForOverlay(const std::vector<std::st
 
     for(const std::string& algorithmName: algorithmNames){
 
-        PartitionedDAPReachAlgorithm *algorithm = nullptr;
+        PartitionedAPReachAlgorithm *algorithm = nullptr;
 
         if(algorithmName == "StaticBFS") {
             algorithm =
@@ -978,7 +978,7 @@ AlgorithmHandler::createSuperVertexAlgorithmForOverlay(const std::vector<std::st
 }
 
 template<typename SubAlgorithm, typename OverlayAlgorithm>
-PartitionedDAPReachAlgorithm *AlgorithmHandler::createSuperVertexAlgorithm(const unsigned int depth) {
+PartitionedAPReachAlgorithm *AlgorithmHandler::createSuperVertexAlgorithm(const unsigned int depth) {
     return new SuperVertexAlgorithmImplementation<SubAlgorithm, OverlayAlgorithm>(depth);
 }
 
@@ -996,7 +996,7 @@ AlgorithmHandler::createSuperVertexAlgorithms(const std::vector<std::string> &al
 
     for(const std::string& algorithmName: algorithmNames){
 
-        PartitionedDAPReachAlgorithm *algorithm = nullptr;
+        PartitionedAPReachAlgorithm *algorithm = nullptr;
 
         if(algorithmName == "StaticBFS") {
             algorithm =

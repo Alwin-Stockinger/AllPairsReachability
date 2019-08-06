@@ -54,7 +54,7 @@ private:
                                 unsigned long long repartitionThreshold = 0);
 
     template<typename SubAlgorithm, typename OverlayAlgorithm = SubAlgorithm>
-    PartitionedDAPReachAlgorithm *createPartitionAlgorithm(unsigned depth = 0U);
+    PartitionedAPReachAlgorithm *createPartitionAlgorithm(unsigned depth = 0U);
 
     std::vector<DynamicAPReachAlgorithm *> * createSpecialOverlayPartitionedAlgorithms(const std::vector<std::string> &algorithmNames,
                                                                                        const std::vector<std::string> &overlayNames,
@@ -95,7 +95,7 @@ private:
                                               unsigned int depth, const unsigned long long int repartitionThreshold);
 
     template<typename SubAlgorithm, typename OverlayAlgorithm>
-    PartitionedDAPReachAlgorithm *createSuperVertexAlgorithm(const unsigned int depth);
+    PartitionedAPReachAlgorithm *createSuperVertexAlgorithm(const unsigned int depth);
 
     std::vector<DynamicAPReachAlgorithm *> *
     createSuperVertexAlgorithms(const std::vector<std::string> &algorithmNames, unsigned long long int k, unsigned int depth,

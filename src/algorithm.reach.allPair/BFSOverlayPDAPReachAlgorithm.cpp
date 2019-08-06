@@ -3,9 +3,9 @@
 //
 
 #include <algorithm.basic.traversal/breadthfirstsearch.h>
-#include "AdvancedBFSOverlayPDAPReachAlgorithm.h"
+#include "BFSOverlayPDAPReachAlgorithm.h"
 
-bool AdvancedBFSOverlayPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
+bool BFSOverlayPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
     if(!initialized){
         run();
     }
@@ -61,12 +61,14 @@ bool AdvancedBFSOverlayPDAPReachAlgorithm::query(Algora::Vertex *start, const Al
             return reachable;
         });
 
-        bfs.onVertexDiscover([&reachableSourceEdgeVertices, &sourceEdge](const Algora::Vertex* vertex){
-            if(vertex != sourceEdge){
-                reachableSourceEdgeVertices.erase(vertex);
-            }
-            return true;
-        });
+        if(setRemovals){
+            bfs.onVertexDiscover([&reachableSourceEdgeVertices, &sourceEdge](const Algora::Vertex* vertex){
+                if(vertex != sourceEdge){
+                    reachableSourceEdgeVertices.erase(vertex);
+                }
+                return true;
+            });
+        }
 
         runAlgorithm(bfs, overlayGraph);
 
@@ -78,7 +80,7 @@ bool AdvancedBFSOverlayPDAPReachAlgorithm::query(Algora::Vertex *start, const Al
     return false;
 }
 
-std::string AdvancedBFSOverlayPDAPReachAlgorithm::getBaseName() {
+std::string BFSOverlayPDAPReachAlgorithm::getBaseName() {
     std::string retName = "ABFSO";
     retName += "(k=" + std::to_string(k);
     retName += "/d=" + std::to_string(depth);
@@ -87,10 +89,10 @@ std::string AdvancedBFSOverlayPDAPReachAlgorithm::getBaseName() {
     return retName;
 }
 
-std::string AdvancedBFSOverlayPDAPReachAlgorithm::getName() const noexcept {
+std::string BFSOverlayPDAPReachAlgorithm::getName() const noexcept {
     return std::__cxx11::string("Advanced BFS Overlay Partitioned Algorithm");
 }
 
-std::string AdvancedBFSOverlayPDAPReachAlgorithm::getShortName() const noexcept {
+std::string BFSOverlayPDAPReachAlgorithm::getShortName() const noexcept {
     return std::__cxx11::string("ABFSO Partitioned Algorithm");
 }

@@ -153,7 +153,7 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
 
 
 void SuperVertexPDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
-    PartitionedDAPReachAlgorithm::onArcAdd(arc);
+    PartitionedAPReachAlgorithm::onArcAdd(arc);
 
     for(Algora::Vertex* vertex: delayedVertices){
         Algora::Vertex* mainVertex;
@@ -164,7 +164,7 @@ void SuperVertexPDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
             mainVertex = arc->getTail();
         }
         else{
-            throw std::logic_error("Delayed Vertex must be head or Tail");
+            throw std::logic_error("Delayed Vertex must be Head or Tail");
         }
 
         auto* graph = mainToSubMap[mainVertex]->getParent();
@@ -200,5 +200,21 @@ void SuperVertexPDAPReachAlgorithm::registerOnOverlay() {
 }
 
 void SuperVertexPDAPReachAlgorithm::deregisterOnOverlay() {
-    overlayGraph->removeOnVertexAdd(this);
+    if(overlayGraph){
+        overlayGraph->removeOnVertexAdd(this);
+    }
+}
+
+void SuperVertexPDAPReachAlgorithm::initializeChildStructures() {
+    PartitionedDynamicAPReachAlgorithm::initializeChildStructures();
+
+    generateSuperVertices();
+    generateOverlayAlgorithms();
+
+    registerOnOverlay(); //this needs to be last, so that super vertices don't notify
+}
+
+void SuperVertexPDAPReachAlgorithm::resetChildStructures() {
+    resetSuperStructure();
+    PartitionedDynamicAPReachAlgorithm::resetChildStructures();
 }

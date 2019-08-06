@@ -7,7 +7,7 @@
 
 
 #include "PartitionedFactory.h"
-#include "../../algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h"
+#include "../../algorithm.reach.allPair/PartitionedAPReachAlgorithm.h"
 
 class SimplePartitionFactory : public PartitionedFactory{
 

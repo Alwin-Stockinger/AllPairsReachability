@@ -9,7 +9,7 @@
 #include <property/fastpropertymap.h>
 #include "AlgorithmFactory.h"
 #include "../../partition/Partitioner.h"
-#include "../../algorithm.reach.allPair/PartitionedDAPReachAlgorithm.h"
+#include "../../algorithm.reach.allPair/PartitionedAPReachAlgorithm.h"
 
 using PartFunc = std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>;
 
@@ -34,7 +34,7 @@ public:
 
 protected:
 
-    void configureAlgorithm(PartitionedDAPReachAlgorithm* algorithm){
+    void configureAlgorithm(PartitionedAPReachAlgorithm* algorithm){
         algorithm->setPartitionFunction(partitionFunction);
         algorithm->setRepartitionThreshold(repartitionThreshold);
     }
