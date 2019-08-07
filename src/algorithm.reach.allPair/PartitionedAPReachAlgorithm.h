@@ -70,7 +70,6 @@ protected:
 
 
 
-
     Algora::PropertyMap<std::unordered_set<Algora::Vertex*>> edgeVertices;
     //cannot use FastPropertyMap, because of different graphs???
     Algora::FastPropertyMap<Algora::Vertex*> mainToSubMap;

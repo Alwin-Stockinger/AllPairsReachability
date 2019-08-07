@@ -79,7 +79,7 @@ void PartitionedAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
 
     }
 
-    DynamicDiGraphAlgorithm::onVertexAdd(vertex);
+    DynamicAPReachAlgorithm::onVertexAdd(vertex);
 }
 
 
@@ -106,7 +106,7 @@ void PartitionedAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
             edgeVertices[subGraph].erase(vertex);
         }
     }
-    DynamicDiGraphAlgorithm::onVertexRemove(vertex);
+    DynamicAPReachAlgorithm::onVertexRemove(vertex);
 }
 
 
@@ -116,7 +116,7 @@ void PartitionedAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
         return;
     }
 
-    DynamicDiGraphAlgorithm::onArcAdd(arc);
+    DynamicAPReachAlgorithm::onArcAdd(arc);
 
     if(repartitionThreshold && ++operationsSinceRepartition >= repartitionThreshold){
         initialized = false;
@@ -164,7 +164,7 @@ void PartitionedAPReachAlgorithm::onArcRemove(Algora::Arc *arc) {
         return;
     }
 
-    DynamicDiGraphAlgorithm::onArcRemove(arc);
+    DynamicAPReachAlgorithm::onArcRemove(arc);
 
 
     if(repartitionThreshold && ++operationsSinceRepartition >= repartitionThreshold){
