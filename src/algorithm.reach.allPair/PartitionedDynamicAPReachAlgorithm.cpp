@@ -65,9 +65,7 @@ void PartitionedDynamicAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGraph *
         }
 
         overlayGraph->mapOutgoingArcsUntil(overlaySource,[&newReachableEdges](Algora::Arc* arc){
-            if(newReachableEdges.count(arc->getHead())){
-                newReachableEdges.erase(arc->getHead());
-            }
+            newReachableEdges.erase(arc->getHead());
         }, [&newReachableEdges](const Algora::Arc* arc){
             return newReachableEdges.empty();
         });
@@ -103,10 +101,10 @@ void PartitionedDynamicAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGraph *
             }
         }
 
-        std::unordered_set<Algora::Arc*> arcsToRemove{};
+        std::vector<Algora::Arc*> arcsToRemove{};
         overlayGraph->mapOutgoingArcsUntil(overlaySource, [&unreachableVertices, &arcsToRemove](Algora::Arc* arc){
             if(unreachableVertices.count(arc->getHead())){
-                arcsToRemove.insert(arc);
+                arcsToRemove.push_back(arc);
             }
         },[&unreachableVertices, &arcsToRemove](const Algora::Arc* arc){
             return unreachableVertices.size() == arcsToRemove.size();
