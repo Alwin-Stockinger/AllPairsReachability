@@ -147,6 +147,8 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
     unsigned long long nextReport = 0ULL;
     unsigned long long reportStep = 1ULL;
 
+    double advantage = 0.025;
+
     bool first = true;
     for (const auto &currentQueries : *queries) {
 
@@ -166,13 +168,15 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
         if( ++currentStep > nextReport){
             nextReport += reportStep;
 
-            int currentProg = (currentStep*100ULL) / queries->size();
+            double progPercentage = double (currentStep) / queries->size();
+
+            auto currentProg = short(progPercentage * 100.0);
             if(progress < currentProg){
                 progress = currentProg;
                 std::cout << progress << "% at " << timer->getAllTime() << std::endl;
             }
 
-            if(timeOut && timeOut * (currentProg + 1./100.) < timer->getAllTime()){ // NOLINT(bugprone-narrowing-conversions)
+            if(timeOut && ( double(timeOut) * (progPercentage + advantage) < double(timer->getAllTime()))){
                 std::cout << "TIMEOUT" << std::endl;
                 timer->timedOut = true;
                 break;
