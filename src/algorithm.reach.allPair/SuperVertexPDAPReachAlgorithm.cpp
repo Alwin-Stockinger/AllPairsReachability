@@ -164,7 +164,7 @@ void SuperVertexPDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
             mainVertex = arc->getTail();
         }
         else{
-            throw std::logic_error("Delayed Vertex must be head or Tail");
+            throw std::logic_error("Delayed vertex must be head or tail");
         }
 
         auto* graph = mainToSubMap[mainVertex]->getParent();
