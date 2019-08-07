@@ -82,9 +82,8 @@ bool BFSOverlayPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Ve
 
 std::string BFSOverlayPDAPReachAlgorithm::getBaseName() {
     std::string retName = "ABFSO";
-    retName += "(k=" + std::to_string(k);
-    retName += "/d=" + std::to_string(depth);
-    retName += "): " + graphToAlgorithmMap.begin()->second->getBaseName();
+    retName += "(" + getPartitionConfiguration() + ")";
+    retName += ": " + graphToAlgorithmMap.begin()->second->getBaseName();
 
     return retName;
 }

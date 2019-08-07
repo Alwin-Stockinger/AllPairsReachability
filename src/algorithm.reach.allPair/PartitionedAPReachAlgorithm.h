@@ -69,6 +69,9 @@ protected:
     virtual void initializeChildStructures() = 0;
 
 
+    std::string getPartitionConfiguration(){
+        return "k=" + std::to_string(k) + "/d=" + std::to_string(depth) + "/t=" + std::to_string(repartitionThreshold);
+    }
 
     Algora::PropertyMap<std::unordered_set<Algora::Vertex*>> edgeVertices;
     //cannot use FastPropertyMap, because of different graphs???

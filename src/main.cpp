@@ -57,11 +57,17 @@ int main(int argc, char *argv[]) {
     bool testSuperVertex = false;
     app.add_option("--testSuperVertex", testSuperVertex, "Test Super Vertex Algorithms");
 
-    bool testSimpleBFSO = false;
-    app.add_option("--testSBFSO", testSimpleBFSO, "Test Simple BFSO Algorithms");
+    bool testSimpleBFS = false;
+    app.add_option("--testSBFS", testSimpleBFS, "Test Simple BFS Algorithms");
 
-    bool testAdvancedBFSO = false;
-    app.add_option("--testABFSO", testAdvancedBFSO, "Test Advanced BFSO Algorithms");
+    bool testAdvancedBFS = false;
+    app.add_option("--testAdvancedBFS", testAdvancedBFS, "Test Advanced BFS Algorithms");
+
+    bool testBFSO = false;
+    app.add_option("--testBFSO", testBFSO, "Test BFSO Algorithms");
+
+    bool testReverseBFS = false;
+    app.add_option("--testReverseBFS", testReverseBFS, "Test Reversed BFS Algorithms");
 
     std::vector<std::string> algorithmNames;
     app.add_option("-A, --algorithms", algorithmNames, "Algorithms to use");
@@ -170,7 +176,7 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        FactoryFacade factory(testWithoutPartition, testPartition, testAdvancedBFSO || testSimpleBFSO, testSuperVertex);
+        FactoryFacade factory(testWithoutPartition, testPartition, testBFSO, testSuperVertex, testReverseBFS);
 
         factory.setExponentialK(exponentialK);
         factory.setKMax(k);
@@ -180,8 +186,8 @@ int main(int argc, char *argv[]) {
         factory.setAlgorithmNames(algorithmNames);
         factory.setOverlayNames(overlayAlgorithms);
         factory.setRepartitionThreshold(repartitionThreshold);
-        factory.setAdvancedBFSO(testAdvancedBFSO);
-        factory.setSimpleBFSO(testSimpleBFSO);
+        factory.setAdvancedBFSO(testAdvancedBFS);
+        factory.setSimpleBFSO(testSimpleBFS);
 
 
         AlgorithmTester tester;

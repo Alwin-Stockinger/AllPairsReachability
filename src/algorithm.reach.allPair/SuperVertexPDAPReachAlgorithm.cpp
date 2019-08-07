@@ -177,9 +177,8 @@ void SuperVertexPDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
 
 std::string SuperVertexPDAPReachAlgorithm::getBaseName() {
     std::string retName = "Super Vertex ";
-    retName += "(k=" + std::to_string(k);
-    retName += "/d=" + std::to_string(depth);
-    retName += "): " + graphToAlgorithmMap.begin()->second->getBaseName();
+    retName += "(" + getPartitionConfiguration() + ")";
+    retName += ": " + graphToAlgorithmMap.begin()->second->getBaseName();
     retName += "(" + overlayAlgorithms.begin()->second->getShortName() + ")";
 
     return retName;

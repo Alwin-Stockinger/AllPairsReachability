@@ -228,7 +228,7 @@ void ReverseBFSPartitionedAPReachAlgorithm::resetChildStructures() {
 }
 
 std::string ReverseBFSPartitionedAPReachAlgorithm::getBaseName() {
-    return "RBFSP(k=" + std::to_string(k) + "/d=" + std::to_string(depth) + ")";
+    return "RBFS(" + getPartitionConfiguration() + ")";
 }
 
 std::string ReverseBFSPartitionedAPReachAlgorithm::getName() const noexcept {
