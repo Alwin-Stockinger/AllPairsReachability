@@ -7,7 +7,6 @@
 
 #include "algorithm.reach.allPair/SimplePartitionedDAPReachAlgorithmImplementation.h"
 #include "algorithm.reach.allPair/SSBasedDAPReachAlgorithmImplementation.h"
-#include "handler/AlgorithmHandler.h"
 #include "handler/FactoryFacade.h"
 #include "handler/AlgorithmTester.h"
 
@@ -17,9 +16,10 @@
 #include <konectnetworkinstanceprovider.h>
 #include <spawn.h>
 #include <wait.h>
+#include <chrono>
 
-
-
+typedef std::chrono::high_resolution_clock HRC;
+typedef HRC::time_point TimePoint;
 
 int main(int argc, char *argv[]) {
 
@@ -181,9 +181,23 @@ int main(int argc, char *argv[]) {
         factory.setOverlayNames(overlayAlgorithms);
         factory.setRepartitionThreshold(repartitionThreshold);
 
-        std::vector<DynamicAPReachAlgorithm*> algorithms = factory.getAlgorithms();
 
         AlgorithmTester tester;
+        std::chrono::high_resolution_clock::time_point& partitionStartTimer = tester.getPartitionStartTimer();
+        std::chrono::high_resolution_clock::time_point& partitionEndTimer = tester.getPartitionEndTimer();
+
+
+        PartFunc partitionFunction = [&partitionStartTimer, &partitionEndTimer](unsigned long long k, Algora::DiGraph* diGraph){
+            partitionStartTimer = std::chrono::high_resolution_clock::now();
+            auto partitionMap = Partitioner::handlePartitioning(k,diGraph);
+            partitionEndTimer = std::chrono::high_resolution_clock::now();
+            return partitionMap;
+        };
+        factory.setPartitionFunction(partitionFunction);
+
+        std::vector<DynamicAPReachAlgorithm*> algorithms = factory.getAlgorithms();
+
+
         tester.setAlgorithms(algorithms);
         tester.setInstanceProvider(provider);
         tester.setTimeOut(timeOut);
@@ -191,8 +205,7 @@ int main(int argc, char *argv[]) {
 
         tester.runTests();
 
-        /*handler.runTests(algorithmNames, exponentialK, k, kMin, timeOut, detailedResults, minDepth, maxDepth,
-                         testWithoutPartition, overlayAlgorithmNames, repartitionThreshold, testPartition, testSuperVertex);*/
+
     }
     else{
         //handler.runInterface();
