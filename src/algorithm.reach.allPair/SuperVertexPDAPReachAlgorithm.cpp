@@ -153,7 +153,7 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
 
 
 void SuperVertexPDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
-    PartitionedDAPReachAlgorithm::onArcAdd(arc);
+    PartitionedAPReachAlgorithm::onArcAdd(arc);
 
     for(Algora::Vertex* vertex: delayedVertices){
         Algora::Vertex* mainVertex;
