@@ -8,8 +8,13 @@
 
 #include <instanceprovider.h>
 
+
+#include <chrono>
 #include <utility>
 #include "../algorithm.reach.allPair/DynamicAPReachAlgorithm.h"
+
+typedef std::chrono::high_resolution_clock HRC;
+typedef HRC::time_point TimePoint;
 
 class AlgorithmTester {
 
@@ -28,6 +33,14 @@ public:
 
     void runTests();
 
+    std::chrono::high_resolution_clock::time_point& getPartitionStartTimer(){
+        return partitionStartTimer;
+    }
+
+    std::chrono::high_resolution_clock::time_point& getPartitionEndTimer(){
+        return partitionEndTimer;
+    }
+
 private:
 
     struct TimeCollector;
@@ -41,6 +54,10 @@ private:
     Algora::InstanceProvider* instanceProvider;
     std::vector<DynamicAPReachAlgorithm*> algorithms;
     unsigned long long timeOut;
+
+    TimePoint partitionStartTimer;
+    TimePoint partitionEndTimer;
+
 };
 
 

@@ -11,6 +11,9 @@
 #include "factories/SSBasedFactory.h"
 #include "factories/BFSOFactory.h"
 
+
+using PartFunc = std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>;
+
 class FactoryFacade {
 
 public:
@@ -73,6 +76,12 @@ public:
     void setAlgorithmNames(const std::vector<std::string>& algorithmNames){
         for(AlgorithmFactory* factory: factories){
             factory->setAlgorithmNames(algorithmNames);
+        }
+    }
+
+    void setPartitionFunction(const PartFunc& partFunc){
+        for(PartitionedFactory* partitionedFactory: partitionedFactories){
+            partitionedFactory->setPartitionFunction(partFunc);
         }
     }
 

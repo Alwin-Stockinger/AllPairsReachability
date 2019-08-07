@@ -8,8 +8,7 @@
 #include <fstream>
 #include "AlgorithmTester.h"
 
-typedef std::chrono::high_resolution_clock HRC;
-typedef HRC::time_point TimePoint;
+
 
 
 struct AlgorithmTester::TimeCollector {
@@ -24,7 +23,7 @@ struct AlgorithmTester::TimeCollector {
 
 
     unsigned long long initTime{};
-    unsigned long long partitionTime{};
+    std::vector<unsigned long long> partitionTimes;
     std::vector<unsigned long long> queryTimes;
     std::vector<unsigned long long> addArcTimes;
     std::vector<unsigned long long> removeArcTimes;
@@ -48,8 +47,13 @@ struct AlgorithmTester::TimeCollector {
         removeArcTimes.push_back(duration);
     }
 
+    void addPartitionTime(TimePoint start, TimePoint end) {
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        partitionTimes.push_back(duration);
+    }
+
     double getAvgQueryTime(){
-        return getAvg(queryTimes);
+        return getAvg(queryTimes) - double(getRepartitionTime())/queryTimes.size();
     }
 
     double getAvgAddArcTime(){
@@ -60,8 +64,21 @@ struct AlgorithmTester::TimeCollector {
         return getAvg(removeArcTimes);
     }
 
+    unsigned long long getRepartitionTime(){
+        if(partitionTimes.size() > 1){
+            return std::accumulate(++partitionTimes.begin(), partitionTimes.end(), 0ULL);
+        }
+        else{
+            return 0ULL;
+        }
+    }
+
+    unsigned long long getPartitionTime(){
+        return std::accumulate(partitionTimes.begin(), partitionTimes.end(), 0ULL);
+    }
+
     unsigned long long getQueryTime(){
-        return std::accumulate(queryTimes.begin(), queryTimes.end(), 0ULL);
+        return std::accumulate(queryTimes.begin(), queryTimes.end(), 0ULL) - getRepartitionTime();
     }
 
     unsigned long long getAddArcTime(){
@@ -76,18 +93,13 @@ struct AlgorithmTester::TimeCollector {
         return getQueryTime() + getAddArcTime() + getRemoveArcTime() + initTime;
     }
 
-    void addPartitionTime(TimePoint start, TimePoint end) {
-        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-        partitionTime = duration;
-    }
+
 
 private:
     static double getAvg(const std::vector<unsigned long long >& times){
-        unsigned long long sum = 0ULL;
-        for(unsigned long long time : times){
-            sum += time;
-        }
-        double avg = sum;
+        unsigned long long sum = std::accumulate(times.begin(), times.end(), 0ULL);
+
+        auto avg = double(sum);
         return avg/times.size();
     }
 };
@@ -100,6 +112,8 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
     auto* dynGraph = instanceProvider->getGraph();
     auto* diGraph = dynGraph->getDiGraph();
 
+    TimePoint prevPartitionTime = partitionStartTimer;
+
     //measurement specific
     algorithm->setAutoUpdate(false);
     algorithm->setGraph(diGraph);
@@ -110,6 +124,9 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
     algorithm->run();
     auto endTime = HRC::now();
     timer->addInitTime(startTime, endTime);
+    timer->addPartitionTime(partitionStartTimer, partitionEndTimer);
+    prevPartitionTime = partitionStartTimer;
+
     std::cout << "Initialized in " << timer->initTime << "ns" << std::endl;
     std::cout << "Starting Algorithm " << algorithm->getBaseName() << std::endl;
 
@@ -147,10 +164,15 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
     unsigned long long nextReport = 0ULL;
     unsigned long long reportStep = 1ULL;
 
+    double advantage = 0.025;
+
     bool first = true;
+
+
+
     for (const auto &currentQueries : *queries) {
 
-        if(first) first=false;
+        if(first) first = false;
         else for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
 
             auto startVertex = dynGraph->getCurrentVertexForId(currentQueries[j]);
@@ -162,17 +184,23 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
             auto endQueryTime = std::chrono::high_resolution_clock::now();
             timer->addQueryTime(startQueryTime, endQueryTime);
         }
+        if(prevPartitionTime != partitionStartTimer){
+            timer->addPartitionTime(partitionStartTimer, partitionEndTimer);
+            prevPartitionTime = partitionStartTimer;
+        }
 
         if( ++currentStep > nextReport){
             nextReport += reportStep;
 
-            int currentProg = (currentStep*100ULL) / queries->size();
+            double progPercentage = double (currentStep) / queries->size();
+
+            auto currentProg = short(progPercentage * 100.0);
             if(progress < currentProg){
                 progress = currentProg;
                 std::cout << progress << "% at " << timer->getAllTime() << std::endl;
             }
 
-            if(timeOut && timeOut * (currentProg + 1./100.) < timer->getAllTime()){ // NOLINT(bugprone-narrowing-conversions)
+            if(timeOut && ( double(timeOut) * (progPercentage + advantage) < double(timer->getAllTime()))){
                 std::cout << "TIMEOUT" << std::endl;
                 timer->timedOut = true;
                 break;
@@ -239,6 +267,8 @@ void AlgorithmTester::writeHeader() {
     file << ",avg add Arc time(ns)";
     file << ",avg remove Arc time(ns)";
     file << ",init time(ns)";
+    file << ",partition time(ns)";
+    file << ",repartition time(ns)";
     file << ",whole Time(ns)";
     file << ",timeout";
     file << ",error";
@@ -254,6 +284,8 @@ void AlgorithmTester::writeResults(AlgorithmTester::TimeCollector *timer) {
     file << "," << timer->getAvgAddArcTime();
     file << "," << timer->getAvgRemoveArcTime();
     file << "," << timer->initTime;
+    file << "," << timer->getPartitionTime();
+    file << "," << timer->getRepartitionTime();
     file << "," << timer->getAllTime();
     file << "," << timer->timedOut;
     file << "," << "\"" << timer->error << "\"";
