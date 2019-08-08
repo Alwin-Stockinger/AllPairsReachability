@@ -97,10 +97,17 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
             sourceNotReachable.push_back(mainToOverlayMap[outVertex]);
         }
     }
+    if(sourceNotReachable.size() == startEdgeVertices.size()){
+        return false;
+    }
+
     for(Algora::Vertex* inVertex : endEdgeVertices) {
         if (!endGraphAlgorithm->query(mainToSubMap[inVertex], end)) {
             destinationNotReachable.push_back(mainToOverlayMap[inVertex]);
         }
+    }
+    if(destinationNotReachable.size() == endEdgeVertices.size()){
+        return false;
     }
 
     //cant use always set because have to remove and reinserted arcs have to keep order
