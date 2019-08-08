@@ -6,6 +6,7 @@
 #include <chrono>
 #include <numeric>
 #include <fstream>
+#include <map>
 #include "AlgorithmTester.h"
 
 
@@ -27,9 +28,14 @@ struct AlgorithmTester::TimeCollector {
     std::vector<unsigned long long> queryTimes;
     std::vector<unsigned long long> addArcTimes;
     std::vector<unsigned long long> removeArcTimes;
+    std::map<short, unsigned long long> percentageTimes;
 
     void addInitTime(TimePoint start, TimePoint end){
         initTime = std::chrono::duration_cast<std::chrono::nanoseconds>(end -start).count();
+    }
+
+    void addPercentageTime(std::pair<short, unsigned long long> newTime) {
+        percentageTimes.insert(newTime);
     }
 
     void addQueryTime(TimePoint start, TimePoint end) {
@@ -196,8 +202,10 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
 
             auto currentProg = short(progPercentage * 100.0);
             if(progress < currentProg){
+                auto currentTime = timer->getAllTime();
                 progress = currentProg;
-                std::cout << progress << "% at " << timer->getAllTime() << std::endl;
+                std::cout << progress << "% at " << currentTime << std::endl;
+                timer->addPercentageTime(std::make_pair(progress, currentTime));
             }
 
             if(timeOut && ( double(timeOut) * (progPercentage + advantage) < double(timer->getAllTime()))){
@@ -221,7 +229,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
 
 
 
-    std::cout << "Finished\n";
+    std::cout << "Finished\n\n" << std::endl;
 
 }
 
@@ -236,6 +244,9 @@ void AlgorithmTester::runTests() {
         runTest(algorithm, &timer);
 
         writeResults(&timer);
+        if(percentageTimes){
+            writePercentageTimes(&timer);
+        }
         delete algorithm;
     }
 
@@ -291,4 +302,22 @@ void AlgorithmTester::writeResults(AlgorithmTester::TimeCollector *timer) {
     file << "," << "\"" << timer->error << "\"";
 
     file << std::endl;
+}
+
+void AlgorithmTester::writePercentageTimes(AlgorithmTester::TimeCollector *timer){
+    std::ofstream file;
+    file.open("percentageTimes.csv", std::ios_base::app);
+
+    file << "\"" << timer->algorithmName << "\"\n";
+    file << "%,time\n"; //header
+
+
+    for( auto& [percentage, time] : timer->percentageTimes){
+        file << percentage << "," << time << "\n";
+    }
+    file << std::endl; //flush and mark end of algorithm
+}
+
+void AlgorithmTester::setPercentageTimes(bool b) {
+    this->percentageTimes = b;
 }

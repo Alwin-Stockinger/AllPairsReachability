@@ -108,6 +108,9 @@ int main(int argc, char *argv[]) {
     bool detailedResults = false;
     app.add_option("--detailed", detailedResults, "Also write detailed Results");
 
+    bool percentageTimes = false;
+    app.add_option("--percentageTimes", percentageTimes, "Write timestamps for every percent to a file");
+
     unsigned long long timeOut = 0ULL;
     app.add_option("-t, --timeOut", timeOut, "Time out time for algorithms");
 
@@ -209,6 +212,7 @@ int main(int argc, char *argv[]) {
         tester.setAlgorithms(algorithms);
         tester.setInstanceProvider(provider);
         tester.setTimeOut(timeOut);
+        tester.setPercentageTimes(percentageTimes);
         //TODO detailed results
 
         tester.runTests();

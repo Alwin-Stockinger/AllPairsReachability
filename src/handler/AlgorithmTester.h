@@ -41,13 +41,17 @@ public:
         return partitionEndTimer;
     }
 
+    void setPercentageTimes(bool b);
+
 private:
 
     struct TimeCollector;
 
     void writeHeader();
 
-    void writeResults(TimeCollector* timer);
+    static void writeResults(TimeCollector* timer);
+    static void writePercentageTimes(TimeCollector* timer);
+
     void resetDynGraph();
     void runTest(DynamicAPReachAlgorithm* algorithm, TimeCollector* timer);
 
@@ -57,6 +61,8 @@ private:
 
     TimePoint partitionStartTimer;
     TimePoint partitionEndTimer;
+
+    bool percentageTimes = false;
 
 };
 
