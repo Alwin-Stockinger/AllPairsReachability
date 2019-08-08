@@ -72,16 +72,11 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
         }
     }
 
-    for(auto& [_,algorithm] : overlayAlgorithms){
-        algorithm->setAutoUpdate(false);
-        (void)(_);// unused warning
-    }
-
     DynamicAPReachAlgorithm* startGraphAlgorithm = graphToAlgorithmMap[startGraph];
     DynamicAPReachAlgorithm* endGraphAlgorithm = graphToAlgorithmMap[endGraph];
 
     Algora::DynamicSSReachAlgorithm* overlayAlgorithm = overlayAlgorithms[startGraph];
-    overlayAlgorithm->setAutoUpdate(true);
+
 
     Algora::Vertex* sourceSuperVertex = sourceSuperVertices[startGraph];
     Algora::Vertex* destinationSuperVertex = destinationSuperVertices[endGraph];
@@ -109,6 +104,12 @@ bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::V
     if(destinationNotReachable.size() == endEdgeVertices.size()){
         return false;
     }
+
+    for(auto& [_,algorithm] : overlayAlgorithms){
+        algorithm->setAutoUpdate(false);
+        (void)(_);// unused warning
+    }
+    overlayAlgorithm->setAutoUpdate(true);
 
     //cant use always set because have to remove and reinserted arcs have to keep order
     std::unordered_set<Algora::Vertex*> sourceNotReachableSet( sourceNotReachable.begin(), sourceNotReachable.end());
