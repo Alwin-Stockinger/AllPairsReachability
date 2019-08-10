@@ -42,9 +42,10 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::run() {
 
 template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onVertexAdd(Algora::Vertex *vertex) {
-    if(initialized){
-        DynamicDiGraphAlgorithm::onVertexAdd(vertex);
 
+    DynamicDiGraphAlgorithm::onVertexAdd(vertex);
+
+    if(initialized){
         for(auto* algorithm: vertexMap){
             if(algorithm){
                 algorithm->onVertexAdd(vertex);
@@ -61,9 +62,8 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onVertexAdd(Algora::Vertex 
 
 template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onVertexRemove(Algora::Vertex *vertex) {
-
+    DynamicDiGraphAlgorithm::onVertexRemove(vertex);
     if(initialized){
-        DynamicDiGraphAlgorithm::onVertexRemove(vertex);
         delete vertexMap[vertex];
         vertexMap.resetToDefault(vertex);
 
@@ -77,9 +77,8 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onVertexRemove(Algora::Vert
 
 template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onArcAdd(Algora::Arc *arc) {
-
+    DynamicDiGraphAlgorithm::onArcAdd(arc);
     if(initialized) {
-        DynamicDiGraphAlgorithm::onArcAdd(arc);
         for(auto* algorithm: vertexMap){
             if(algorithm){
                 algorithm->onArcAdd(arc);
@@ -90,6 +89,7 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onArcAdd(Algora::Arc *arc) 
 
 template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::onArcRemove(Algora::Arc *arc) {
+    DynamicDiGraphAlgorithm::onArcRemove(arc);
     if(initialized){
         for(auto* algorithm: vertexMap){
             if(algorithm){
@@ -111,7 +111,7 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::addVertexToMap(Algora::Vert
 
     Algora::DynamicSSReachAlgorithm *algorithm = createSSAlgorithm();
 
-    //important for testing, otherwise major work happens outside meassurement when only testing SSBased
+    //important for testing, otherwise major work happens outside measurement when only testing SSBased
     algorithm->setAutoUpdate(false);
 
     algorithm->setGraph(diGraph);

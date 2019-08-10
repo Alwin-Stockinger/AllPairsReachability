@@ -17,7 +17,6 @@ bool BFSOverlayPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Ve
     auto* endGraph = end->getParent();
 
     //same subgraph? then normal Algorithm
-    //same subgraph? then normal Algorithm
     if(startGraph == endGraph){
         if(graphToAlgorithmMap[startGraph] -> query(start, end)){
             return true;

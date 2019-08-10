@@ -14,6 +14,7 @@ PartitionedDynamicAPReachAlgorithm::initializeChildStructures() {
     for (Algora::DiGraph *graph : subGraphs) {
         DynamicAPReachAlgorithm* algorithm = createSubAlgorithm();
         algorithm -> setGraph(graph);
+        algorithm -> run();
         graphToAlgorithmMap.setValue(graph, algorithm);
     }
 }
