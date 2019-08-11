@@ -6,6 +6,7 @@
 #define ALLPAIRREACH_REVERSEBFSPARTITIONEDAPREACHALGORITHM_H
 
 
+#include <numeric>
 #include "PartitionedAPReachAlgorithm.h"
 
 class ReverseBFSPartitionedAPReachAlgorithm : public PartitionedAPReachAlgorithm{
@@ -41,6 +42,15 @@ public:
     std::string getName() const noexcept override;
 
     std::string getShortName() const noexcept override;
+
+    unsigned long long getAmount(){
+        unsigned long long sum = 0ULL;
+
+        for(auto& [_,edgeSet] : edgeVertices){
+            sum += edgeSet.size();
+        }
+        return sum;
+    }
 
 private:
     Algora::PropertyMap<Algora::Vertex*> subToMainMap; //can't use FastPropertyMap because vertices of subgraphs could have same id

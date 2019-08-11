@@ -8,8 +8,7 @@
 #include <fstream>
 #include <map>
 #include "AlgorithmTester.h"
-
-
+#include "../algorithm.reach.allPair/ReverseBFSPartitionedAPReachAlgorithm.h"
 
 
 struct AlgorithmTester::TimeCollector {
@@ -174,12 +173,13 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
 
     bool first = true;
 
-
+    auto* castedAlgorithm = dynamic_cast<ReverseBFSPartitionedAPReachAlgorithm*>(algorithm);
+    std::cout << progress << "% at " << castedAlgorithm->getAmount() << std::endl;
 
     for (const auto &currentQueries : *queries) {
 
         if(first) first = false;
-        else for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
+        /*else for (auto j = 0ULL; currentQueries.size() != 0ULL && j < currentQueries.size() - 1; j += 2) {
 
             auto startVertex = dynGraph->getCurrentVertexForId(currentQueries[j]);
             auto endVertex = dynGraph->getCurrentVertexForId(currentQueries[j + 1]);
@@ -189,7 +189,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
             algorithm->query(startVertex, endVertex);
             auto endQueryTime = std::chrono::high_resolution_clock::now();
             timer->addQueryTime(startQueryTime, endQueryTime);
-        }
+        }*/
         if(prevPartitionTime != partitionStartTimer){
             timer->addPartitionTime(partitionStartTimer, partitionEndTimer);
             prevPartitionTime = partitionStartTimer;
@@ -204,7 +204,12 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
             if(progress < currentProg){
                 auto currentTime = timer->getAllTime();
                 progress = currentProg;
-                std::cout << progress << "% at " << currentTime << std::endl;
+
+
+
+
+
+                std::cout << progress << "% at " << castedAlgorithm->getAmount() << std::endl;
                 timer->addPercentageTime(std::make_pair(progress, currentTime));
             }
 
