@@ -33,7 +33,7 @@ void SuperVertexPDAPReachAlgorithm::generateOverlayAlgorithms() {
         ssAlgorithm->setGraph(overlayGraph);
         ssAlgorithm->setSource(superVertex);
 
-        //ssAlgorithm->run();
+        ssAlgorithm->run();
 
         overlayAlgorithms[graph] = ssAlgorithm;
     }
