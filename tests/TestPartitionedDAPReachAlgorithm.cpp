@@ -96,7 +96,7 @@ public:
 
         algorithm->setGraph(mainGraph->getDiGraph());
 
-        algorithm->run();
+        //algorithm->run();
     }
 };
 
