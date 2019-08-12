@@ -121,7 +121,7 @@ std::vector<DynamicAPReachAlgorithm *> SuperVertexFactory::createSpecificAlgorit
         exponentialK ? (k *= 2ULL) : (k++);
     }()) {
         for(unsigned long long depth = depthMin; depth <= depthMax; depth++){
-            auto* algorithm = new SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<SubAlgorithm, true>, OverlayAlgorithm>(depth);
+            auto* algorithm = new SuperVertexAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<SubAlgorithm, false>, OverlayAlgorithm>(depth);
 
             configureAlgorithm(algorithm);
             algorithm->setK(k);

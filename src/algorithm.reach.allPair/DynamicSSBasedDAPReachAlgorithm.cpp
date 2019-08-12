@@ -32,7 +32,7 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::run() {
         init();
     }
     if(immediateInit){
-        for (auto &&algorithm : vertexMap) {
+        for (auto* algorithm : vertexMap) {
             algorithm->run();
         }
     }
@@ -139,7 +139,7 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::reset() {
 
 template<bool immediateInit>
 void DynamicSSBasedDAPReachAlgorithm<immediateInit>::deleteAllAlgorithms(){
-    for (auto &&algorithm : vertexMap) {
+    for (auto* algorithm : vertexMap) {
         delete algorithm;
     }
 }

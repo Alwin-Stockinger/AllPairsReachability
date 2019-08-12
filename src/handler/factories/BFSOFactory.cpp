@@ -68,7 +68,7 @@ std::vector<DynamicAPReachAlgorithm *> BFSOFactory::createAlgorithms() {
     }()) {
         for(unsigned long long depth = depthMin; depth <= depthMax; depth++){
             if(advancedBFSO){
-                auto* algorithm = new BFSOPDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<SubAlgorithm, true>>(depth);
+                auto* algorithm = new BFSOPDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<SubAlgorithm, false>>(depth);
 
                 configureAlgorithm(algorithm);
                 algorithm->setK(k);
@@ -77,7 +77,7 @@ std::vector<DynamicAPReachAlgorithm *> BFSOFactory::createAlgorithms() {
                 algorithms.push_back(algorithm);
             }
             if(simpleBFSO){
-                auto* algorithm = new BFSOPDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<SubAlgorithm, true>>(depth);
+                auto* algorithm = new BFSOPDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<SubAlgorithm, false>>(depth);
 
                 configureAlgorithm(algorithm);
                 algorithm->setK(k);

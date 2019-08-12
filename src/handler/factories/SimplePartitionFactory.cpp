@@ -120,7 +120,7 @@ std::vector<DynamicAPReachAlgorithm *> SimplePartitionFactory::createSpecificAlg
         exponentialK ? (k *= 2ULL) : (k++);
     }()) {
         for(unsigned long long depth = depthMin; depth <= depthMax; depth++){
-            auto* algorithm = new SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<SubAlgorithm, true>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm, true>>(depth);
+            auto* algorithm = new SimplePartitionedDAPReachAlgorithmImplementation<SSBasedDAPReachAlgorithmImplementation<SubAlgorithm, false>, SSBasedDAPReachAlgorithmImplementation<OverlayAlgorithm, false>>(depth);
 
             configureAlgorithm(algorithm);
             algorithm->setK(k);
