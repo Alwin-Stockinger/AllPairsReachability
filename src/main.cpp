@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
     dynGraph->applyNextDelta();
 
     std::cout << "Algor Generated Graph with n=" << dynGraph->getConstructedGraphSize()
-        << "  and m=" << dynGraph->getConstructedArcSize();
+        << "  and m=" << dynGraph->getConstructedArcSize() << std::endl;
 
 
 
