@@ -66,6 +66,9 @@ int main(int argc, char *argv[]) {
     bool testBFSO = false;
     app.add_option("--testBFSO", testBFSO, "Test BFSO Algorithms");
 
+    bool testDFSO = false;
+    app.add_option("--testDFSO", testBFSO, "Test DFSO Algorithms");
+
     bool testReverseBFS = false;
     app.add_option("--testReverseBFS", testReverseBFS, "Test Reversed BFS Algorithms");
 
@@ -182,7 +185,7 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        FactoryFacade factory(testWithoutPartition, testPartition, testBFSO, testSuperVertex, testReverseBFS);
+        FactoryFacade factory(testWithoutPartition, testPartition, testBFSO, testSuperVertex, testReverseBFS, testDFSO);
 
         factory.setExponentialK(exponentialK);
         factory.setKMax(k);
