@@ -176,6 +176,8 @@ int main(int argc, char *argv[]) {
     dynGraph->resetToBigBang();
     dynGraph->applyNextDelta();
 
+    std::cout << "n=" << dynGraph->getConstructedGraphSize() << std::endl;
+
 
 
     if(runPerformanceTests){

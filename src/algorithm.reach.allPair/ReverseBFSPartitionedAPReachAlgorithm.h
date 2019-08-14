@@ -44,11 +44,30 @@ public:
     std::string getShortName() const noexcept override;
 
     unsigned long long getAmount(){
-        unsigned long long sum = 0ULL;
+        return overlayGraph->getSize();
+    }
 
-        for(auto& [_,edgeSet] : edgeVertices){
-            sum += edgeSet.size();
-        }
+    unsigned long long getArcAmount(){
+        return overlayGraph->getNumArcs(false);
+    }
+
+    unsigned long long getSubConnectionArcs(){
+        auto sum = 0ULL;
+        diGraph->mapArcs([this, &sum] (Algora::Arc* arc){
+            auto* tail = arc->getTail();
+            auto* head = arc->getHead();
+
+            auto* subTail = mainToSubMap[tail];
+            auto* subHead = mainToSubMap[head];
+
+            auto* overlayTail = mainToOverlayMap[tail];
+            auto* overlayHead = mainToOverlayMap[head];
+
+            if(overlayHead && overlayTail && (subHead->getParent() == subTail->getParent())){
+                sum++;
+            }
+        });
+
         return sum;
     }
 

@@ -1,5 +1,5 @@
 file_name = "origGraph"
-new_file_name = "reducedGraph"
+new_file_name = "reducedNLGraph"
 
 reduced_size = 50000
 

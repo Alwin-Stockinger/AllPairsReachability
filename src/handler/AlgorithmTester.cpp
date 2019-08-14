@@ -174,7 +174,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
     bool first = true;
 
     auto* castedAlgorithm = dynamic_cast<ReverseBFSPartitionedAPReachAlgorithm*>(algorithm);
-    std::cout << progress << "% at " << castedAlgorithm->getAmount() << std::endl;
+    std::cout << progress << "% at " << castedAlgorithm->getAmount() << "," << castedAlgorithm->getArcAmount() << "," << castedAlgorithm->getSubConnectionArcs() << std::endl;
 
     for (const auto &currentQueries : *queries) {
 
@@ -209,7 +209,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
 
 
 
-                std::cout << progress << "% at " << castedAlgorithm->getAmount() << std::endl;
+                std::cout << progress << "% at " << castedAlgorithm->getAmount() << "," << castedAlgorithm->getArcAmount() << "," << castedAlgorithm->getSubConnectionArcs() << std::endl;
                 timer->addPercentageTime(std::make_pair(progress, currentTime));
             }
 
