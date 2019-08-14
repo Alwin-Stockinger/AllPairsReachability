@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     app.add_option("--testBFSO", testBFSO, "Test BFSO Algorithms");
 
     bool testDFSO = false;
-    app.add_option("--testDFSO", testBFSO, "Test DFSO Algorithms");
+    app.add_option("--testDFSO", testDFSO, "Test DFSO Algorithms");
 
     bool testReverseBFS = false;
     app.add_option("--testReverseBFS", testReverseBFS, "Test Reversed BFS Algorithms");
