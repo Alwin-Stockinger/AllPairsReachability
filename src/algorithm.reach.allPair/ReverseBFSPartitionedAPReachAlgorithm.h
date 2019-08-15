@@ -51,9 +51,10 @@ public:
         return overlayGraph->getNumArcs(false);
     }
 
-    unsigned long long getSubConnectionArcs(){
-        auto sum = 0ULL;
-        diGraph->mapArcs([this, &sum] (Algora::Arc* arc){
+    unsigned long long getRealOverlayArcs(){
+        auto realOverlaySum = 0ULL;
+
+        diGraph->mapArcs([this, &realOverlaySum] (Algora::Arc* arc){
             auto* tail = arc->getTail();
             auto* head = arc->getHead();
 
@@ -63,12 +64,13 @@ public:
             auto* overlayTail = mainToOverlayMap[tail];
             auto* overlayHead = mainToOverlayMap[head];
 
-            if(overlayHead && overlayTail && (subHead->getParent() == subTail->getParent())){
-                sum++;
+
+            if(subHead->getParent() != subTail->getParent()){
+                realOverlaySum++;
             }
         });
 
-        return sum;
+        return realOverlaySum;
     }
 
 private:
