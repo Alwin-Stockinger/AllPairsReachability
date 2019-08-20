@@ -78,8 +78,14 @@ void Partitioner::convertDiGraphToKahip(Algora::DiGraph *graph, const std::strin
 std::map<unsigned long long int, std::map<unsigned long long int, unsigned long long int>> Partitioner::generateVertexMapFromGraph(
         Algora::DiGraph *graph) {
 
+    //Algora::FastPropertyMap<unsigned long long> algoraToKahipMap;
+    //std::map <unsigned long long, Algora::Vertex*> kahipToAlgoraMap;
 
     std::map<unsigned long long , std::map<unsigned long long, unsigned long long>> vertexMap;
+
+    graph->mapVertices([&vertexMap](Algora::Vertex* vertex){
+        vertexMap[vertex->getId()];
+    });
 
     graph->mapArcs([&vertexMap](Algora::Arc* arc){
         if(!arc->isLoop()){
@@ -117,7 +123,27 @@ void Partitioner::writeMapToFile(const std::string &outFileName, Algora::DiGraph
         //outFile.flush();
     }
 
-    for(unsigned long long i = 0; i < graph->getSize(); i++){
+    for(auto& [head,map] : vertexMap){
+
+        for( auto &[tail, weight] : map){
+
+            unsigned long long kahipTailId = 1ULL;
+
+            for(const auto &[algoraTailId,_] : vertexMap){
+                if(algoraTailId == tail){
+                    break;
+                } else{
+                    kahipTailId++;
+                }
+            }
+
+            outFile << kahipTailId << " " << weight << " ";
+
+        }
+        outFile << "\n";
+    }
+
+    /*for(unsigned long long i = 0; i < graph->getSize(); i++){
         if(vertexMap.find(i) != vertexMap.end()){
             for(const auto &[tail, weight]: vertexMap[i]){
                 outFile << tail + 1 << " " << weight << " ";
@@ -125,7 +151,7 @@ void Partitioner::writeMapToFile(const std::string &outFileName, Algora::DiGraph
         }
         outFile << "\n";
         //outFile.flush();
-    }
+    }*/
 
     outFile.close();
 }

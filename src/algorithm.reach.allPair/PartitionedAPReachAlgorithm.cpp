@@ -84,7 +84,7 @@ void PartitionedAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
 }
 
 void PartitionedAPReachAlgorithm::addNeighbourVertex(Algora::Vertex *lazyVertex, Algora::Vertex *neighbourVertex) {
-    auto* neighbourGraph = dynamic_cast<Algora::DiGraph*>(neighbourVertex->getParent());
+    auto* neighbourGraph = dynamic_cast<Algora::DiGraph*>(mainToSubMap[neighbourVertex]->getParent());
     addVertex(lazyVertex, neighbourGraph);
 }
 
@@ -96,8 +96,7 @@ void PartitionedAPReachAlgorithm::addLazyVertexPair(Algora::Vertex *lazyHead, Al
 }
 
 void PartitionedAPReachAlgorithm::addVertex(Algora::Vertex *lazyVertex, Algora::DiGraph *subGraph) {
-    auto* subVertex = subGraph->addVertex();
-    mainToSubMap[lazyVertex] = subVertex;
+    mainToSubMap[lazyVertex] = subGraph->addVertex();
 }
 
 
@@ -150,8 +149,10 @@ void PartitionedAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
         auto *subHead = mainToSubMap[mainHead];
         auto *subTail = mainToSubMap[mainTail];
 
-        if( !subHead && ! subTail){
+        if( !subHead && !subTail){
             addLazyVertexPair(mainHead, mainTail);
+            subHead = mainToSubMap[mainHead];
+            subTail = mainToSubMap[mainTail];
         }
         else if(!subHead){
             addNeighbourVertex(mainHead, mainTail);
