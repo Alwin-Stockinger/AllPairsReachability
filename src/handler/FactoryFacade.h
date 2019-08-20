@@ -12,6 +12,7 @@
 #include "factories/BFSOFactory.h"
 #include "factories/ReverseBFSFactory.h"
 #include "factories/DFSOFactory.h"
+#include "factories/TwoWayFactory.h"
 
 
 using PartFunc = std::function<Algora::FastPropertyMap<unsigned long long>(unsigned long long int, Algora::DiGraph*)>;
@@ -20,9 +21,12 @@ class FactoryFacade {
 
 public:
 
-    FactoryFacade(bool ssBased, bool simplePartition, bool bFSO, bool superVertex, bool reverseBFS, bool dFSO){
+    FactoryFacade(bool ssBased, bool simplePartition, bool bFSO, bool superVertex, bool reverseBFS, bool dFSO, bool twoWay){
         if(ssBased){
             factories.push_back(&ssBasedFactory);
+        }
+        if(twoWay){
+            factories.push_back(&twoWayFactory);
         }
         if(simplePartition){
             factories.push_back(&simplePartitionFactory);
@@ -45,6 +49,13 @@ public:
             partitionedFactories.push_back(&dfsoFactory);
         }
 
+    }
+
+    void setMinTwoWaySteps(unsigned long long stepSize){
+        twoWayFactory.setMinSteps(stepSize);
+    }
+    void setMaxTwoWaySteps(unsigned long long stepSize){
+        twoWayFactory.setMaxSteps(stepSize);
     }
 
     void setExponentialK(bool expoK){
@@ -135,6 +146,7 @@ private:
     SuperVertexFactory superVertexFactory{};
     SSBasedFactory ssBasedFactory{};
     ReverseBFSFactory reverseBFSFactory{};
+    TwoWayFactory twoWayFactory{};
 
 
     std::vector<AlgorithmFactory*> factories{};

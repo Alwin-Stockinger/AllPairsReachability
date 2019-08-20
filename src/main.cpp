@@ -49,6 +49,15 @@ int main(int argc, char *argv[]) {
     bool testWithoutPartition = false;
     app.add_option("--testWithoutPartition", testWithoutPartition, "Also test not partitioned algorithms");
 
+    bool testTwoWay = false;
+    app.add_option("--testTwoWay", testTwoWay, "Test Two Way algorithms");
+
+    unsigned long long minTwoWayStepSize = 2ULL;
+    unsigned long long maxTwoWayStepSize = 2ULL;
+    app.add_option("--minTwoWay", minTwoWayStepSize, "Minimum Step size for two way algorithm");
+    app.add_option("--maxTwoWay", maxTwoWayStepSize, "Maximum Step size for two way algorithm");
+
+
     bool testPartition = true;
     app.add_option("--testPartition", testPartition, "Test Normal Partition Algorithms");
 
@@ -185,7 +194,7 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        FactoryFacade factory(testWithoutPartition, testPartition, testBFSO, testSuperVertex, testReverseBFS, testDFSO);
+        FactoryFacade factory(testWithoutPartition, testPartition, testBFSO, testSuperVertex, testReverseBFS, testDFSO, testTwoWay);
 
         factory.setExponentialK(exponentialK);
         factory.setKMax(k);
@@ -197,6 +206,8 @@ int main(int argc, char *argv[]) {
         factory.setRepartitionThreshold(repartitionThreshold);
         factory.setAdvancedBFSO(testAdvancedBFS);
         factory.setSimpleBFSO(testSimpleBFS);
+        factory.setMinTwoWaySteps(minTwoWayStepSize);
+        factory.setMaxTwoWaySteps(maxTwoWayStepSize);
 
 
         AlgorithmTester tester;
