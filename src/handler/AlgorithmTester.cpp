@@ -119,6 +119,13 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
 
     TimePoint prevPartitionTime = partitionStartTimer;
 
+    auto isolatedCounter = 0ULL;
+    diGraph->mapVertices([&isolatedCounter, &diGraph](Algora::Vertex* vertex){
+        isolatedCounter += diGraph->isIsolated(vertex);
+    });
+
+    std::cout << "There are " << isolatedCounter << " isolated Vertices at the Start" << std::endl;
+
     //measurement specific
     algorithm->setAutoUpdate(false);
     algorithm->setGraph(diGraph);
@@ -204,10 +211,6 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
             if(progress < currentProg){
                 auto currentTime = timer->getAllTime();
                 progress = currentProg;
-
-
-
-
 
                 std::cout << progress << "% at " << castedAlgorithm->getAmount() << "," << castedAlgorithm->getArcAmount() << "," << castedAlgorithm->getRealOverlayArcs() << std::endl;
                 timer->addPercentageTime(std::make_pair(progress, currentTime));

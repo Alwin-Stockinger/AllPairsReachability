@@ -13,7 +13,7 @@
 #include <property/fastpropertymap.h>
 #include <type_traits>
 
-template < bool immediateInit = false>
+template < bool immediateInit = true>
 class DynamicSSBasedDAPReachAlgorithm : public SSBasedDAPReachAlgorithm {
 
 public:
