@@ -17,8 +17,8 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
 
     unsigned long long stepsTaken = 0ULL;
 
-    std::unordered_set<const Algora::Vertex*> sourceSet = {};
-    std::unordered_set<const Algora::Vertex*> targetSet = {};
+    std::unordered_set<const Algora::Vertex*> sourceSet = {start};
+    std::unordered_set<const Algora::Vertex*> targetSet = {end};
 
     Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> sourceBFS(false, false);
     sourceBFS.setStartVertex(start);
