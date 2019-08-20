@@ -23,6 +23,11 @@ bool DynamicSSBasedDAPReachAlgorithm<immediateInit>::query(Algora::Vertex *start
     if(!initialized){
         run();
     }
+
+    if(diGraph->isIsolated(end)){
+        return false;
+    }
+
     return vertexMap[start]->query(end);
 }
 
