@@ -46,9 +46,9 @@ Algora::FastPropertyMap<unsigned long long> Partitioner::makePartitionMap(const 
 
     std::map<unsigned long long, Algora::Vertex*> vertices;
 
-    unsigned long long vertexI = 0ULL;
+    unsigned long long vertexI = graph->getSize() - 1ULL;
     graph->mapVertices([&vertices, &vertexI](Algora::Vertex* vertex){
-        vertices.insert({vertexI++, vertex});
+        vertices.insert({vertexI--, vertex});
     });
 
     Algora::FastPropertyMap<unsigned long long> partitionMap;
