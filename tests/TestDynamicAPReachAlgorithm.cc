@@ -88,3 +88,42 @@ TEST_P(TestDynamicAPReachAlgorithm, testVertexRemove){
     dynamicDiGraph->applyNextDelta();
 }
 
+TEST_P(TestDynamicAPReachAlgorithm, testMultipleWay){
+    dynamicDiGraph->addVertex(4,1);
+
+    dynamicDiGraph->addArc(1,2,1);
+    dynamicDiGraph->addArc(2,3,1);
+    dynamicDiGraph->addArc(3,4,1);
+    dynamicDiGraph->addArc(1,4,1);
+    dynamicDiGraph->applyNextDelta();
+
+    Algora::Vertex* vertex1 = dynamicDiGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex4 = dynamicDiGraph -> getCurrentVertexForId(4);
+    ASSERT_TRUE(algorithm -> query(vertex1, vertex4));
+}
+
+TEST_P(TestDynamicAPReachAlgorithm, testLongWay){
+    dynamicDiGraph->addVertex(4,1);
+    dynamicDiGraph->addVertex(5,1);
+    dynamicDiGraph->addVertex(6,1);
+    dynamicDiGraph->addVertex(7,1);
+    dynamicDiGraph->addVertex(8,1);
+    dynamicDiGraph->addVertex(9,1);
+
+    dynamicDiGraph->addArc(1,2,1);
+    dynamicDiGraph->addArc(2,3,1);
+    dynamicDiGraph->addArc(3,4,1);
+    dynamicDiGraph->addArc(4,5,1);
+    dynamicDiGraph->addArc(5,6,1);
+    dynamicDiGraph->addArc(6,7,1);
+    dynamicDiGraph->addArc(7,8,1);
+    dynamicDiGraph->addArc(8,9,1);
+
+    dynamicDiGraph->applyNextDelta();
+
+    Algora::Vertex* vertex1 = dynamicDiGraph -> getCurrentVertexForId(1);
+    Algora::Vertex* vertex5 = dynamicDiGraph -> getCurrentVertexForId(5);
+    Algora::Vertex* vertex9 = dynamicDiGraph -> getCurrentVertexForId(9);
+    ASSERT_TRUE(algorithm -> query(vertex5, vertex9));
+    ASSERT_TRUE(algorithm -> query(vertex1, vertex9));
+}
