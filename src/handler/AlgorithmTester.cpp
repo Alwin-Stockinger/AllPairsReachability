@@ -170,8 +170,6 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
     unsigned long long nextReport = 0ULL;
     unsigned long long reportStep = 1ULL;
 
-    double advantage = 0.025;
-
     bool first = true;
 
 
@@ -208,7 +206,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
                 timer->addPercentageTime(std::make_pair(progress, currentTime));
             }
 
-            if(timeOut && ( double(timeOut) * (progPercentage + advantage) < double(timer->getAllTime()))){
+            if(timeOut && timeOut < timer->getAllTime()){
                 std::cout << "TIMEOUT" << std::endl;
                 timer->timedOut = true;
                 break;
