@@ -27,9 +27,9 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
         return reachable;
     });
     sourceBFS.setVertexStopCondition([&stepsTaken, &sourceSet, this](const Algora::Vertex* vertex){
-        sourceSet.insert(vertex);
-
-        return ++stepsTaken == stepSize;
+        auto [it,inserted] = sourceSet.insert(vertex);
+        stepsTaken += inserted;
+        return stepsTaken == stepSize;
     });
 
     Algora::BreadthFirstSearch<Algora::FastPropertyMap, false> targetBFS(false, false);
@@ -40,9 +40,9 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
         return reachable;
     });
     targetBFS.setVertexStopCondition([&stepsTaken,& targetSet, this](const Algora::Vertex* vertex){
-        targetSet.insert(vertex);
-
-        return ++stepsTaken == stepSize;
+        auto [it,inserted] = targetSet.insert(vertex);
+        stepsTaken += inserted;
+        return stepsTaken == stepSize;
     });
 
     runAlgorithm(sourceBFS, diGraph);

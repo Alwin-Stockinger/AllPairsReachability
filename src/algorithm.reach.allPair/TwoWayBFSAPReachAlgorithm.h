@@ -27,7 +27,7 @@ public:
     std::string getShortName() const noexcept override;
 
 private:
-    unsigned long long stepSize = 2;
+    unsigned long long stepSize = 1ULL;
 
 };
 
