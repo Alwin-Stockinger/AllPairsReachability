@@ -472,3 +472,34 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testOverlayConnectionOfSameSubgraph
 
     ASSERT_TRUE(this->algorithm->query(vertex2, vertex1));
 }
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testLazyVertexAdditions){
+
+    this->mainGraph->addVertex(30, 1);
+    this->mainGraph->applyNextDelta();
+    this->mainGraph->addArc(30, 1, 2);
+    this->mainGraph->applyNextDelta();
+
+    auto* vertex1 = this->mainGraph->getCurrentVertexForId(1);
+    auto* vertex30 = this->mainGraph->getCurrentVertexForId(30);
+
+    ASSERT_TRUE(this->algorithm->query(vertex30, vertex1));
+    ASSERT_FALSE(this->algorithm->query(vertex1, vertex30));
+}
+
+TYPED_TEST(TestPartitionedDAPReachAlgorithm, testTwoLazyVertexAdditions){
+
+    this->mainGraph->addVertex(30, 1);
+    this->mainGraph->addVertex(31, 1);
+    this->mainGraph->applyNextDelta();
+
+    auto* vertex31 = this->mainGraph->getCurrentVertexForId(31);
+    auto* vertex30 = this->mainGraph->getCurrentVertexForId(30);
+
+    ASSERT_FALSE(this->algorithm->query(vertex31, vertex30));
+
+    this->mainGraph->addArc(31, 30, 2);
+    this->mainGraph->applyNextDelta();
+
+    ASSERT_TRUE(this->algorithm->query(vertex31, vertex30));
+}

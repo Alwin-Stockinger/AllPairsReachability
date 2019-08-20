@@ -61,6 +61,7 @@ void PartitionedAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
     if(repartitionThreshold && ++operationsSinceRepartition >= repartitionThreshold){
         initialized = false;
     } else {
+        /*
 
         Algora::DiGraph *subGraph = nullptr;
 
@@ -76,11 +77,29 @@ void PartitionedAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
         }
         auto* subVertex = subGraph->addVertex();
         mainToSubMap[vertex] = subVertex;
-
+        */
     }
 
     DynamicAPReachAlgorithm::onVertexAdd(vertex);
 }
+
+void PartitionedAPReachAlgorithm::addNeighbourVertex(Algora::Vertex *lazyVertex, Algora::Vertex *neighbourVertex) {
+    auto* neighbourGraph = dynamic_cast<Algora::DiGraph*>(neighbourVertex->getParent());
+    addVertex(lazyVertex, neighbourGraph);
+}
+
+void PartitionedAPReachAlgorithm::addLazyVertexPair(Algora::Vertex *lazyHead, Algora::Vertex *lazyTail) {
+    auto* subGraph = subGraphs[kDistribution(randomGenerator)];
+
+    addVertex(lazyHead, subGraph);
+    addVertex(lazyTail, subGraph);
+}
+
+void PartitionedAPReachAlgorithm::addVertex(Algora::Vertex *lazyVertex, Algora::DiGraph *subGraph) {
+    auto* subVertex = subGraph->addVertex();
+    mainToSubMap[lazyVertex] = subVertex;
+}
+
 
 
 void PartitionedAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
@@ -94,6 +113,10 @@ void PartitionedAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
     } else {
 
         Algora::Vertex *subVertex = mainToSubMap[vertex];
+        if(!subVertex){
+            return;
+        }
+
         Algora::Vertex *overlayVertex = mainToOverlayMap[vertex];
 
         auto * subGraph = dynamic_cast<Algora::DiGraph*>(subVertex->getParent());
@@ -126,6 +149,18 @@ void PartitionedAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
 
         auto *subHead = mainToSubMap[mainHead];
         auto *subTail = mainToSubMap[mainTail];
+
+        if( !subHead && ! subTail){
+            addLazyVertexPair(mainHead, mainTail);
+        }
+        else if(!subHead){
+            addNeighbourVertex(mainHead, mainTail);
+            subHead = mainToSubMap[mainHead];
+        }
+        else if(!subTail){
+            addNeighbourVertex(mainTail, mainHead);
+            subTail = mainToSubMap[mainTail];
+        }
 
         auto *headGraph = subHead->getParent();
         auto *tailGraph = subTail->getParent();
@@ -313,3 +348,4 @@ void PartitionedAPReachAlgorithm::removeOverlayVertex(Algora::Vertex *vertex) {
     overlayGraph->removeVertex(mainToOverlayMap[vertex]);
     mainToOverlayMap.resetToDefault(vertex);
 }
+

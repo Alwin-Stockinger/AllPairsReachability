@@ -56,12 +56,21 @@ void SuperVertexPDAPReachAlgorithm::resetSuperStructure() {
 }
 
 bool SuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
+
+    if( start == end){
+        return true;
+    }
+
     if(!initialized){
         run();
     }
 
     start = mainToSubMap[start];
     end = mainToSubMap[end];
+
+    if(!start || !end){
+        return false;
+    }
 
     //select subgraphs
     auto* startGraph = start->getParent();

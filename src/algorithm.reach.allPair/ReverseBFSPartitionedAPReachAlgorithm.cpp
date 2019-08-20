@@ -7,6 +7,10 @@
 
 bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
 
+    if(start == end){
+        return true;
+    }
+
     if(!initialized){
         run();
     }
@@ -15,6 +19,9 @@ bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const A
     auto* overlayEnd = mainToOverlayMap[end];
     start = mainToSubMap[start];
     end = mainToSubMap[end];
+    if(!start || ! end){
+        return false;
+    }
 
     //select subgraphs
     auto* startGraph = dynamic_cast<Algora::DiGraph*>(start->getParent());
@@ -242,14 +249,29 @@ std::string ReverseBFSPartitionedAPReachAlgorithm::getShortName() const noexcept
 void ReverseBFSPartitionedAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
     PartitionedAPReachAlgorithm::onVertexAdd(vertex);
 
-    subToMainMap[mainToSubMap[vertex]] = vertex;
+    auto* subVertex = mainToSubMap[vertex];
+
+    if(subVertex){
+        subToMainMap[subVertex] = vertex;
+    }
 }
 
 void ReverseBFSPartitionedAPReachAlgorithm::onVertexRemove(Algora::Vertex *vertex) {
 
-    subToMainMap.resetToDefault(mainToSubMap[vertex]);
+    auto* subVertex = mainToSubMap[vertex];
+
+    if(subVertex){
+        subToMainMap.resetToDefault(mainToSubMap[vertex]);
+    }
 
     PartitionedAPReachAlgorithm::onVertexRemove(vertex);
+}
+
+void ReverseBFSPartitionedAPReachAlgorithm::addVertex(Algora::Vertex *lazyVertex, Algora::DiGraph *subGraph) {
+    PartitionedAPReachAlgorithm::addVertex(lazyVertex, subGraph);
+
+    auto* subVertex = mainToSubMap[lazyVertex];
+    subToMainMap[subVertex] = lazyVertex;
 }
 
 

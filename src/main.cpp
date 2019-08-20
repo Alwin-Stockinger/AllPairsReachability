@@ -165,6 +165,8 @@ int main(int argc, char *argv[]) {
 
         konectProvider->setSeed(183788608);     //make sure tests are reproducible
 
+        konectProvider->antedateVertexAdditions(false);
+
         if(squashOption){
             konectProvider->squash(true);
             konectProvider->squashRatio(squashRatio);

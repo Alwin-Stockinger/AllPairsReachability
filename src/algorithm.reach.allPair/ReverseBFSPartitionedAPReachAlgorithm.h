@@ -11,6 +11,7 @@
 class ReverseBFSPartitionedAPReachAlgorithm : public PartitionedAPReachAlgorithm{
 
 public:
+
     bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
 
 
@@ -31,6 +32,8 @@ protected:
     void removeOverlayEdgeArcs(Algora::DiGraph *subGraph) override;
 
     void resetChildStructures() override;
+
+    void addVertex(Algora::Vertex *lazyVertex, Algora::DiGraph *subGraph) override;
 
 public:
     void onVertexAdd(Algora::Vertex *vertex) override;

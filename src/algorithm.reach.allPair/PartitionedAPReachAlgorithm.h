@@ -11,6 +11,7 @@
 
 #include <property/propertymap.h>
 #include <unordered_set>
+#include <random>
 #include "property/fastpropertymap.h"
 
 #include "DynamicAPReachAlgorithm.h"
@@ -21,6 +22,13 @@ using PartFunc = std::function<Algora::FastPropertyMap<unsigned long long>(unsig
 class PartitionedAPReachAlgorithm : public DynamicAPReachAlgorithm{
 public:
 
+    std::mt19937 randomGenerator;
+    std::uniform_int_distribution<unsigned long long> kDistribution;
+
+    explicit PartitionedAPReachAlgorithm(unsigned long long seed = 38052ULL) : DynamicAPReachAlgorithm(){
+        randomGenerator.seed(seed);
+    }
+
     ~PartitionedAPReachAlgorithm() override;
 
     void run() override;
@@ -29,6 +37,7 @@ public:
         this->k = newK;
 
         initialized = false;
+        kDistribution = std::uniform_int_distribution<unsigned long long >(0, k-1);
     }
 
     void onArcAdd(Algora::Arc *arc) override;
@@ -111,6 +120,12 @@ private:
 
 protected:
     unsigned depth = 0U;
+
+    void addNeighbourVertex(Algora::Vertex *lazyVertex, Algora::Vertex *neighbourVertex);
+
+    void addLazyVertexPair(Algora::Vertex *lazyHead, Algora::Vertex *lazyTail);
+
+    virtual void addVertex(Algora::Vertex *lazyVertex, Algora::DiGraph *subGraph);
 };
 
 
