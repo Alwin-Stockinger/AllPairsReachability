@@ -17,31 +17,45 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
 
     unsigned long long stepsTaken = 0ULL;
 
-    std::unordered_set<const Algora::Vertex*> sourceSet = {start};
-    std::unordered_set<const Algora::Vertex*> targetSet = {end};
+    Algora::FastPropertyMap<bool> sourceReachable(false);
+    sourceReachable[start] = true;
+
+    Algora::FastPropertyMap<bool> targetReachable(false);
+    targetReachable[end] = true;
+
+    //std::unordered_set<const Algora::Vertex*> sourceSet = {start};
+    //std::unordered_set<const Algora::Vertex*> targetSet = {end};
 
     Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> sourceBFS(false, false);
     sourceBFS.setStartVertex(start);
-    sourceBFS.setArcStopCondition([&reachable, &targetSet](const Algora::Arc* arc){
-        reachable = targetSet.count(arc->getHead());
+    sourceBFS.setArcStopCondition([&reachable, &targetReachable](const Algora::Arc* arc){
+        reachable = targetReachable(arc->getHead());
         return reachable;
     });
-    sourceBFS.setVertexStopCondition([&stepsTaken, &sourceSet, this](const Algora::Vertex* vertex){
-        auto [it,inserted] = sourceSet.insert(vertex);
-        stepsTaken += inserted;
+    sourceBFS.setVertexStopCondition([&stepsTaken, &sourceReachable, this](const Algora::Vertex* vertex){
+        bool alreadyFound = sourceReachable(vertex);
+        if(!alreadyFound){
+            sourceReachable[vertex] = true;
+            stepsTaken++;
+        }
         return stepsTaken == stepSize;
     });
+
+
 
     Algora::BreadthFirstSearch<Algora::FastPropertyMap, false> targetBFS(false, false);
     targetBFS.setStartVertex(end);
     targetBFS.reverseArcDirection(true);
-    targetBFS.setArcStopCondition([&reachable, &sourceSet](const Algora::Arc* arc){
-        reachable = sourceSet.count(arc->getTail());
+    targetBFS.setArcStopCondition([&reachable, &sourceReachable](const Algora::Arc* arc){
+        reachable = sourceReachable(arc->getTail());
         return reachable;
     });
-    targetBFS.setVertexStopCondition([&stepsTaken,& targetSet, this](const Algora::Vertex* vertex){
-        auto [it,inserted] = targetSet.insert(vertex);
-        stepsTaken += inserted;
+    targetBFS.setVertexStopCondition([&stepsTaken,&targetReachable, this](const Algora::Vertex* vertex){
+        bool alreadyFound = targetReachable(vertex);
+        if(!alreadyFound){
+            targetReachable[vertex] = true;
+            stepsTaken++;
+        }
         return stepsTaken == stepSize;
     });
 
