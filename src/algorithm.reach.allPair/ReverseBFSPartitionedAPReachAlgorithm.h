@@ -27,7 +27,7 @@ protected:
 
     void insertOverlayEdgeArcs(Algora::DiGraph *subGraph) override;
 
-    void insertOverlayEdgeArcsOfVertex(Algora::Vertex *vertex) override;
+    void insertOverlayEdgeArcsOfNewOverlayVertex(Algora::Vertex *vertex) override;
 
     void removeOverlayEdgeArcs(Algora::DiGraph *subGraph) override;
 

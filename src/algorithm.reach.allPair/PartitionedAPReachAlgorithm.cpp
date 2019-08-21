@@ -179,13 +179,13 @@ void PartitionedAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
                 overlayHead = overlayGraph->addVertex();
                 mainToOverlayMap[mainHead] = overlayHead;
                 edgeVertices[headGraph].insert(mainHead);
-                insertOverlayEdgeArcsOfVertex(mainHead);
+                insertOverlayEdgeArcsOfNewOverlayVertex(mainHead);
             }
             if (!overlayTail) {
                 overlayTail = overlayGraph->addVertex();
                 mainToOverlayMap[mainTail] = overlayTail;
                 edgeVertices[tailGraph].insert(mainTail);
-                insertOverlayEdgeArcsOfVertex(mainTail);
+                insertOverlayEdgeArcsOfNewOverlayVertex(mainTail);
             }
 
             overlayGraph->addArc(overlayTail, overlayHead);

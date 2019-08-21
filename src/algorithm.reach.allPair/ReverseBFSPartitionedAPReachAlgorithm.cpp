@@ -33,10 +33,6 @@ bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const A
     //same subgraph? then normal Algorithm
     if(startGraph == endGraph){
 
-        if(start == end){
-            return true;
-        }
-
         Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> bfs(false, false);
 
         bfs.setStartVertex(start);
@@ -59,6 +55,8 @@ bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const A
     auto& sourceEdgeVertices = edgeVertices[startGraph];
     auto& destinationEdgeVertices = edgeVertices[endGraph];
 
+
+
     Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> destinationBFS(false, false);
     destinationBFS.reverseArcDirection(true);
     destinationBFS.setStartVertex(end);
@@ -79,6 +77,8 @@ bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const A
         return false;
     }
 
+
+
     Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> sourceBFS(false, false);
     sourceBFS.setStartVertex(start);
     sourceBFS.setArcStopCondition([sourceEdgeVertices, &reachableSourceEdgeVertices, this](const Algora::Arc* arc){
@@ -88,7 +88,7 @@ bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const A
            reachableSourceEdgeVertices.insert(mainToOverlayMap[head]);
        }
 
-        return reachableSourceEdgeVertices.size() == sourceEdgeVertices.size();
+       return reachableSourceEdgeVertices.size() == sourceEdgeVertices.size();
     });
 
     if(overlayStart){
@@ -140,14 +140,45 @@ void ReverseBFSPartitionedAPReachAlgorithm::insertOverlayEdgeArcs(Algora::DiGrap
 
     for(Algora::Vertex* sourceVertex : overlayVertices){
 
-        insertOverlayEdgeArcsOfVertex(sourceVertex);
+        Algora::Vertex* subSource = mainToSubMap[sourceVertex];
+        Algora::Vertex* overlaySource = mainToOverlayMap[sourceVertex];
+
+        std::unordered_set<Algora::Vertex*> reachableVertices{};
+
+        Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> bfs(false, false);
+        bfs.setStartVertex(subSource);
+        bfs.setArcStopCondition([this, &overlayVertices, &reachableVertices, &subSource](const Algora::Arc* arc){
+            Algora::Vertex* head = subToMainMap[arc->getHead()];
+            if(overlayVertices.count(head)){
+                if(subSource != head){
+                    reachableVertices.insert(mainToOverlayMap[head]);
+                }
+            }
+
+            return (overlayVertices.size() - 1) == reachableVertices.size();
+        });
+
+        runAlgorithm(bfs, subGraph);
+
+
+        overlayGraph->mapOutgoingArcsUntil(overlaySource, [&reachableVertices] (Algora::Arc* arc){
+            Algora::Vertex* head = arc->getHead();
+            reachableVertices.erase(head);
+        }, [&reachableVertices](const Algora::Arc*){
+            return reachableVertices.empty();
+        });
+
+        for(Algora::Vertex* reachableVertex: reachableVertices){
+            overlayGraph->addArc(overlaySource, reachableVertex);
+        }
     }
 
 }
 
-void ReverseBFSPartitionedAPReachAlgorithm::insertOverlayEdgeArcsOfVertex(Algora::Vertex *vertex) {
+void ReverseBFSPartitionedAPReachAlgorithm::insertOverlayEdgeArcsOfNewOverlayVertex(Algora::Vertex *vertex) {
 
     auto* subSource = mainToSubMap[vertex];
+    Algora::Vertex* overlaySource = mainToOverlayMap[vertex];
 
     auto* subGraph = dynamic_cast<Algora::DiGraph*> (subSource->getParent());
 
@@ -156,10 +187,7 @@ void ReverseBFSPartitionedAPReachAlgorithm::insertOverlayEdgeArcsOfVertex(Algora
     std::unordered_set<Algora::Vertex*> reachableVertices{};
 
     Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> bfs(false, false);
-
-
     bfs.setStartVertex(subSource);
-
     bfs.setArcStopCondition([this, &overlayVertices, &reachableVertices, &subSource](const Algora::Arc* arc){
         Algora::Vertex* head = subToMainMap[arc->getHead()];
         if(overlayVertices.count(head)){
@@ -173,17 +201,31 @@ void ReverseBFSPartitionedAPReachAlgorithm::insertOverlayEdgeArcsOfVertex(Algora
 
     runAlgorithm(bfs, subGraph);
 
-    Algora::Vertex* overlaySource = mainToOverlayMap[vertex];
-
-    overlayGraph->mapOutgoingArcsUntil(overlaySource, [&reachableVertices] (Algora::Arc* arc){
-        Algora::Vertex* head = arc->getHead();
-        reachableVertices.erase(head);
-    }, [&reachableVertices](const Algora::Arc*){
-        return reachableVertices.empty();
-    });
-
     for(Algora::Vertex* reachableVertex: reachableVertices){
         overlayGraph->addArc(overlaySource, reachableVertex);
+    }
+
+    //reverse------------------
+    std::unordered_set<Algora::Vertex*> reverseReachableVertices{};
+
+    Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> reverseBfs(false, false);
+    reverseBfs.setStartVertex(subSource);
+    reverseBfs.reverseArcDirection(true);
+    reverseBfs.setArcStopCondition([this, &overlayVertices, &reverseReachableVertices, &subSource](const Algora::Arc* arc){
+        Algora::Vertex* tail = subToMainMap[arc->getTail()];
+        if(overlayVertices.count(tail)){
+            if(subSource != tail){
+                reverseReachableVertices.insert(mainToOverlayMap[tail]);
+            }
+        }
+
+        return (overlayVertices.size() - 1) == reverseReachableVertices.size();
+    });
+
+    runAlgorithm(reverseBfs, subGraph);
+
+    for(Algora::Vertex* reverseReachableVertex: reverseReachableVertices){
+        overlayGraph->addArc(reverseReachableVertex, overlaySource);
     }
 }
 

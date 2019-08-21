@@ -115,7 +115,7 @@ private:
 
     bool checkIfOverlayIsolated(Algora::Vertex* vertex);
 
-    virtual void insertOverlayEdgeArcsOfVertex(Algora::Vertex* vertex) = 0;
+    virtual void insertOverlayEdgeArcsOfNewOverlayVertex(Algora::Vertex* vertex) = 0;
 
 
 protected:

@@ -23,7 +23,7 @@ protected:
 
     virtual DynamicAPReachAlgorithm* createSubAlgorithm() = 0;
 
-    void insertOverlayEdgeArcsOfVertex(Algora::Vertex* vertex) override;
+    void insertOverlayEdgeArcsOfNewOverlayVertex(Algora::Vertex* vertex) override;
 
     void insertOverlayEdgeArcs(Algora::DiGraph *subGraph) override;
 

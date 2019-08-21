@@ -19,7 +19,7 @@ PartitionedDynamicAPReachAlgorithm::initializeChildStructures() {
     }
 }
 
-void PartitionedDynamicAPReachAlgorithm::insertOverlayEdgeArcsOfVertex(Algora::Vertex *vertex) {
+void PartitionedDynamicAPReachAlgorithm::insertOverlayEdgeArcsOfNewOverlayVertex(Algora::Vertex *vertex) {
 
     auto* overlayVertex = mainToOverlayMap[vertex];
     auto* subVertex = mainToSubMap[vertex];

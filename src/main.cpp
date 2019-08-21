@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
     dynGraph->resetToBigBang();
     dynGraph->applyNextDelta();
 
-    std::cout << "Algor Generated Graph with n=" << dynGraph->getConstructedGraphSize()
+    std::cout << "Algora Generated Graph with n=" << dynGraph->getConstructedGraphSize()
         << "  and m=" << dynGraph->getConstructedArcSize() << std::endl;
 
 
