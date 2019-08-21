@@ -173,6 +173,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
     bool first = true;
 
     unsigned long long queryCount = 0ULL;
+    unsigned long long overallQueries = 0ULL;
 
     for (const auto &currentQueries : *queries) {
 
@@ -187,6 +188,8 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
             queryCount += algorithm->query(startVertex, endVertex);
             auto endQueryTime = std::chrono::high_resolution_clock::now();
             timer->addQueryTime(startQueryTime, endQueryTime);
+
+            overallQueries++;
         }
         if(prevPartitionTime != partitionStartTimer){
             timer->addPartitionTime(partitionStartTimer, partitionEndTimer);
@@ -223,11 +226,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
     diGraph->removeOnVertexAdd(algorithm);
     diGraph->removeOnVertexRemove(algorithm);
 
-
-
-
-
-    std::cout << "Finished with q= " << queryCount << "\n\n" << std::endl;
+    std::cout << "Finished with q= " << queryCount << " / " << overallQueries << "\n\n" << std::endl;
 
 }
 
