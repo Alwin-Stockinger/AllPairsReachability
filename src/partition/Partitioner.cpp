@@ -83,14 +83,17 @@ std::map<unsigned long long int, std::map<unsigned long long int, unsigned long 
 
     std::map<unsigned long long , std::map<unsigned long long, unsigned long long>> vertexMap;
 
-    graph->mapVertices([&vertexMap](Algora::Vertex* vertex){
-        vertexMap[vertex->getId()];
+
+    std::map<unsigned long long, unsigned long long> vertices;      //kahipId,AlgoraId
+    unsigned long long kahipId = graph->getSize() - 1ULL;
+    graph->mapVertices([&vertices, &kahipId](Algora::Vertex* vertex){
+        vertices.insert({vertex->getId(), kahipId--});
     });
 
-    graph->mapArcs([&vertexMap](Algora::Arc* arc){
+    graph->mapArcs([&vertexMap, &vertices](Algora::Arc* arc){
         if(!arc->isLoop()){
-            unsigned long long headId = arc->getHead()->getId();
-            unsigned long long tailId = arc->getTail()->getId();
+            unsigned long long headId = vertices[arc->getHead()->getId()];
+            unsigned long long tailId = vertices[arc->getTail()->getId()];
 
             if(vertexMap.find(headId) == vertexMap.end()){
                 vertexMap[headId][tailId] = 1;
@@ -123,7 +126,7 @@ void Partitioner::writeMapToFile(const std::string &outFileName, Algora::DiGraph
         //outFile.flush();
     }
 
-    for(auto& [head,map] : vertexMap){
+    /*for(auto& [head,map] : vertexMap){
 
         for( auto &[tail, weight] : map){
 
@@ -141,9 +144,9 @@ void Partitioner::writeMapToFile(const std::string &outFileName, Algora::DiGraph
 
         }
         outFile << "\n";
-    }
+    }*/
 
-    /*for(unsigned long long i = 0; i < graph->getSize(); i++){
+    for(unsigned long long i = 0; i < graph->getSize(); i++){
         if(vertexMap.find(i) != vertexMap.end()){
             for(const auto &[tail, weight]: vertexMap[i]){
                 outFile << tail + 1 << " " << weight << " ";
@@ -151,7 +154,7 @@ void Partitioner::writeMapToFile(const std::string &outFileName, Algora::DiGraph
         }
         outFile << "\n";
         //outFile.flush();
-    }*/
+    }
 
     outFile.close();
 }
