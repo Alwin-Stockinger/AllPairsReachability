@@ -14,6 +14,10 @@ bool BFSOverlayPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Ve
     if(!initialized){
         run();
     }
+
+    auto* overlaySource = mainToOverlayMap[start];
+    auto* overlayEnd = mainToOverlayMap[end];
+
     start = mainToSubMap[start];
     end = mainToSubMap[end];
 

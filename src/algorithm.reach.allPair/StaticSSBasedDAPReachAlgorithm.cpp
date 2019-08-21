@@ -36,7 +36,10 @@ StaticSSBasedDAPReachAlgorithm::~StaticSSBasedDAPReachAlgorithm() {
 }
 
 bool StaticSSBasedDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
-    if(diGraph->isIsolated(end)){
+    if(start == end){
+        return true;
+    }
+    else if(diGraph->isIsolated(end)){
         return false;
     }
     algorithm->setSource(start);

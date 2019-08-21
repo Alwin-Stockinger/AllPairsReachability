@@ -20,12 +20,16 @@
 
 template<bool immediateInit>
 bool DynamicSSBasedDAPReachAlgorithm<immediateInit>::query(Algora::Vertex *start, const Algora::Vertex *end) {
-    if(!initialized){
-        run();
+
+    if(start == end){
+        return true;
+    }
+    else if(diGraph->isIsolated(end)){
+        return false;
     }
 
-    if(diGraph->isIsolated(end)){
-        return false;
+    if(!initialized){
+        run();
     }
 
     return vertexMap[start]->query(end);

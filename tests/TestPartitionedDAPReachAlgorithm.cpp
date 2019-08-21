@@ -96,7 +96,7 @@ public:
 
         algorithm->setGraph(mainGraph->getDiGraph());
 
-        //algorithm->run();
+        algorithm->run();
     }
 };
 
@@ -355,6 +355,7 @@ TYPED_TEST(TestPartitionedDAPReachAlgorithm, testNewGraph){
     }, 2);
 
     this->algorithm->setGraph(&newGraph);
+    this->algorithm->run();
 
 
 
