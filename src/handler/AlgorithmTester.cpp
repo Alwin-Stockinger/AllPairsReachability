@@ -96,7 +96,7 @@ struct AlgorithmTester::TimeCollector {
     }
 
     unsigned long long getAllTime(){
-        return getQueryTime() + getAddArcTime() + getRemoveArcTime() + initTime;// + getRepartitionTime();
+        return getQueryTime() + getAddArcTime() + getRemoveArcTime() + initTime + getRepartitionTime();
     }
 
 
