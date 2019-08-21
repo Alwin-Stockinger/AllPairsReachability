@@ -172,6 +172,8 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
 
     bool first = true;
 
+    unsigned long long queryCount = 0ULL;
+
     for (const auto &currentQueries : *queries) {
 
         if(first) first = false;
@@ -182,7 +184,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
 
 
             auto startQueryTime = std::chrono::high_resolution_clock::now();
-            algorithm->query(startVertex, endVertex);
+            queryCount += algorithm->query(startVertex, endVertex);
             auto endQueryTime = std::chrono::high_resolution_clock::now();
             timer->addQueryTime(startQueryTime, endQueryTime);
         }
@@ -225,7 +227,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
 
 
 
-    std::cout << "Finished!\n\n" << std::endl;
+    std::cout << "Finished with q= " << queryCount << "\n\n" << std::endl;
 
 }
 
