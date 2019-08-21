@@ -2,8 +2,8 @@ import subprocess
 import sys
 
 algorithms = "-A "
-algorithms += "StaticBFS "
-algorithms += "StaticDFS "
+#algorithms += "StaticBFS "
+#algorithms += "StaticDFS "
 #algorithms += "LazyDFS "
 #algorithms += "LazyBFS "
 #algorithms += "CachingDFS "
@@ -12,13 +12,13 @@ algorithms += "StaticDFS "
 #algorithms += "ESTreeQ "
 #algorithms += "ESTreeML "
 #algorithms += "SimpleESTree "
-#algorithms += "SimpleInc "
+algorithms += "SimpleInc "
 
 
 overlayAlgorithm = "-O SimpleInc"
 
-timeOutHours = 0
-timeOutSeconds = 60 * timeOutHours
+timeOutHours = 1
+timeOutSeconds = 60 * 10 # * timeOutHours
 nanoConverter = 1000 * 1000 * 1000  # seconds to nanoseconds
 timeOutNumber = nanoConverter * timeOutSeconds
 timeOut = "-t " + str(timeOutNumber)
@@ -39,11 +39,11 @@ withoutPartitionNumber = 0
 simplePartitionNumber = 0
 superVerticesNumber = 0
 reverseBFSNumber = 0
-BFSONumber = 0
+BFSONumber = 1
 DFSONumber = 0
-ABFSONumber = 0
-SBFSONumber = 1
-twoWayNumber = 1
+ABFSONumber = 1
+SBFSONumber = 0
+twoWayNumber = 0
 
 multiArcsNumber = 1
 
@@ -51,11 +51,11 @@ queriesNumber = 30
 insertsNumber = 30
 removalNumber = 30
 
-twoWayMin = "--minTwoWay 1000"
-twoWayMax = "--maxTwoWay 1000"
+twoWayMin = "--minTwoWay 1"
+twoWayMax = "--maxTwoWay 20"
 
-kMax = "-k 33000"
-kMin = "--kMin 4096"
+kMax = "-k 256"
+kMin = "--kMin 2"
 
 
 vertices = "-s " + str(verticesNumber)
