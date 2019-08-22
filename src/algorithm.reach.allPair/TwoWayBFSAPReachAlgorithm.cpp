@@ -33,8 +33,7 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
         return reachable;
     });
     sourceBFS.setVertexStopCondition([&stepsTaken, &sourceReachable, this](const Algora::Vertex* vertex){
-        bool alreadyFound = sourceReachable(vertex);
-        if(!alreadyFound){
+        if(!sourceReachable(vertex)){
             sourceReachable[vertex] = true;
             stepsTaken++;
         }
@@ -51,8 +50,7 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
         return reachable;
     });
     targetBFS.setVertexStopCondition([&stepsTaken,&targetReachable, this](const Algora::Vertex* vertex){
-        bool alreadyFound = targetReachable(vertex);
-        if(!alreadyFound){
+        if(!targetReachable(vertex)){
             targetReachable[vertex] = true;
             stepsTaken++;
         }
@@ -63,7 +61,7 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
     if(reachable){
         return reachable;
     }
-    else if(!stepsTaken){
+    else if(stepsTaken != stepSize){
         return false;
     }
     stepsTaken = 0ULL;
@@ -72,7 +70,7 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
     if(reachable){
         return reachable;
     }
-    else if(!stepsTaken){
+    else if(stepsTaken != stepSize){
         return false;
     }
     stepsTaken = 0ULL;
@@ -82,7 +80,7 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
         if(reachable){
             return reachable;
         }
-        else if(!stepsTaken){
+        else if(stepsTaken != stepSize){
             return false;
         }
         stepsTaken = 0ULL;
@@ -91,7 +89,7 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
         if(reachable){
             return reachable;
         }
-        else if(!stepsTaken){
+        else if(stepsTaken != stepSize){
             return false;
         }
         stepsTaken = 0ULL;
