@@ -149,18 +149,23 @@ void PartitionedAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
         auto *subHead = mainToSubMap[mainHead];
         auto *subTail = mainToSubMap[mainTail];
 
+        bool delayedVertex = false;
+
         if( !subHead && !subTail){
             addLazyVertexPair(mainHead, mainTail);
             subHead = mainToSubMap[mainHead];
             subTail = mainToSubMap[mainTail];
+            delayedVertex = true;
         }
         else if(!subHead){
             addNeighbourVertex(mainHead, mainTail);
             subHead = mainToSubMap[mainHead];
+            delayedVertex = true;
         }
         else if(!subTail){
             addNeighbourVertex(mainTail, mainHead);
             subTail = mainToSubMap[mainTail];
+            delayedVertex = true;
         }
 
         auto *headGraph = subHead->getParent();
@@ -170,7 +175,9 @@ void PartitionedAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
             auto *subGraph = dynamic_cast<Algora::DiGraph *>(headGraph);
             subGraph->addArc(subTail, subHead);
 
-            insertOverlayEdgeArcs(subGraph);
+            if(!delayedVertex){
+                insertOverlayEdgeArcs(subGraph);
+            }
         } else {
             auto *overlayHead = mainToOverlayMap[mainHead];
             auto *overlayTail = mainToOverlayMap[mainTail];
