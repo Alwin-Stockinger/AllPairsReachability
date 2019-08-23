@@ -108,10 +108,13 @@ elif len(sys.argv) == 2:
     subprocess.call([callString + " " + inputFile], shell=True)
 
 elif len(sys.argv) == 3:
-    inputFile = "-i " + sys.argv[1]
-    squashRatio = "-S " + sys.argv[2]
-    subprocess.call([callString + " " + inputFile + " " + squashRatio],
-                    shell=True)
+
+    for i in range(1, 5):
+        inputFile = "-i " + sys.argv[1]
+        squashRatio = "-S " + sys.argv[2]
+        subprocess.call([callString + " " + inputFile + " " + squashRatio],
+                        shell=True)
+        repartitionNumber *= 2
 
 else:
     print("too many arguments")
