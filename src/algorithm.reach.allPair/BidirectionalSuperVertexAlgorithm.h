@@ -2,15 +2,15 @@
 // Created by alwin on 7/22/19.
 //
 
-#ifndef ALLPAIRREACH_BIDIRECTIONALSUPERVERTEXPDAPREACHALGORITHM_H
-#define ALLPAIRREACH_BIDIRECTIONALSUPERVERTEXPDAPREACHALGORITHM_H
+#ifndef ALLPAIRREACH_BIDIRECTIONALSUPERVERTEXALGORITHM_H
+#define ALLPAIRREACH_BIDIRECTIONALSUPERVERTEXALGORITHM_H
 
 
 #include "PartitionedAPReachAlgorithm.h"
 #include "SimplePartitionedDAPReachAlgorithmImplementation.h"
 
 
-class BidirectionalSuperVertexPDAPReachAlgorithm
+class BidirectionalSuperVertexAlgorithm
         : public PartitionedDynamicAPReachAlgorithm {
 
 public:
@@ -19,7 +19,7 @@ public:
     bool query(Algora::Vertex *start, const Algora::Vertex *end) override;
 
 
-    ~BidirectionalSuperVertexPDAPReachAlgorithm() override;
+    ~BidirectionalSuperVertexAlgorithm() override;
 
     Algora::PropertyMap<Algora::Vertex*> sourceSuperVertices;
     Algora::PropertyMap<Algora::Vertex*> destinationSuperVertices;
@@ -33,7 +33,6 @@ public:
     std::string getShortName() const noexcept override;
 
 protected:
-    virtual Algora::DynamicSSReachAlgorithm* createOverlayAlgorithm() = 0;
 
     void initializeChildStructures() override;
 
@@ -56,4 +55,4 @@ private:
 };
 
 
-#endif //ALLPAIRREACH_BIDIRECTIONALSUPERVERTEXPDAPREACHALGORITHM_H
+#endif //ALLPAIRREACH_BIDIRECTIONALSUPERVERTEXALGORITHM_H

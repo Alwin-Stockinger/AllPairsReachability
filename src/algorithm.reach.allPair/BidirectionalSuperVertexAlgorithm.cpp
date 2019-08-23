@@ -3,9 +3,9 @@
 //
 
 #include <algorithm.basic.traversal/breadthfirstsearch.h>
-#include "BidirectionalSuperVertexPDAPReachAlgorithm.h"
+#include "BidirectionalSuperVertexAlgorithm.h"
 
-void BidirectionalSuperVertexPDAPReachAlgorithm::generateSuperVertices() {
+void BidirectionalSuperVertexAlgorithm::generateSuperVertices() {
     for(auto& [graph,_] : graphToAlgorithmMap){
         (void)(_);// unused warning
 
@@ -24,12 +24,12 @@ void BidirectionalSuperVertexPDAPReachAlgorithm::generateSuperVertices() {
     }
 }
 
-BidirectionalSuperVertexPDAPReachAlgorithm::~BidirectionalSuperVertexPDAPReachAlgorithm() {
+BidirectionalSuperVertexAlgorithm::~BidirectionalSuperVertexAlgorithm() {
     resetSuperStructure();
 }
 
 
-void BidirectionalSuperVertexPDAPReachAlgorithm::resetSuperStructure() {
+void BidirectionalSuperVertexAlgorithm::resetSuperStructure() {
     if(overlayGraph){
         deregisterOnOverlay();
     }
@@ -38,7 +38,7 @@ void BidirectionalSuperVertexPDAPReachAlgorithm::resetSuperStructure() {
     destinationSuperVertices.resetAll();
 }
 
-bool BidirectionalSuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
+bool BidirectionalSuperVertexAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
 
     if( start == end){
         return true;
@@ -145,7 +145,7 @@ bool BidirectionalSuperVertexPDAPReachAlgorithm::query(Algora::Vertex *start, co
 
 
 
-void BidirectionalSuperVertexPDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
+void BidirectionalSuperVertexAlgorithm::onArcAdd(Algora::Arc *arc) {
     PartitionedAPReachAlgorithm::onArcAdd(arc);
 
     for(Algora::Vertex* vertex: delayedVertices){
@@ -168,7 +168,7 @@ void BidirectionalSuperVertexPDAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
     delayedVertices.clear();
 }
 
-std::string BidirectionalSuperVertexPDAPReachAlgorithm::getBaseName() {
+std::string BidirectionalSuperVertexAlgorithm::getBaseName() {
     std::string retName = "Bidirectional Super Vertex ";
     retName += "(" + getPartitionConfiguration() + ")";
     retName += "(s=" + std::to_string(stepSize) + ")";
@@ -177,27 +177,27 @@ std::string BidirectionalSuperVertexPDAPReachAlgorithm::getBaseName() {
     return retName;
 }
 
-std::string BidirectionalSuperVertexPDAPReachAlgorithm::getName()  const noexcept {
+std::string BidirectionalSuperVertexAlgorithm::getName()  const noexcept {
     return std::__cxx11::string("Bidirectional Super Vertex Partitioned Algorithm");
 }
 
-std::string BidirectionalSuperVertexPDAPReachAlgorithm::getShortName() const noexcept {
+std::string BidirectionalSuperVertexAlgorithm::getShortName() const noexcept {
     return std::__cxx11::string("Bidi Super Vertex Partitioned Algorithm");
 }
 
-void BidirectionalSuperVertexPDAPReachAlgorithm::registerOnOverlay() {
+void BidirectionalSuperVertexAlgorithm::registerOnOverlay() {
     overlayGraph->onVertexAdd(this, [this](Algora::Vertex* vertex){
         delayedVertices.push_back(vertex);
     });
 }
 
-void BidirectionalSuperVertexPDAPReachAlgorithm::deregisterOnOverlay() {
+void BidirectionalSuperVertexAlgorithm::deregisterOnOverlay() {
     if(overlayGraph){
         overlayGraph->removeOnVertexAdd(this);
     }
 }
 
-void BidirectionalSuperVertexPDAPReachAlgorithm::initializeChildStructures() {
+void BidirectionalSuperVertexAlgorithm::initializeChildStructures() {
     PartitionedDynamicAPReachAlgorithm::initializeChildStructures();
 
     generateSuperVertices();
@@ -205,13 +205,13 @@ void BidirectionalSuperVertexPDAPReachAlgorithm::initializeChildStructures() {
     registerOnOverlay(); //this needs to be last, so that super vertices don't notify
 }
 
-void BidirectionalSuperVertexPDAPReachAlgorithm::resetChildStructures() {
+void BidirectionalSuperVertexAlgorithm::resetChildStructures() {
     resetSuperStructure();
     PartitionedDynamicAPReachAlgorithm::resetChildStructures();
 }
 
 bool
-BidirectionalSuperVertexPDAPReachAlgorithm::bidirectionalOverlaySearch(Algora::Vertex *source, Algora::Vertex *target) {
+BidirectionalSuperVertexAlgorithm::bidirectionalOverlaySearch(Algora::Vertex *source, Algora::Vertex *target) {
     bool reachable = false;
 
     unsigned long long stepsTaken = 0ULL;
@@ -256,7 +256,7 @@ BidirectionalSuperVertexPDAPReachAlgorithm::bidirectionalOverlaySearch(Algora::V
         return stepsTaken == stepSize;
     });
 
-    runAlgorithm(sourceBFS, diGraph);
+    runAlgorithm(sourceBFS, overlayGraph);
     if(reachable){
         return reachable;
     }
@@ -265,7 +265,7 @@ BidirectionalSuperVertexPDAPReachAlgorithm::bidirectionalOverlaySearch(Algora::V
     }
     stepsTaken = 0ULL;
 
-    runAlgorithm(targetBFS, diGraph);
+    runAlgorithm(targetBFS, overlayGraph);
     if(reachable){
         return reachable;
     }
