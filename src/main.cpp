@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     app.add_option("--testSuperVertex", testSuperVertex, "Test Super Vertex Algorithms");
 
     bool testBiSuper = false;
-    app.add_option("--biSuper", testBiSuper, "Test Bidirectional Super Vertex Algorithms")
+    app.add_option("--testBiSuper", testBiSuper, "Test Bidirectional Super Vertex Algorithms");
 
     bool testSimpleBFS = false;
     app.add_option("--testSBFS", testSimpleBFS, "Test Simple BFS Algorithms");
