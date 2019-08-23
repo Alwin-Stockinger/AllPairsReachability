@@ -64,6 +64,9 @@ int main(int argc, char *argv[]) {
     bool testSuperVertex = false;
     app.add_option("--testSuperVertex", testSuperVertex, "Test Super Vertex Algorithms");
 
+    bool testBiSuper = false;
+    app.add_option("--biSuper", testBiSuper, "Test Bidirectional Super Vertex Algorithms")
+
     bool testSimpleBFS = false;
     app.add_option("--testSBFS", testSimpleBFS, "Test Simple BFS Algorithms");
 
@@ -194,7 +197,7 @@ int main(int argc, char *argv[]) {
 
 
     if(runPerformanceTests){
-        FactoryFacade factory(testWithoutPartition, testPartition, testBFSO, testSuperVertex, testReverseBFS, testDFSO, testTwoWay);
+        FactoryFacade factory(testWithoutPartition, testPartition, testBFSO, testSuperVertex, testReverseBFS, testDFSO, testTwoWay, testBiSuper);
 
         factory.setExponentialK(exponentialK);
         factory.setKMax(k);

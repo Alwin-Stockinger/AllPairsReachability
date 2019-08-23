@@ -32,6 +32,10 @@ public:
 
     std::string getShortName() const noexcept override;
 
+    void setStepSize(unsigned long long newSteps){
+        this->stepSize = newSteps;
+    }
+
 protected:
 
     void initializeChildStructures() override;
