@@ -4,21 +4,21 @@ import sys
 algorithms = "-A "
 #algorithms += "StaticBFS "
 #algorithms += "StaticDFS "
-algorithms += "LazyDFS "
-algorithms += "LazyBFS "
-algorithms += "CachingDFS "
-algorithms += "CachingBFS "
+#algorithms += "LazyDFS "
+#algorithms += "LazyBFS "
+#algorithms += "CachingDFS "
+#algorithms += "CachingBFS "
 #algorithms += "OldESTree "
-algorithms += "ESTreeQ "
-algorithms += "ESTreeML "
-algorithms += "SimpleESTree "
+#algorithms += "ESTreeQ "
+#algorithms += "ESTreeML "
+#algorithms += "SimpleESTree "
 algorithms += "SimpleInc "
 
 
 overlayAlgorithm = "-O SimpleInc"
 
 timeOutHours = 0
-timeOutSeconds = 60 * 10#60 * timeOutHours
+timeOutSeconds = 60 * 60 * timeOutHours
 nanoConverter = 1000 * 1000 * 1000  # seconds to nanoseconds
 timeOutNumber = nanoConverter * timeOutSeconds
 timeOut = "-t " + str(timeOutNumber)
@@ -38,12 +38,15 @@ maxDepthNumber = 0
 withoutPartitionNumber = 0
 simplePartitionNumber = 0
 superVerticesNumber = 0
-reverseBFSNumber = 1
-BFSONumber = 1
+biSuperVerticesNumber = 1
+reverseBFSNumber = 0
+BFSONumber = 0
 DFSONumber = 0
 ABFSONumber = 1
 SBFSONumber = 0
 twoWayNumber = 0
+
+randomVertexNumber = 1
 
 multiArcsNumber = 1
 
@@ -51,11 +54,11 @@ queriesNumber = 30
 insertsNumber = 30
 removalNumber = 30
 
-twoWayMin = "--minTwoWay 1"
-twoWayMax = "--maxTwoWay 10"
+twoWayMin = "--minTwoWay 5"
+twoWayMax = "--maxTwoWay 5"
 
-kMax = "-k 20000"
-kMin = "--kMin 1024"
+kMax = "-k 40000"
+kMin = "--kMin 2048"
 
 
 vertices = "-s " + str(verticesNumber)
@@ -70,6 +73,7 @@ maxDepth = "--maxDepth " + str(maxDepthNumber)
 withoutPartition = "--testWithoutPartition " + str(withoutPartitionNumber)
 simplePartition = "--testPartition " + str(simplePartitionNumber)
 superVertices= "--testSuperVertex " + str(superVerticesNumber)
+biSuperVertices = "--testBiSuper " + str(biSuperVerticesNumber)
 reverseBFS= "--testReverseBFS " + str(reverseBFSNumber)
 BFSO = "--testBFSO " + str(BFSONumber)
 DFSO = "--testDFSO " + str(DFSONumber)
@@ -77,20 +81,22 @@ ABFSO = "--testAdvancedBFS " + str(ABFSONumber)
 SBFSO = "--testSBFS " + str(SBFSONumber)
 twoWay = "--testTwoWay " + str(twoWayNumber)
 
+randomVertex = "--randomVertexAdd " + str(randomVertexNumber)
+
 multiArcs = "--multiArcs " + str(multiArcsNumber)
 
 queries = "-q " + str(queriesNumber)
 inserts = "-a " + str(insertsNumber)
 removes = "-r " + str(removalNumber)
 
-repartitionNumber = 60000
+repartitionNumber = 160000
 repartition = "--repartition " + str(repartitionNumber)
 
 callString = "taskset -c 3 ./AllPairReach"
 
 callString += " " + kMax + " " + algorithms + " " + timeOut \
               + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs \
-              + " " + exponentialK + " " + repartition + " " + overlayAlgorithm + " " + simplePartition + " " + superVertices + " " + ABFSO + " " + SBFSO + " " + reverseBFS + " " + BFSO + " " + percentageTimes + " " + DFSO + " " + twoWay + " " + twoWayMin + " " + twoWayMax
+              + " " + exponentialK + " " + repartition + " " + overlayAlgorithm + " " + simplePartition + " " + superVertices + " " + ABFSO + " " + SBFSO + " " + reverseBFS + " " + BFSO + " " + percentageTimes + " " + DFSO + " " + twoWay + " " + twoWayMin + " " + twoWayMax + " " + biSuperVertices + " " + randomVertex
 print("CallString: " + callString)
 
 if len(sys.argv) == 1:
@@ -115,6 +121,14 @@ elif len(sys.argv) == 3:
         subprocess.call([callString + " " + inputFile + " " + squashRatio],
                         shell=True)
         repartitionNumber *= 2
+
+        repartition = "--repartition " + str(repartitionNumber)
+        
+        callString = "taskset -c 3 ./AllPairReach"
+
+        callString += " " + kMax + " " + algorithms + " " + timeOut \
+                      + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs \
+                      + " " + exponentialK + " " + repartition + " " + overlayAlgorithm + " " + simplePartition + " " + superVertices + " " + ABFSO + " " + SBFSO + " " + reverseBFS + " " + BFSO + " " + percentageTimes + " " + DFSO + " " + twoWay + " " + twoWayMin + " " + twoWayMax + " " + biSuperVertices
 
 else:
     print("too many arguments")
