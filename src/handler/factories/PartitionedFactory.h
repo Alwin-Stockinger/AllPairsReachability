@@ -32,11 +32,16 @@ public:
 
     void setRepartitionThreshold(unsigned long long int threshold);
 
+    void setRandomVertexAdditions(bool b){
+        randomVertexAdditions = b;
+    }
+
 protected:
 
     void configureAlgorithm(PartitionedAPReachAlgorithm* algorithm){
         algorithm->setPartitionFunction(partitionFunction);
         algorithm->setRepartitionThreshold(repartitionThreshold);
+        algorithm->setRandomVertexAdditions(randomVertexAdditions);
     }
 
     PartFunc partitionFunction = Partitioner::handlePartitioning;
@@ -50,6 +55,8 @@ protected:
     unsigned long long depthMax = 0;
 
     unsigned long long repartitionThreshold = 0ULL;
+
+    bool randomVertexAdditions;
 };
 
 

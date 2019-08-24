@@ -130,6 +130,9 @@ int main(int argc, char *argv[]) {
     unsigned long long repartitionThreshold = 0ULL;
     app.add_option("--repartition", repartitionThreshold, "Amount of operations until algorithms are repartitioned");
 
+    bool randomVertexAdditions = false;
+    app.add_option("--randomVertexAdd", randomVertexAdditions, "Add  new vertices to random subgraph");
+
     //for konect files
 
     double queriesPerDelta = -1; //keep this one, so that always two vertices are there for queries
@@ -211,6 +214,7 @@ int main(int argc, char *argv[]) {
         factory.setSimpleBFSO(testSimpleBFS);
         factory.setMinTwoWaySteps(minTwoWayStepSize);
         factory.setMaxTwoWaySteps(maxTwoWayStepSize);
+        factory.setRandomVertexAdditions(randomVertexAdditions);
 
 
         AlgorithmTester tester;

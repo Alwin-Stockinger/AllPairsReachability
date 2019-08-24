@@ -170,8 +170,8 @@ void BidirectionalSuperVertexAlgorithm::onArcAdd(Algora::Arc *arc) {
 
 std::string BidirectionalSuperVertexAlgorithm::getBaseName() {
     std::string retName = "Bidi Super Vertex ";
-    retName += "(" + getPartitionConfiguration() + ")";
-    retName += "(s=" + std::to_string(stepSize) + ")";
+    retName += "(" + getPartitionConfiguration();
+    retName += "/s=" + std::to_string(stepSize) + ")";
     retName += ": " + graphToAlgorithmMap.begin()->second->getBaseName();
 
     return retName;

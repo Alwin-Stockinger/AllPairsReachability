@@ -60,24 +60,9 @@ void PartitionedAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
 
     if(repartitionThreshold && ++operationsSinceRepartition >= repartitionThreshold){
         initialized = false;
-    } else {
-        /*
-
-        Algora::DiGraph *subGraph = nullptr;
-
-        //TODO chose smart or random graph
-        for(auto anyVertex : mainToSubMap){
-            if(anyVertex){
-                subGraph = dynamic_cast<Algora::DiGraph*>(anyVertex->getParent());
-                break;
-            }
-        }
-        if(!subGraph){
-            throw std::logic_error("Could not find any non empty graph to insert new Vertex");  //TODO something better (can't use graphToAlgorithm map because graphs are const inside
-        }
-        auto* subVertex = subGraph->addVertex();
-        mainToSubMap[vertex] = subVertex;
-        */
+    } else if(randomVertexAdditions){
+        auto* subGraph = subGraphs[kDistribution(randomGenerator)];
+        addVertex(vertex, subGraph);
     }
 
     DynamicAPReachAlgorithm::onVertexAdd(vertex);

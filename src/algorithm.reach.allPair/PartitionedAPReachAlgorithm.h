@@ -63,6 +63,9 @@ public:
         this->repartitionThreshold = newThreshold;
     }
 
+    void setRandomVertexAdditions(bool b){
+        this->randomVertexAdditions = b;
+    }
 
 
 
@@ -79,7 +82,8 @@ protected:
 
 
     std::string getPartitionConfiguration(){
-        return "k=" + std::to_string(k) + "/d=" + std::to_string(depth) + "/t=" + std::to_string(repartitionThreshold);
+        return "k=" + std::to_string(k) + "/d=" + std::to_string(depth) + "/t=" + std::to_string(repartitionThreshold)
+        + "/r=" + std::to_string(randomVertexAdditions);
     }
 
     Algora::PropertyMap<std::unordered_set<Algora::Vertex*>> edgeVertices;
@@ -120,6 +124,8 @@ private:
 
 protected:
     unsigned depth = 0U;
+
+    bool randomVertexAdditions = false;
 
     void addNeighbourVertex(Algora::Vertex *lazyVertex, Algora::Vertex *neighbourVertex);
 

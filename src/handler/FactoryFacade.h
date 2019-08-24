@@ -125,6 +125,12 @@ public:
         return algorithms;
     }
 
+    void setRandomVertexAdditions(bool b){
+        for(PartitionedFactory* factory: partitionedFactories){
+            factory->setRandomVertexAdditions(b);
+        }
+    }
+
 
     void setRepartitionThreshold(unsigned long long int threshold) {
         for(PartitionedFactory* factory: partitionedFactories){
