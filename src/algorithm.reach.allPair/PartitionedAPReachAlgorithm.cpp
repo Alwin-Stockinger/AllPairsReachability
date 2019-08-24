@@ -60,9 +60,6 @@ void PartitionedAPReachAlgorithm::onVertexAdd(Algora::Vertex *vertex) {
 
     if(repartitionThreshold && ++operationsSinceRepartition >= repartitionThreshold){
         initialized = false;
-    } else if(randomVertexAdditions){
-        auto* subGraph = subGraphs[kDistribution(randomGenerator)];
-        addVertex(vertex, subGraph);
     }
 
     DynamicAPReachAlgorithm::onVertexAdd(vertex);
@@ -143,12 +140,24 @@ void PartitionedAPReachAlgorithm::onArcAdd(Algora::Arc *arc) {
             delayedVertex = true;
         }
         else if(!subHead){
-            addNeighbourVertex(mainHead, mainTail);
+            if(randomVertexAdditions){
+                auto* subGraph = subGraphs[kDistribution(randomGenerator)];
+                addVertex(mainHead, subGraph);
+            }
+            else{
+                addNeighbourVertex(mainHead, mainTail);
+            }
             subHead = mainToSubMap[mainHead];
             delayedVertex = true;
         }
         else if(!subTail){
-            addNeighbourVertex(mainTail, mainHead);
+            if(randomVertexAdditions){
+                auto* subGraph = subGraphs[kDistribution(randomGenerator)];
+                addVertex(mainTail, subGraph);
+            }
+            else{
+                addNeighbourVertex(mainTail, mainHead);
+            }
             subTail = mainToSubMap[mainTail];
             delayedVertex = true;
         }
