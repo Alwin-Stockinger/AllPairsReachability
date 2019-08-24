@@ -4,21 +4,21 @@ import sys
 algorithms = "-A "
 #algorithms += "StaticBFS "
 #algorithms += "StaticDFS "
-#algorithms += "LazyDFS "
-#algorithms += "LazyBFS "
-#algorithms += "CachingDFS "
-#algorithms += "CachingBFS "
-#algorithms += "OldESTree "
-#algorithms += "ESTreeQ "
-#algorithms += "ESTreeML "
-#algorithms += "SimpleESTree "
+algorithms += "LazyDFS "
+algorithms += "LazyBFS "
+algorithms += "CachingDFS "
+algorithms += "CachingBFS "
+algorithms += "OldESTree "
+algorithms += "ESTreeQ "
+algorithms += "ESTreeML "
+algorithms += "SimpleESTree "
 algorithms += "SimpleInc "
 
 
 overlayAlgorithm = "-O SimpleInc"
 
 timeOutHours = 0
-timeOutSeconds = 60 * 60 * timeOutHours
+timeOutSeconds = 60 * 10 #60 * timeOutHours
 nanoConverter = 1000 * 1000 * 1000  # seconds to nanoseconds
 timeOutNumber = nanoConverter * timeOutSeconds
 timeOut = "-t " + str(timeOutNumber)
@@ -54,11 +54,14 @@ queriesNumber = 30
 insertsNumber = 30
 removalNumber = 30
 
-twoWayMin = "--minTwoWay 5"
-twoWayMax = "--maxTwoWay 5"
+twoWayMinNumber = 5
+twoWayMaxNumber = 10
+
+twoWayMin = "--minTwoWay " + str(twoWayMinNumber)
+twoWayMax = "--maxTwoWay " + str(twoWayMaxNumber)
 
 kMax = "-k 40000"
-kMin = "--kMin 2048"
+kMin = "--kMin 512"
 
 
 vertices = "-s " + str(verticesNumber)
