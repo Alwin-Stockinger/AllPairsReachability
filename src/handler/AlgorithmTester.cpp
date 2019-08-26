@@ -231,7 +231,7 @@ AlgorithmTester::runTest(DynamicAPReachAlgorithm *algorithm, TimeCollector* time
 
 void AlgorithmTester::runTests() {
 
-    writeHeader();
+    //writeHeader();
 
     for(DynamicAPReachAlgorithm* algorithm: algorithms){
         resetDynGraph();

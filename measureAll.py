@@ -1,18 +1,19 @@
 import subprocess
 import sys
 
-algorithms = "-A "
-#algorithms += "StaticBFS "
-#algorithms += "StaticDFS "
-algorithms += "LazyDFS "
-algorithms += "LazyBFS "
-algorithms += "SimpleInc "
-algorithms += "CachingDFS "
-algorithms += "CachingBFS "
-#algorithms += "OldESTree "
-algorithms += "ESTreeQ "
-algorithms += "ESTreeML "
-algorithms += "SimpleESTree "
+algorithms = []
+algoString = "-A "
+algorithms.append(algoString + "StaticBFS ")
+algorithms.append(algoString + "StaticDFS ")
+algorithms.append(algoString + "LazyDFS ")
+algorithms.append(algoString + "LazyBFS ")
+algorithms.append(algoString + "SimpleInc ")
+algorithms.append(algoString + "CachingDFS ")
+algorithms.append(algoString + "CachingBFS ")
+algorithms.append(algoString + "OldESTree ")
+algorithms.append(algoString + "ESTreeQ ")
+algorithms.append(algoString + "ESTreeML ")
+algorithms.append(algoString + "SimpleESTree ")
 
 
 overlayAlgorithm = "-O SimpleInc"
@@ -95,43 +96,44 @@ removes = "-r " + str(removalNumber)
 repartitionNumber = 0
 repartition = "--repartition " + str(repartitionNumber)
 
-callString = "taskset -c 3 ./AllPairReach"
 
-callString += " " + kMax + " " + algorithms + " " + timeOut \
-              + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs \
-              + " " + exponentialK + " " + repartition + " " + overlayAlgorithm + " " + simplePartition + " " + superVertices + " " + ABFSO + " " + SBFSO + " " + reverseBFS + " " + BFSO + " " + percentageTimes + " " + DFSO + " " + twoWay + " " + twoWayMin + " " + twoWayMax + " " + biSuperVertices + " " + randomVertex
-print("CallString: " + callString)
 
-if len(sys.argv) == 1:
 
-    for i in range(1, 2):
-        arcs = "--arcSize " + str(arcsNumber)
 
-        callString += " " + vertices + " " + arcs + " " + operations + " " + queries + " " + inserts + " " + removes
-        subprocess.call([callString], shell=True)
+#if len(sys.argv) == 1:
 
-        arcsNumber *= 2
+#    for i in range(1, 2):
+ #       arcs = "--arcSize " + str(arcsNumber)
 
-elif len(sys.argv) == 2:
-    inputFile = "-i " + sys.argv[1]
-    subprocess.call([callString + " " + inputFile], shell=True)
+  #      callString += " " + vertices + " " + arcs + " " + operations + " " + queries + " " + inserts + " " + removes
+   #     subprocess.call([callString], shell=True)
 
-elif len(sys.argv) == 3:
+    #    arcsNumber *= 2
+
+#elif len(sys.argv) == 2:
+ #   inputFile = "-i " + sys.argv[1]
+  #  subprocess.call([callString + " " + inputFile], shell=True)
+
+if len(sys.argv) == 3:
 
     for i in range(1, 10):
-        inputFile = "-i " + sys.argv[1]
-        squashRatio = "-S " + sys.argv[2]
-        subprocess.call([callString + " " + inputFile + " " + squashRatio],
-                        shell=True)
-        repartitionNumber *= 2
 
-        repartition = "--repartition " + str(repartitionNumber)
-        
-        callString = "taskset -c 3 ./AllPairReach"
+        for algorithm in algorithms:
 
-        
-        callString += " " + kMax + " " + algorithms + " " + timeOut \
-                      + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs \
-                      + " " + exponentialK + " " + repartition + " " + overlayAlgorithm + " " + simplePartition + " " + superVertices + " " + ABFSO + " " + SBFSO + " " + reverseBFS + " " + BFSO + " " + percentageTimes + " " + DFSO + " " + twoWay + " " + twoWayMin + " " + twoWayMax + " " + biSuperVertices + " " + randomVertex
+            callString = "taskset -c 3 ./AllPairReach"
+            callString += " " + kMax + " " + algorithm + " " + timeOut \
+                          + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs \
+                          + " " + exponentialK + " " + repartition + " " + overlayAlgorithm + " " + simplePartition + " " + superVertices + " " + ABFSO + " " + SBFSO + " " + reverseBFS + " " + BFSO + " " + percentageTimes + " " + DFSO + " " + twoWay + " " + twoWayMin + " " + twoWayMax + " " + biSuperVertices + " " + randomVertex
+
+
+
+            inputFile = "-i " + sys.argv[1]
+            squashRatio = "-S " + sys.argv[2]
+            subprocess.call([callString + " " + inputFile + " " + squashRatio],
+                            shell=True)
+
+            repartitionNumber *= 2
+            repartition = "--repartition " + str(repartitionNumber)
+
 else:
     print("too many arguments")
