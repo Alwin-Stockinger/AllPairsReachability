@@ -42,7 +42,9 @@ void DynamicSSBasedDAPReachAlgorithm<immediateInit>::run() {
     }
     if(immediateInit){
         for (auto* algorithm : vertexMap) {
-            algorithm->run();
+            if(algorithm){
+                algorithm->run();
+            }
         }
     }
 
