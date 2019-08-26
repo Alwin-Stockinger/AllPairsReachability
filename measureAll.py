@@ -6,13 +6,13 @@ algorithms = "-A "
 #algorithms += "StaticDFS "
 algorithms += "LazyDFS "
 algorithms += "LazyBFS "
+algorithms += "SimpleInc "
 algorithms += "CachingDFS "
 algorithms += "CachingBFS "
-algorithms += "OldESTree "
+#algorithms += "OldESTree "
 algorithms += "ESTreeQ "
 algorithms += "ESTreeML "
 algorithms += "SimpleESTree "
-algorithms += "SimpleInc "
 
 
 overlayAlgorithm = "-O SimpleInc"
@@ -54,14 +54,14 @@ queriesNumber = 30
 insertsNumber = 30
 removalNumber = 30
 
-twoWayMinNumber = 5
-twoWayMaxNumber = 10
+twoWayMinNumber = 3
+twoWayMaxNumber = 3
 
 twoWayMin = "--minTwoWay " + str(twoWayMinNumber)
 twoWayMax = "--maxTwoWay " + str(twoWayMaxNumber)
 
-kMax = "-k 40000"
-kMin = "--kMin 512"
+kMax = "-k 5000"
+kMin = "--kMin 4096"
 
 
 vertices = "-s " + str(verticesNumber)
@@ -92,7 +92,7 @@ queries = "-q " + str(queriesNumber)
 inserts = "-a " + str(insertsNumber)
 removes = "-r " + str(removalNumber)
 
-repartitionNumber = 160000
+repartitionNumber = 0
 repartition = "--repartition " + str(repartitionNumber)
 
 callString = "taskset -c 3 ./AllPairReach"
@@ -118,7 +118,7 @@ elif len(sys.argv) == 2:
 
 elif len(sys.argv) == 3:
 
-    for i in range(1, 5):
+    for i in range(1, 10):
         inputFile = "-i " + sys.argv[1]
         squashRatio = "-S " + sys.argv[2]
         subprocess.call([callString + " " + inputFile + " " + squashRatio],
@@ -129,9 +129,9 @@ elif len(sys.argv) == 3:
         
         callString = "taskset -c 3 ./AllPairReach"
 
+        
         callString += " " + kMax + " " + algorithms + " " + timeOut \
                       + " " + kMin + " " + minDepth + " " + maxDepth + " " + withoutPartition + " " + multiArcs \
-                      + " " + exponentialK + " " + repartition + " " + overlayAlgorithm + " " + simplePartition + " " + superVertices + " " + ABFSO + " " + SBFSO + " " + reverseBFS + " " + BFSO + " " + percentageTimes + " " + DFSO + " " + twoWay + " " + twoWayMin + " " + twoWayMax + " " + biSuperVertices
-
+                      + " " + exponentialK + " " + repartition + " " + overlayAlgorithm + " " + simplePartition + " " + superVertices + " " + ABFSO + " " + SBFSO + " " + reverseBFS + " " + BFSO + " " + percentageTimes + " " + DFSO + " " + twoWay + " " + twoWayMin + " " + twoWayMax + " " + biSuperVertices + " " + randomVertex
 else:
     print("too many arguments")
