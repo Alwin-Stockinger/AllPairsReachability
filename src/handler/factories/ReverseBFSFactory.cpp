@@ -11,7 +11,7 @@ std::vector<DynamicAPReachAlgorithm *> ReverseBFSFactory::getAlgorithms() {
     for(unsigned long long k = kMin; k <= kMax ;  [this, &k]() {
         exponentialK ? (k *= 2ULL) : (k++);
     }()){
-        for(unsigned long long steps = minSteps; steps <= maxSteps; steps++){
+        if (fullyReverse) for(unsigned long long steps = minSteps; steps <= maxSteps; steps++){
             if (advancedBFSO) {
                 auto *algorithm = new ReverseBFSPartitionedAPReachAlgorithm;
 
@@ -33,8 +33,32 @@ std::vector<DynamicAPReachAlgorithm *> ReverseBFSFactory::getAlgorithms() {
                 algorithms.push_back(algorithm);
             }
         }
+        else{
+            if (advancedBFSO) {
+                auto *algorithm = new ReverseBFSPartitionedAPReachAlgorithm;
+
+                configureAlgorithm(algorithm);
+                algorithm->setK(k);
+                algorithm->setSetRemovals(true);
+
+                algorithms.push_back(algorithm);
+            }
+            if (simpleBFSO) {
+                auto *algorithm = new ReverseBFSPartitionedAPReachAlgorithm;
+
+                configureAlgorithm(algorithm);
+                algorithm->setK(k);
+                algorithm->setSetRemovals(false);
+
+                algorithms.push_back(algorithm);
+            }
+        }
     }
     return algorithms;
+}
+
+void ReverseBFSFactory::setFullyReverseBFS(bool b) {
+    fullyReverse = b;
 }
 
 std::vector<DynamicAPReachAlgorithm *> ReverseBFSFactory::getStaticBFSAlgorithms() {

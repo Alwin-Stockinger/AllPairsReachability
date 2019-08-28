@@ -31,7 +31,11 @@ public:
         maxSteps = newMaxSteps;
     }
 
+    void setFullyReverseBFS(bool b);
+
 private:
+
+    bool fullyReverse = false;
 
     unsigned long long minSteps = 2ULL;
     unsigned long long maxSteps = 2ULL;

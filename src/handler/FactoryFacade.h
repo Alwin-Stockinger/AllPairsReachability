@@ -153,6 +153,10 @@ public:
         reverseBFSFactory.setSimpleBFSO(b);
     }
 
+    void setFullyReverseBFS(bool b){
+        reverseBFSFactory.setFullyReverseBFS(b);
+    }
+
 private:
     BFSOFactory bfsoFactory{};
     DFSOFactory dfsoFactory{};

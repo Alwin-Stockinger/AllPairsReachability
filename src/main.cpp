@@ -82,6 +82,9 @@ int main(int argc, char *argv[]) {
     bool testReverseBFS = false;
     app.add_option("--testReverseBFS", testReverseBFS, "Test Reversed BFS Algorithms");
 
+    bool fullyReverse = false;
+    app.add_option("--fullyReverse", fullyReverse, "Test reverse BFS with overlay bidirectional");
+
     std::vector<std::string> algorithmNames;
     app.add_option("-A, --algorithms", algorithmNames, "Algorithms to use");
 
@@ -215,6 +218,8 @@ int main(int argc, char *argv[]) {
         factory.setMinTwoWaySteps(minTwoWayStepSize);
         factory.setMaxTwoWaySteps(maxTwoWayStepSize);
         factory.setRandomVertexAdditions(randomVertexAdditions);
+
+        factory.setFullyReverseBFS(fullyReverse);
 
 
         AlgorithmTester tester;
