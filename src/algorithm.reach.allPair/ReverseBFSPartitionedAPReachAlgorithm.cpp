@@ -97,11 +97,13 @@ bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const A
     runAlgorithm(sourceBFS, startGraph);
 
     if(bidirectional){
-        bidirectionalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
+        reachable = bidirectionalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
     } else{
-        normalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
+        reachable = normalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
     }
-    return false;
+
+
+    return reachable;
 }
 
 void ReverseBFSPartitionedAPReachAlgorithm::initializeChildStructures() {
