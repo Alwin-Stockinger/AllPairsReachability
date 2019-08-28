@@ -380,7 +380,7 @@ bool ReverseBFSPartitionedAPReachAlgorithm::bidirectionalOverlayBFS(std::unorder
     });
 
 
-    runAlgorithm(sourceOverlayBfs, diGraph);
+    runAlgorithm(sourceOverlayBfs, overlayGraph);
     if(reachable){
         return reachable;
     }
@@ -389,7 +389,7 @@ bool ReverseBFSPartitionedAPReachAlgorithm::bidirectionalOverlayBFS(std::unorder
     }
     stepsTaken = 0ULL;
 
-    runAlgorithm(targetOverlayBfs, diGraph);
+    runAlgorithm(targetOverlayBfs, overlayGraph);
     if(reachable){
         return reachable;
     }
