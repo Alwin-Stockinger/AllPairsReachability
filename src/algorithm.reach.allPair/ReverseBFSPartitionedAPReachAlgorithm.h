@@ -35,10 +35,18 @@ protected:
 
     void addVertex(Algora::Vertex *lazyVertex, Algora::DiGraph *subGraph) override;
 
+    bool normalOverlayBFS(std::unordered_set<const Algora::Vertex*> sourceBorders, std::unordered_set<Algora::Vertex*> targetBorders);
+
+    bool bidirectionalOverlayBFS(std::unordered_set<const Algora::Vertex*> sourceBorders, std::unordered_set<Algora::Vertex*> targetBorders);
+
 public:
     void onVertexAdd(Algora::Vertex *vertex) override;
 
     void onVertexRemove(Algora::Vertex *vertex) override;
+
+    void setStepSize(unsigned long long newStepSize){
+        this->stepSize = newStepSize;
+    }
 
 public:
     std::string getName() const noexcept override;
@@ -49,6 +57,11 @@ private:
     Algora::PropertyMap<Algora::Vertex*> subToMainMap; //can't use FastPropertyMap because vertices of subgraphs could have same id
 
     bool setRemovals = true;
+
+    bool bidirectional = false;
+
+    unsigned long long stepSize = 0ULL;
+
 };
 
 

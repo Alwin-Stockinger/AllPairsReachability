@@ -96,33 +96,11 @@ bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const A
     }
     runAlgorithm(sourceBFS, startGraph);
 
-
-    for(const Algora::Vertex* sourceEdge : reachableSourceEdgeVertices){  //iterator is not invalidated, because only pointers to erased elements are invalidated
-
-        Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> overlayBfs(false, false);
-        overlayBfs.setStartVertex(sourceEdge);
-
-        overlayBfs.setArcStopCondition([&reachableDestinationEdgeVertices, &reachable](const Algora::Arc* arc){
-            reachable = reachableDestinationEdgeVertices.count(arc->getHead());
-            return reachable;
-        });
-
-        if(setRemovals){
-            overlayBfs.onVertexDiscover([&reachableSourceEdgeVertices, &sourceEdge](const Algora::Vertex* vertex){
-                if(vertex != sourceEdge){   //otherwise iterator invalidation
-                    reachableSourceEdgeVertices.erase(vertex);
-                }
-                return true;
-            });
-        }
-
-        runAlgorithm(overlayBfs, overlayGraph);
-
-        if(reachable){
-            return true;
-        }
+    if(bidirectional){
+        bidirectionalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
+    } else{
+        normalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
     }
-
     return false;
 }
 
@@ -272,12 +250,13 @@ void ReverseBFSPartitionedAPReachAlgorithm::removeOverlayEdgeArcs(Algora::DiGrap
 
 }
 
+
 void ReverseBFSPartitionedAPReachAlgorithm::resetChildStructures() {
     subToMainMap.resetAll();
 }
 
 std::string ReverseBFSPartitionedAPReachAlgorithm::getBaseName() {
-    return "RBFS(" + getPartitionConfiguration() + "/A=" + std::to_string(setRemovals) + ")";;
+    return "RBFS(" + getPartitionConfiguration() + "/A=" + std::to_string(setRemovals) + ")";
 }
 
 std::string ReverseBFSPartitionedAPReachAlgorithm::getName() const noexcept {
@@ -314,6 +293,130 @@ void ReverseBFSPartitionedAPReachAlgorithm::addVertex(Algora::Vertex *lazyVertex
 
     auto* subVertex = mainToSubMap[lazyVertex];
     subToMainMap[subVertex] = lazyVertex;
+}
+
+bool ReverseBFSPartitionedAPReachAlgorithm::normalOverlayBFS(std::unordered_set<const Algora::Vertex *> sourceBorders,
+                                                             std::unordered_set<Algora::Vertex *> targetBorders) {
+
+    bool reachable = false;
+
+    for(const Algora::Vertex* sourceEdge : sourceBorders){  //iterator is not invalidated, because only pointers to erased elements are invalidated
+
+        Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> overlayBfs(false, false);
+        overlayBfs.setStartVertex(sourceEdge);
+
+        overlayBfs.setArcStopCondition([&targetBorders, &reachable](const Algora::Arc* arc){
+            reachable = targetBorders.count(arc->getHead());
+            return reachable;
+        });
+
+        if(setRemovals){
+            overlayBfs.onVertexDiscover([&sourceEdge, &sourceBorders](const Algora::Vertex* vertex){
+                if(vertex != sourceEdge){   //otherwise iterator invalidation
+                    sourceBorders.erase(vertex);
+                }
+                return true;
+            });
+        }
+
+        runAlgorithm(overlayBfs, overlayGraph);
+
+        if(reachable){
+            return true;
+        }
+    }
+    return reachable;
+}
+
+bool ReverseBFSPartitionedAPReachAlgorithm::bidirectionalOverlayBFS(std::unordered_set<const Algora::Vertex *> sourceBorders,
+                                                                    std::unordered_set<Algora::Vertex *> targetBorders) {
+    bool reachable = false;
+
+    unsigned long long stepsTaken = 0ULL;
+
+    Algora::FastPropertyMap<bool> sourceReachable(false);
+    Algora::FastPropertyMap<bool> targetReachable(false);
+
+    Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> sourceOverlayBfs(false, false);
+    std::vector<const Algora::Vertex*> sourceVector;
+    sourceVector.reserve(sourceBorders.size());
+    for (auto it = sourceBorders.begin(); it != sourceBorders.end(); ) {
+        sourceReachable[(*it)] = true;
+        sourceVector.push_back(sourceBorders.extract(it++).value());
+    }
+    sourceOverlayBfs.setStartVertices(sourceVector);
+    sourceOverlayBfs.setArcStopCondition([&reachable, &targetReachable](const Algora::Arc* arc){
+        reachable = targetReachable(arc->getHead());
+        return reachable;
+    });
+    sourceOverlayBfs.setVertexStopCondition([&stepsTaken, &sourceReachable, this](const Algora::Vertex* vertex){
+        if(!sourceReachable(vertex)){
+            sourceReachable[vertex] = true;
+            stepsTaken++;
+        }
+        return stepsTaken == stepSize;
+    });
+
+
+    Algora::BreadthFirstSearch<Algora::FastPropertyMap, false> targetOverlayBfs(false, false);
+    std::vector<const Algora::Vertex*> targetVector;
+    targetVector.reserve(targetBorders.size());
+    for(auto it = targetBorders.begin(); it != targetBorders.end();){
+        targetReachable[(*it)] = true;
+        targetVector.push_back(targetBorders.extract(it++).value());
+    }
+    targetOverlayBfs.setStartVertices(targetVector);
+    targetOverlayBfs.reverseArcDirection(true);
+    targetOverlayBfs.setArcStopCondition([&reachable, &sourceReachable](const Algora::Arc* arc){
+        reachable = sourceReachable(arc->getTail());
+        return reachable;
+    });
+    targetOverlayBfs.setVertexStopCondition([&stepsTaken,&targetReachable, this](const Algora::Vertex* vertex){
+        if(!targetReachable(vertex)){
+            targetReachable[vertex] = true;
+            stepsTaken++;
+        }
+        return stepsTaken == stepSize;
+    });
+
+
+    runAlgorithm(sourceOverlayBfs, diGraph);
+    if(reachable){
+        return reachable;
+    }
+    else if(stepsTaken != stepSize){
+        return false;
+    }
+    stepsTaken = 0ULL;
+
+    runAlgorithm(targetOverlayBfs, diGraph);
+    if(reachable){
+        return reachable;
+    }
+    else if(stepsTaken != stepSize){
+        return false;
+    }
+    stepsTaken = 0ULL;
+
+    while(true){
+        sourceOverlayBfs.resume();
+        if(reachable){
+            return reachable;
+        }
+        else if(stepsTaken != stepSize){
+            return false;
+        }
+        stepsTaken = 0ULL;
+
+        targetOverlayBfs.resume();
+        if(reachable){
+            return reachable;
+        }
+        else if(stepsTaken != stepSize){
+            return false;
+        }
+        stepsTaken = 0ULL;
+    }
 }
 
 

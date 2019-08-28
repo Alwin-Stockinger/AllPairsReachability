@@ -58,10 +58,12 @@ public:
     void setMinTwoWaySteps(unsigned long long stepSize){
         twoWayFactory.setMinSteps(stepSize);
         biSuperFactory.setMinSteps(stepSize);
+        reverseBFSFactory.setMinSteps(stepSize);
     }
     void setMaxTwoWaySteps(unsigned long long stepSize){
         twoWayFactory.setMaxSteps(stepSize);
         biSuperFactory.setMaxSteps(stepSize);
+        reverseBFSFactory.setMaxSteps(stepSize);
     }
 
     void setExponentialK(bool expoK){

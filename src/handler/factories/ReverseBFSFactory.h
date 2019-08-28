@@ -22,7 +22,20 @@ public:
         this->simpleBFSO = b;
     }
 
+
+    void setMinSteps(unsigned long long newMinSteps){
+        minSteps = newMinSteps;
+    }
+
+    void setMaxSteps(unsigned long long newMaxSteps){
+        maxSteps = newMaxSteps;
+    }
+
 private:
+
+    unsigned long long minSteps = 2ULL;
+    unsigned long long maxSteps = 2ULL;
+
     bool advancedBFSO = false;
     bool simpleBFSO = false;
 

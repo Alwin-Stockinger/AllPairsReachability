@@ -52,7 +52,7 @@ std::vector<DynamicAPReachAlgorithm *> TwoWayFactory::getOldESTAlgorithms() {
 std::vector<DynamicAPReachAlgorithm *> TwoWayFactory::getAlgorithms() {
 
     std::vector<DynamicAPReachAlgorithm*> algorithmVector;
-    for(unsigned steps = minSteps; steps <= maxSteps ; steps++){
+    for(unsigned long long steps = minSteps; steps <= maxSteps ; steps++){
         auto* algorithm = new TwoWayBFSAPReachAlgorithm();
         algorithm->setStepSize(steps);
         algorithmVector.push_back(algorithm);
