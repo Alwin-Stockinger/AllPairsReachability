@@ -18,6 +18,7 @@ std::vector<DynamicAPReachAlgorithm *> ReverseBFSFactory::getAlgorithms() {
                 algorithm->setK(k);
                 algorithm->setSetRemovals(true);
                 algorithm->setStepSize(steps);
+                algorithm->setBidirectional(fullyReverse);
 
                 algorithms.push_back(algorithm);
         }

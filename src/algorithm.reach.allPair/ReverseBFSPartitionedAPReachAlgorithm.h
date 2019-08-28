@@ -48,6 +48,10 @@ public:
         this->stepSize = newStepSize;
     }
 
+    void setBidirectional(bool b){
+        this->bidirectional = b;
+    }
+
 public:
     std::string getName() const noexcept override;
 
