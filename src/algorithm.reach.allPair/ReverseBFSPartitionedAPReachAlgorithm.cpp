@@ -3,6 +3,7 @@
 //
 
 #include <algorithm.basic.traversal/breadthfirstsearch.h>
+#include <iostream>
 #include "ReverseBFSPartitionedAPReachAlgorithm.h"
 
 bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Vertex *end) {
@@ -96,8 +97,9 @@ bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const A
     }
     runAlgorithm(sourceBFS, startGraph);
 
+
     if(bidirectional){
-        reachable = bidirectionalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
+         reachable = bidirectionalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
     } else{
         reachable = normalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
     }
@@ -335,8 +337,10 @@ bool ReverseBFSPartitionedAPReachAlgorithm::normalOverlayBFS(std::unordered_set<
     return reachable;
 }
 
-bool ReverseBFSPartitionedAPReachAlgorithm::bidirectionalOverlayBFS(std::unordered_set<const Algora::Vertex *> sourceBorders,
-                                                                    std::unordered_set<Algora::Vertex *> targetBorders) {
+bool ReverseBFSPartitionedAPReachAlgorithm::bidirectionalOverlayBFS(const std::unordered_set<const Algora::Vertex *>& sourceBorders,
+                                                                    const std::unordered_set<Algora::Vertex *>& targetBorders) {
+
+
     bool reachable = false;
 
     unsigned long long stepsTaken = 0ULL;
@@ -347,9 +351,9 @@ bool ReverseBFSPartitionedAPReachAlgorithm::bidirectionalOverlayBFS(std::unorder
     Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> sourceOverlayBfs(false, false);
     std::vector<const Algora::Vertex*> sourceVector;
     sourceVector.reserve(sourceBorders.size());
-    for (auto it = sourceBorders.begin(); it != sourceBorders.end(); ) {
-        sourceReachable[(*it)] = true;
-        sourceVector.push_back(sourceBorders.extract(it++).value());
+    for (const Algora::Vertex* sourceVertex : sourceBorders) {
+        sourceReachable[sourceVertex] = true;
+        sourceVector.push_back(sourceVertex);
     }
     sourceOverlayBfs.setStartVertices(sourceVector);
     sourceOverlayBfs.setArcStopCondition([&reachable, &targetReachable](const Algora::Arc* arc){
@@ -368,11 +372,12 @@ bool ReverseBFSPartitionedAPReachAlgorithm::bidirectionalOverlayBFS(std::unorder
     Algora::BreadthFirstSearch<Algora::FastPropertyMap, false> targetOverlayBfs(false, false);
     std::vector<const Algora::Vertex*> targetVector;
     targetVector.reserve(targetBorders.size());
-    for(auto it = targetBorders.begin(); it != targetBorders.end();){
-        targetReachable[(*it)] = true;
-        targetVector.push_back(targetBorders.extract(it++).value());
+    for(const Algora::Vertex* targetVertex : targetBorders){
+        targetReachable[targetVertex] = true;
+        targetVector.push_back(targetVertex);
     }
     targetOverlayBfs.setStartVertices(targetVector);
+
     targetOverlayBfs.reverseArcDirection(true);
     targetOverlayBfs.setArcStopCondition([&reachable, &sourceReachable](const Algora::Arc* arc){
         reachable = sourceReachable(arc->getTail());

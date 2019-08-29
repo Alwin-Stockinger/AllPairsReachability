@@ -37,7 +37,7 @@ protected:
 
     bool normalOverlayBFS(std::unordered_set<const Algora::Vertex*> sourceBorders, std::unordered_set<Algora::Vertex*> targetBorders);
 
-    bool bidirectionalOverlayBFS(std::unordered_set<const Algora::Vertex*> sourceBorders, std::unordered_set<Algora::Vertex*> targetBorders);
+    bool bidirectionalOverlayBFS(const std::unordered_set<const Algora::Vertex*>& sourceBorders,const std::unordered_set<Algora::Vertex*>& targetBorders);
 
 public:
     void onVertexAdd(Algora::Vertex *vertex) override;
