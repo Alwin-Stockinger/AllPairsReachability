@@ -97,6 +97,10 @@ bool ReverseBFSPartitionedAPReachAlgorithm::query(Algora::Vertex *start, const A
     }
     runAlgorithm(sourceBFS, startGraph);
 
+    if(reachableSourceEdgeVertices.empty()){
+        return false;
+    }
+
 
     if(bidirectional){
          reachable = bidirectionalOverlayBFS(reachableSourceEdgeVertices, reachableDestinationEdgeVertices);
