@@ -13,6 +13,10 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
         return true;
     }
 
+    if(diGraph->isIsolated(start) || diGraph->isIsolated(end)){
+        return false;
+    }
+
     bool reachable = false;
 
     unsigned long long stepsTaken = 0ULL;
