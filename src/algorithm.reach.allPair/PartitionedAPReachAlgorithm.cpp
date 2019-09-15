@@ -72,8 +72,9 @@ void PartitionedAPReachAlgorithm::addNeighbourVertex(Algora::Vertex *lazyVertex,
 
 void PartitionedAPReachAlgorithm::addLazyVertexPair(Algora::Vertex *lazyHead, Algora::Vertex *lazyTail) {
     auto* subGraph = subGraphs[kDistribution(randomGenerator)];
-
     addVertex(lazyHead, subGraph);
+
+    subGraph = subGraphs[kDistribution(randomGenerator)];
     addVertex(lazyTail, subGraph);
 }
 
