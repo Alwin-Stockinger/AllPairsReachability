@@ -31,7 +31,7 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
     //std::unordered_set<const Algora::Vertex*> targetSet = {end};
 
     Algora::BreadthFirstSearch<Algora::FastPropertyMap,false> sourceBFS(false, false);
-    sourceBFS.setStartVertex(start);
+    sourceBFS.setStartVertices({start});
     sourceBFS.setArcStopCondition([&reachable, &targetReachable](const Algora::Arc* arc){
         reachable = targetReachable(arc->getHead());
         return reachable;
@@ -47,7 +47,7 @@ bool TwoWayBFSAPReachAlgorithm::query(Algora::Vertex *start, const Algora::Verte
 
 
     Algora::BreadthFirstSearch<Algora::FastPropertyMap, false> targetBFS(false, false);
-    targetBFS.setStartVertex(end);
+    targetBFS.setStartVertices({end});
     targetBFS.reverseArcDirection(true);
     targetBFS.setArcStopCondition([&reachable, &sourceReachable](const Algora::Arc* arc){
         reachable = sourceReachable(arc->getTail());
