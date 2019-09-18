@@ -1,1 +1,1 @@
-All Pair Reachability Algorithms
+All-Pairs Reachability Algorithms
